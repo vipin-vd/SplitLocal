@@ -71,5 +71,22 @@ final whatsAppServiceProvider = AutoDisposeProvider<WhatsAppService>.internal(
 );
 
 typedef WhatsAppServiceRef = AutoDisposeProviderRef<WhatsAppService>;
+String _$exportImportServiceHash() =>
+    r'c3d356f5a7a3096f302030726e2667e57f5f8bf5';
+
+/// See also [exportImportService].
+@ProviderFor(exportImportService)
+final exportImportServiceProvider =
+    AutoDisposeProvider<ExportImportService>.internal(
+  exportImportService,
+  name: r'exportImportServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$exportImportServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef ExportImportServiceRef = AutoDisposeProviderRef<ExportImportService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -29,6 +29,11 @@ dependencies:
   flutter_contacts: ^1.1.7+1
   url_launcher: ^6.2.2
   
+  # File Handling
+  file_picker: ^8.0.0+1
+  share_plus: ^10.0.0
+  path_provider: ^2.1.4
+  
   # UI
   cupertino_icons: ^1.0.6
 

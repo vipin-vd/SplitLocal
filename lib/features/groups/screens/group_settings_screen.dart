@@ -4,6 +4,7 @@ import '../models/group.dart';
 import '../models/user.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
+import '../../expenses/providers/transactions_provider.dart';
 import '../../../shared/providers/services_provider.dart';
 import '../../../shared/utils/dialogs.dart';
 import '../../../shared/utils/currency.dart';
@@ -308,6 +309,123 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     }
   }
 
+  Future<void> _exportGroupData() async {
+    try {
+      final exportService = ref.read(exportImportServiceProvider);
+      
+      // Show loading
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      final success = await exportService.exportGroup(widget.group.id);
+      
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        
+        if (success) {
+          showSnackBar(context, 'Group data exported successfully');
+        } else {
+          showSnackBar(context, 'Export cancelled', isError: false);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        showSnackBar(context, 'Error exporting data: $e', isError: true);
+      }
+    }
+  }
+
+  Future<void> _importData() async {
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Import Data'),
+        content: const Text('How would you like to import the data?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'replace'),
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.refresh),
+                SizedBox(height: 4),
+                Text('Replace All', textAlign: TextAlign.center),
+                Text(
+                  '(Delete existing data)',
+                  style: TextStyle(fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'merge'),
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.merge),
+                SizedBox(height: 4),
+                Text('Merge', textAlign: TextAlign.center),
+                Text(
+                  '(Keep existing data)',
+                  style: TextStyle(fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (choice == null || !mounted) return;
+
+    try {
+      final exportService = ref.read(exportImportServiceProvider);
+      
+      // Show loading
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      final success = await exportService.importData(
+        mergeWithExisting: choice == 'merge',
+      );
+      
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        
+        if (success) {
+          // Refresh all providers
+          ref.invalidate(usersProvider);
+          ref.invalidate(groupsProvider);
+          ref.invalidate(transactionsProvider);
+          
+          showSnackBar(context, 'Data imported successfully');
+        } else {
+          showSnackBar(context, 'Import cancelled', isError: false);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        showSnackBar(context, 'Error importing data: $e', isError: true);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Watch the group for updates instead of using widget.group
@@ -502,6 +620,41 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                   subtitle: Text(
                     currentGroup.createdAt.toString().split('.')[0],
                   ),
+                ),
+              ],
+            ),
+          ),
+
+          // Data Management Section
+          Card(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Data Management',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.file_upload),
+                  title: const Text('Export Group Data'),
+                  subtitle: const Text('Share this group\'s data as a file'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: _exportGroupData,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.file_download),
+                  title: const Text('Import Data'),
+                  subtitle: const Text('Import data from a file'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: _importData,
                 ),
               ],
             ),

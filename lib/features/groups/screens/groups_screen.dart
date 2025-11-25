@@ -4,6 +4,7 @@ import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
 import '../../../shared/utils/formatters.dart';
 import '../../expenses/providers/transactions_provider.dart';
+import '../../settings/screens/backup_restore_screen.dart';
 import 'create_group_screen.dart';
 import 'group_detail_screen.dart';
 
@@ -21,8 +22,14 @@ class GroupsScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: 'Backup & Restore',
             onPressed: () {
-              // Navigate to settings/backup screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const BackupRestoreScreen(),
+                ),
+              );
             },
           ),
         ],

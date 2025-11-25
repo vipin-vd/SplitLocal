@@ -1,0 +1,371 @@
+version: '3'
+
+vars:
+  APP_NAME: SplitLocal
+  FLUTTER_VERSION: stable
+  DART_VERSION: stable
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  install:
+    desc: Install all dependencies and setup the project
+    cmds:
+      - task: check-flutter
+      - task: get-dependencies
+      - task: generate-code
+      - task: verify
+
+  check-flutter:
+    desc: Verify Flutter and Dart are installed
+    cmds:
+      - flutter --version
+      - dart --version
+    preconditions:
+      - sh: command -v flutter
+        msg: "Flutter is not installed. Please install Flutter from https://flutter.dev"
+      - sh: command -v dart
+        msg: "Dart is not installed. Please install Dart or Flutter"
+
+  get-dependencies:
+    desc: Get Flutter dependencies
+    cmds:
+      - echo "📦 Installing dependencies..."
+      - flutter pub get
+    sources:
+      - pubspec.yaml
+    generates:
+      - pubspec.lock
+
+  generate-code:
+    desc: Run code generators (Riverpod, JSON Serializable, Hive)
+    cmds:
+      - echo "🔨 Generating code..."
+      - dart run build_runner build --delete-conflicting-outputs
+    sources:
+      - lib/**/*.dart
+      - pubspec.yaml
+    generates:
+      - lib/**/*.g.dart
+
+  watch:
+    desc: Watch for changes and auto-generate code
+    cmds:
+      - echo "👀 Watching for changes..."
+      - dart run build_runner watch --delete-conflicting-outputs
+
+  clean:
+    desc: Clean build artifacts and caches
+    cmds:
+      - echo "🧹 Cleaning..."
+      - flutter clean
+      - rm -rf .dart_tool/
+      - rm -rf build/
+      - rm -f pubspec.lock
+
+  clean-generate:
+    desc: Clean and regenerate all code
+    cmds:
+      - task: clean
+      - task: get-dependencies
+      - task: generate-code
+
+  test:
+    desc: Run all tests
+    cmds:
+      - echo "🧪 Running tests..."
+      - flutter test
+    sources:
+      - lib/**/*.dart
+      - test/**/*.dart
+
+  test-coverage:
+    desc: Run tests with coverage
+    cmds:
+      - echo "📊 Running tests with coverage..."
+      - flutter test --coverage
+      - genhtml coverage/lcov.info -o coverage/html
+      - open coverage/html/index.html
+    preconditions:
+      - sh: command -v genhtml
+        msg: "genhtml is not installed. Install lcov: brew install lcov"
+
+  analyze:
+    desc: Analyze code for issues
+    cmds:
+      - echo "🔍 Analyzing code..."
+      - flutter analyze --no-fatal-infos --no-fatal-warnings
+
+  format:
+    desc: Format all Dart code
+    cmds:
+      - echo "✨ Formatting code..."
+      - dart format lib/ test/
+
+  format-check:
+    desc: Check if code is formatted correctly
+    cmds:
+      - dart format --set-exit-if-changed lib/ test/
+
+  lint:
+    desc: Run all code quality checks
+    cmds:
+      - task: format-check
+      - task: analyze
+      - task: test
+
+  verify:
+    desc: Verify project setup is complete
+    cmds:
+      - echo "✅ Verifying project setup..."
+      - flutter doctor -v
+      - flutter pub get
+      - dart run build_runner build --delete-conflicting-outputs
+      - flutter analyze --no-fatal-infos --no-fatal-warnings
+      - echo "✅ Setup verification complete!"
+
+  run:
+    desc: Run the app in debug mode (Chrome by default, use --device to specify)
+    cmds:
+      - flutter run -d chrome
+
+  run-device:
+    desc: Run on a specific device (usage task run-device -- <device-id>)
+    cmds:
+      - flutter run -d {{.CLI_ARGS}}
+
+  run-release:
+    desc: Run the app in release mode
+    cmds:
+      - flutter run -d chrome --release
+
+  run-profile:
+    desc: Run the app in profile mode
+    cmds:
+      - flutter run -d chrome --profile
+
+  devices:
+    desc: List all connected devices
+    cmds:
+      - flutter devices
+
+  ios:
+    desc: Run on iOS simulator/device
+    cmds:
+      - flutter run -d ios
+
+  android:
+    desc: Run on Android emulator/device
+    cmds:
+      - flutter run -d android
+
+  macos:
+    desc: Run on macOS desktop
+    cmds:
+      - flutter run -d macos
+
+  chrome:
+    desc: Run on Chrome browser
+    cmds:
+      - flutter run -d chrome
+
+  web:
+    desc: Run on web (Chrome)
+    cmds:
+      - flutter run -d web-server --web-port 8080
+
+  build-android:
+    desc: Build Android APK
+    cmds:
+      - echo "📱 Building Android APK..."
+      - flutter build apk --release
+      - echo "✅ APK built at build/app/outputs/flutter-apk/app-release.apk"
+
+  build-android-bundle:
+    desc: Build Android App Bundle (for Play Store)
+    cmds:
+      - echo "📱 Building Android App Bundle..."
+      - flutter build appbundle --release
+      - echo "✅ AAB built at build/app/outputs/bundle/release/app-release.aab"
+
+  build-ios:
+    desc: Build iOS app (requires macOS)
+    cmds:
+      - echo "📱 Building iOS app..."
+      - flutter build ios --release
+      - echo "✅ iOS build complete"
+    preconditions:
+      - sh: test "$(uname)" = "Darwin"
+        msg: "iOS builds require macOS"
+
+  build-all:
+    desc: Build for all platforms
+    cmds:
+      - task: build-android
+      - task: build-android-bundle
+      - task: build-ios
+
+  upgrade:
+    desc: Upgrade Flutter and dependencies
+    cmds:
+      - echo "⬆️  Upgrading Flutter..."
+      - flutter upgrade
+      - flutter pub upgrade
+      - task: generate-code
+
+  outdated:
+    desc: Check for outdated dependencies
+    cmds:
+      - flutter pub outdated
+
+  doctor:
+    desc: Run Flutter doctor
+    cmds:
+      - flutter doctor -v
+
+  # Development helpers
+  create-model:
+    desc: "Create a new model with JSON serialization (usage: task create-model -- ModelName)"
+    cmds:
+      - mkdir -p lib/features/models/
+      - |
+        cat > lib/features/models/{{.CLI_ARGS | lower}}.dart <<'ENDOFFILE'
+        import 'package:json_annotation/json_annotation.dart';
+        
+        part '{{.CLI_ARGS | lower}}.g.dart';
+        
+        @JsonSerializable()
+        class {{.CLI_ARGS}} {
+          final String id;
+          
+          {{.CLI_ARGS}}({required this.id});
+          
+          factory {{.CLI_ARGS}}.fromJson(Map<String, dynamic> json) =>
+              _${{.CLI_ARGS}}FromJson(json);
+          
+          Map<String, dynamic> toJson() => _${{.CLI_ARGS}}ToJson(this);
+        }
+        ENDOFFILE
+      - echo "✅ Created model at lib/features/models/{{.CLI_ARGS | lower}}.dart"
+      - task: generate-code
+
+  # Database management
+  reset-db:
+    desc: Reset local database (USE WITH CAUTION)
+    prompt: This will delete all local data. Continue?
+    cmds:
+      - echo "🗑️  Resetting database..."
+      - flutter run lib/main.dart --dart-define=RESET_DB=true
+      - echo "✅ Database reset complete"
+
+  # Performance
+  profile:
+    desc: Run performance profiling
+    cmds:
+      - flutter run --profile --trace-startup
+
+  benchmark:
+    desc: Run benchmark tests
+    cmds:
+      - flutter test --tags=benchmark
+
+  # CI/CD helpers
+  ci:
+    desc: Run all CI checks (format, analyze, test)
+    cmds:
+      - task: format-check
+      - task: analyze
+      - task: test
+      - echo "✅ All CI checks passed!"
+
+  # Documentation
+  docs:
+    desc: Generate documentation
+    cmds:
+      - echo "📚 Generating documentation..."
+      - dart doc .
+      - echo "✅ Documentation generated in doc/api/"
+
+  # Cleanup tasks
+  clean-ios:
+    desc: Clean iOS build (macOS only)
+    cmds:
+      - cd ios && rm -rf Pods/ Podfile.lock
+      - cd ios && pod install
+    preconditions:
+      - sh: test "$(uname)" = "Darwin"
+        msg: "iOS cleanup requires macOS"
+
+  clean-android:
+    desc: Clean Android build
+    cmds:
+      - cd android && ./gradlew clean
+
+  # Git hooks
+  install-hooks:
+    desc: Install Git pre-commit hooks
+    cmds:
+      - |
+        cat > .git/hooks/pre-commit << 'EOF'
+        #!/bin/sh
+        echo "Running pre-commit checks..."
+        task format-check && task analyze
+        EOF
+      - chmod +x .git/hooks/pre-commit
+      - echo "✅ Git hooks installed"
+
+  # Utility tasks
+  count-lines:
+    desc: Count lines of code
+    cmds:
+      - echo "📊 Counting lines of code..."
+      - find lib -name '*.dart' | xargs wc -l | tail -1
+      - find test -name '*.dart' | xargs wc -l | tail -1
+
+  tree:
+    desc: Show project structure
+    cmds:
+      - tree -I 'build|.dart_tool|.idea|.vscode|*.g.dart|*.freezed.dart' -L 4
+
+  # Release tasks
+  version-patch:
+    desc: Bump patch version (x.x.X)
+    cmds:
+      - echo "Bumping patch version..."
+      - ./scripts/bump_version.sh patch
+
+  version-minor:
+    desc: Bump minor version (x.X.0)
+    cmds:
+      - echo "Bumping minor version..."
+      - ./scripts/bump_version.sh minor
+
+  version-major:
+    desc: Bump major version (X.0.0)
+    cmds:
+      - echo "Bumping major version..."
+      - ./scripts/bump_version.sh major
+
+  # Quick shortcuts
+  r:
+    desc: Quick run (alias for 'run')
+    cmds:
+      - task: run
+
+  t:
+    desc: Quick test (alias for 'test')
+    cmds:
+      - task: test
+
+  g:
+    desc: Quick generate (alias for 'generate-code')
+    cmds:
+      - task: generate-code
+
+  a:
+    desc: Quick analyze (alias for 'analyze')
+    cmds:
+      - task: analyze

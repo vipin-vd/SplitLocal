@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
 import '../../expenses/providers/transactions_provider.dart';
 import '../../expenses/models/expense_category.dart';
 import '../../../shared/utils/formatters.dart';
+import '../../../shared/providers/services_provider.dart';
 import '../../expenses/screens/add_expense_screen.dart';
 import '../../expenses/screens/settle_up_screen.dart';
 import '../../expenses/screens/expense_list_screen.dart';
 import '../../expenses/screens/group_insights_screen.dart';
+import '../../expenses/screens/admin_debt_view_screen.dart';
 import 'group_settings_screen.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
@@ -25,6 +29,155 @@ class GroupDetailScreen extends ConsumerStatefulWidget {
 
 class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   bool _showSimplifiedDebts = false;
+
+  String _generateGroupSummaryText({
+    required String groupName,
+    required List<dynamic> members,
+    required Map<String, double> netBalances,
+    required Map<String, double> totalPaidByUser,
+    required double totalSpend,
+    required String currency,
+  }) {
+    final buffer = StringBuffer();
+    buffer.writeln('📊 Group Summary: $groupName');
+    buffer.writeln('');
+    buffer.writeln('Total Group Spend: ${CurrencyFormatter.format(totalSpend, currencyCode: currency)}');
+    buffer.writeln('');
+    buffer.writeln('Payments Made:');
+    buffer.writeln('─────────────');
+
+    for (final member in members) {
+      final paid = totalPaidByUser[member.id] ?? 0.0;
+      buffer.writeln('${member.name} paid ${CurrencyFormatter.format(paid, currencyCode: currency)}');
+    }
+
+    buffer.writeln('');
+    buffer.writeln('Current Balances:');
+    buffer.writeln('─────────────');
+
+    for (final member in members) {
+      final balance = netBalances[member.id] ?? 0.0;
+      if (balance > 0.01) {
+        buffer.writeln('${member.name} is owed ${CurrencyFormatter.format(balance, currencyCode: currency)}');
+      } else if (balance < -0.01) {
+        buffer.writeln('${member.name} owes ${CurrencyFormatter.format(balance.abs(), currencyCode: currency)}');
+      } else {
+        buffer.writeln('${member.name} is settled up ✓');
+      }
+    }
+
+    buffer.writeln('');
+    buffer.writeln('Check the SplitLocal app for detailed breakdown!');
+
+    return buffer.toString();
+  }
+
+  void _shareGroupSummary() {
+    final group = ref.read(selectedGroupProvider(widget.groupId));
+    final netBalances = ref.read(groupNetBalancesProvider(widget.groupId));
+    final totalSpend = ref.read(groupTotalSpendProvider(widget.groupId));
+    final users = ref.read(usersProvider);
+    final transactions = ref.read(groupTransactionsProvider(widget.groupId));
+    final debtCalculator = ref.read(debtCalculatorServiceProvider);
+
+    if (group == null) return;
+
+    final members = users.where((u) => group.memberIds.contains(u.id)).toList();
+    
+    // Calculate total paid by each user
+    final totalPaidByUser = <String, double>{};
+    for (final member in members) {
+      totalPaidByUser[member.id] = debtCalculator.getUserTotalPaid(member.id, transactions);
+    }
+
+    final summaryText = _generateGroupSummaryText(
+      groupName: group.name,
+      members: members,
+      netBalances: netBalances,
+      totalPaidByUser: totalPaidByUser,
+      totalSpend: totalSpend,
+      currency: group.currency,
+    );
+
+    // Get members with phone numbers for WhatsApp sharing
+    final membersWithPhone = members.where((m) => m.phoneNumber != null && m.phoneNumber!.isNotEmpty).toList();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share Group Summary'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(summaryText),
+              const SizedBox(height: 16),
+              if (membersWithPhone.isNotEmpty) ...[
+                const Divider(),
+                const SizedBox(height: 8),
+                const Text(
+                  'Share via WhatsApp:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                ...membersWithPhone.map((member) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.chat, size: 18),
+                      label: Text(
+                        member.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        alignment: Alignment.centerLeft,
+                      ),
+                      onPressed: () async {
+                        final cleanPhone = member.phoneNumber!.replaceAll(RegExp(r'\D'), '');
+                        final encodedMessage = Uri.encodeComponent(summaryText);
+                        final url = 'https://wa.me/$cleanPhone?text=$encodedMessage';
+                        
+                        final uri = Uri.parse(url);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        } else {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Could not open WhatsApp')),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  );
+                }),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: summaryText));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Summary copied to clipboard'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: const Text('Copy'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +201,18 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
       appBar: AppBar(
         title: Text(group.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            tooltip: 'Admin View',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminDebtViewScreen(groupId: widget.groupId),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.insights),
             tooltip: 'Insights',
@@ -73,9 +238,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.share),
-            onPressed: () {
-              // Share group summary
-            },
+            onPressed: _shareGroupSummary,
           ),
         ],
       ),

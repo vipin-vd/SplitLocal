@@ -32,11 +32,21 @@ class CurrencyFormatter {
 
 class DateFormatter {
   static final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
+  static final DateFormat _shortDateFormat = DateFormat('MMM dd');
+  static final DateFormat _fullDateFormat = DateFormat('EEEE, MMMM dd, yyyy');
   static final DateFormat _timeFormat = DateFormat('hh:mm a');
   static final DateFormat _dateTimeFormat = DateFormat('MMM dd, yyyy • hh:mm a');
 
   static String formatDate(DateTime date) {
     return _dateFormat.format(date);
+  }
+
+  static String formatShort(DateTime date) {
+    return _shortDateFormat.format(date);
+  }
+
+  static String formatFull(DateTime date) {
+    return _fullDateFormat.format(date);
   }
 
   static String formatTime(DateTime date) {

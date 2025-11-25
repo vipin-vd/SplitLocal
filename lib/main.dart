@@ -7,6 +7,7 @@ import 'features/groups/models/group.dart';
 import 'features/expenses/models/transaction.dart';
 import 'features/expenses/models/transaction_type.dart';
 import 'features/expenses/models/split_mode.dart';
+import 'features/expenses/models/expense_category.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,7 @@ void main() async {
   Hive.registerAdapter(TransactionTypeAdapter());   // typeId: 2
   Hive.registerAdapter(SplitModeAdapter());         // typeId: 3
   Hive.registerAdapter(TransactionAdapter());       // typeId: 4
+  Hive.registerAdapter(ExpenseCategoryAdapter());   // typeId: 5
   
   // Open boxes
   await Hive.openBox<User>('users');

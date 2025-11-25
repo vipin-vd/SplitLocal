@@ -28,13 +28,17 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       timestamp: fields[8] as DateTime,
       notes: fields[9] as String?,
       createdBy: fields[10] as String,
+      category: fields[11] as ExpenseCategory,
+      receiptPath: fields[12] as String?,
+      isRecurring: fields[13] as bool,
+      recurringFrequency: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Transaction obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +60,15 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       ..writeByte(9)
       ..write(obj.notes)
       ..writeByte(10)
-      ..write(obj.createdBy);
+      ..write(obj.createdBy)
+      ..writeByte(11)
+      ..write(obj.category)
+      ..writeByte(12)
+      ..write(obj.receiptPath)
+      ..writeByte(13)
+      ..write(obj.isRecurring)
+      ..writeByte(14)
+      ..write(obj.recurringFrequency);
   }
 
   @override
@@ -90,6 +102,12 @@ Transaction _$TransactionFromJson(Map<String, dynamic> json) => Transaction(
       timestamp: DateTime.parse(json['timestamp'] as String),
       notes: json['notes'] as String?,
       createdBy: json['createdBy'] as String,
+      category:
+          $enumDecodeNullable(_$ExpenseCategoryEnumMap, json['category']) ??
+              ExpenseCategory.general,
+      receiptPath: json['receiptPath'] as String?,
+      isRecurring: json['isRecurring'] as bool? ?? false,
+      recurringFrequency: json['recurringFrequency'] as String?,
     );
 
 Map<String, dynamic> _$TransactionToJson(Transaction instance) =>
@@ -105,6 +123,10 @@ Map<String, dynamic> _$TransactionToJson(Transaction instance) =>
       'timestamp': instance.timestamp.toIso8601String(),
       'notes': instance.notes,
       'createdBy': instance.createdBy,
+      'category': _$ExpenseCategoryEnumMap[instance.category]!,
+      'receiptPath': instance.receiptPath,
+      'isRecurring': instance.isRecurring,
+      'recurringFrequency': instance.recurringFrequency,
     };
 
 const _$TransactionTypeEnumMap = {
@@ -117,4 +139,18 @@ const _$SplitModeEnumMap = {
   SplitMode.unequal: 'unequal',
   SplitMode.percent: 'percent',
   SplitMode.shares: 'shares',
+};
+
+const _$ExpenseCategoryEnumMap = {
+  ExpenseCategory.general: 'general',
+  ExpenseCategory.food: 'food',
+  ExpenseCategory.entertainment: 'entertainment',
+  ExpenseCategory.transport: 'transport',
+  ExpenseCategory.utilities: 'utilities',
+  ExpenseCategory.shopping: 'shopping',
+  ExpenseCategory.groceries: 'groceries',
+  ExpenseCategory.rent: 'rent',
+  ExpenseCategory.healthcare: 'healthcare',
+  ExpenseCategory.travel: 'travel',
+  ExpenseCategory.other: 'other',
 };

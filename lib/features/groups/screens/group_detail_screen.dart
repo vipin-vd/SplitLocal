@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
 import '../../expenses/providers/transactions_provider.dart';
-import '../../../shared/providers/services_provider.dart';
+import '../../expenses/models/expense_category.dart';
 import '../../../shared/utils/formatters.dart';
 import '../../expenses/screens/add_expense_screen.dart';
 import '../../expenses/screens/settle_up_screen.dart';
+import '../../expenses/screens/expense_list_screen.dart';
+import '../../expenses/screens/group_insights_screen.dart';
 import 'group_settings_screen.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
@@ -41,15 +43,23 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     }
 
     final members = users.where((u) => group.memberIds.contains(u.id)).toList();
-    final debtCalculator = ref.read(debtCalculatorServiceProvider);
-    final debts = _showSimplifiedDebts
-        ? debtCalculator.simplifyDebts(transactions)
-        : debtCalculator.getActualDebts(transactions);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(group.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.insights),
+            tooltip: 'Insights',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GroupInsightsScreen(groupId: widget.groupId),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -225,9 +235,25 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Recent Transactions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Recent Transactions',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ExpenseListScreen(groupId: widget.groupId),
+                            ),
+                          );
+                        },
+                        child: const Text('View All'),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   if (transactions.isEmpty)
@@ -250,18 +276,28 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                         contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
                           backgroundColor: transaction.type.name == 'expense'
-                              ? Colors.orange
+                              ? transaction.category.color.withOpacity(0.8)
                               : Colors.green,
                           child: Icon(
                             transaction.type.name == 'expense'
-                                ? Icons.receipt
+                                ? transaction.category.icon
                                 : Icons.payments,
                             color: Colors.white,
                           ),
                         ),
-                        title: Text(transaction.description),
+                        title: Row(
+                          children: [
+                            Expanded(child: Text(transaction.description)),
+                            if (transaction.isRecurring)
+                              const Icon(
+                                Icons.repeat,
+                                size: 16,
+                                color: Colors.blue,
+                              ),
+                          ],
+                        ),
                         subtitle: Text(
-                          '${payer.name} • ${DateFormatter.formatRelative(transaction.timestamp)}',
+                          '${payer.name} • ${transaction.category.displayName} • ${DateFormatter.formatRelative(transaction.timestamp)}',
                         ),
                         trailing: Text(
                           CurrencyFormatter.format(transaction.totalAmount, currencyCode: group.currency),

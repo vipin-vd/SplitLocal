@@ -414,6 +414,268 @@ class _GroupTotalSpendProviderElement extends AutoDisposeProviderElement<double>
   String get groupId => (origin as GroupTotalSpendProvider).groupId;
 }
 
+String _$groupCategorySpendingHash() =>
+    r'804abb3b7e37fb491181f6d35e16e4f5264344fb';
+
+/// See also [groupCategorySpending].
+@ProviderFor(groupCategorySpending)
+const groupCategorySpendingProvider = GroupCategorySpendingFamily();
+
+/// See also [groupCategorySpending].
+class GroupCategorySpendingFamily extends Family<Map<ExpenseCategory, double>> {
+  /// See also [groupCategorySpending].
+  const GroupCategorySpendingFamily();
+
+  /// See also [groupCategorySpending].
+  GroupCategorySpendingProvider call(
+    String groupId,
+  ) {
+    return GroupCategorySpendingProvider(
+      groupId,
+    );
+  }
+
+  @override
+  GroupCategorySpendingProvider getProviderOverride(
+    covariant GroupCategorySpendingProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupCategorySpendingProvider';
+}
+
+/// See also [groupCategorySpending].
+class GroupCategorySpendingProvider
+    extends AutoDisposeProvider<Map<ExpenseCategory, double>> {
+  /// See also [groupCategorySpending].
+  GroupCategorySpendingProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => groupCategorySpending(
+            ref as GroupCategorySpendingRef,
+            groupId,
+          ),
+          from: groupCategorySpendingProvider,
+          name: r'groupCategorySpendingProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupCategorySpendingHash,
+          dependencies: GroupCategorySpendingFamily._dependencies,
+          allTransitiveDependencies:
+              GroupCategorySpendingFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  GroupCategorySpendingProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    Map<ExpenseCategory, double> Function(GroupCategorySpendingRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupCategorySpendingProvider._internal(
+        (ref) => create(ref as GroupCategorySpendingRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<Map<ExpenseCategory, double>> createElement() {
+    return _GroupCategorySpendingProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupCategorySpendingProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GroupCategorySpendingRef
+    on AutoDisposeProviderRef<Map<ExpenseCategory, double>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _GroupCategorySpendingProviderElement
+    extends AutoDisposeProviderElement<Map<ExpenseCategory, double>>
+    with GroupCategorySpendingRef {
+  _GroupCategorySpendingProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as GroupCategorySpendingProvider).groupId;
+}
+
+String _$recurringExpensesHash() => r'49b04c65972010aeb68b6ddc1b93e0174a108283';
+
+/// See also [recurringExpenses].
+@ProviderFor(recurringExpenses)
+const recurringExpensesProvider = RecurringExpensesFamily();
+
+/// See also [recurringExpenses].
+class RecurringExpensesFamily extends Family<List<Transaction>> {
+  /// See also [recurringExpenses].
+  const RecurringExpensesFamily();
+
+  /// See also [recurringExpenses].
+  RecurringExpensesProvider call(
+    String groupId,
+  ) {
+    return RecurringExpensesProvider(
+      groupId,
+    );
+  }
+
+  @override
+  RecurringExpensesProvider getProviderOverride(
+    covariant RecurringExpensesProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recurringExpensesProvider';
+}
+
+/// See also [recurringExpenses].
+class RecurringExpensesProvider extends AutoDisposeProvider<List<Transaction>> {
+  /// See also [recurringExpenses].
+  RecurringExpensesProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => recurringExpenses(
+            ref as RecurringExpensesRef,
+            groupId,
+          ),
+          from: recurringExpensesProvider,
+          name: r'recurringExpensesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$recurringExpensesHash,
+          dependencies: RecurringExpensesFamily._dependencies,
+          allTransitiveDependencies:
+              RecurringExpensesFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  RecurringExpensesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    List<Transaction> Function(RecurringExpensesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RecurringExpensesProvider._internal(
+        (ref) => create(ref as RecurringExpensesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<List<Transaction>> createElement() {
+    return _RecurringExpensesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecurringExpensesProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RecurringExpensesRef on AutoDisposeProviderRef<List<Transaction>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _RecurringExpensesProviderElement
+    extends AutoDisposeProviderElement<List<Transaction>>
+    with RecurringExpensesRef {
+  _RecurringExpensesProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as RecurringExpensesProvider).groupId;
+}
+
 String _$transactionsHash() => r'14853d94cb08788c2867c39a7a414d8c09aece7e';
 
 /// See also [Transactions].

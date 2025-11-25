@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'transaction_type.dart';
 import 'split_mode.dart';
+import 'expense_category.dart';
 
 part 'transaction.g.dart';
 
@@ -47,6 +48,18 @@ class Transaction {
   @HiveField(10)
   final String createdBy; // User ID
 
+  @HiveField(11)
+  final ExpenseCategory category;
+
+  @HiveField(12)
+  final String? receiptPath; // Path to receipt image
+
+  @HiveField(13)
+  final bool isRecurring;
+
+  @HiveField(14)
+  final String? recurringFrequency; // 'daily', 'weekly', 'monthly', 'yearly'
+
   Transaction({
     required this.id,
     required this.groupId,
@@ -59,6 +72,10 @@ class Transaction {
     required this.timestamp,
     this.notes,
     required this.createdBy,
+    this.category = ExpenseCategory.general,
+    this.receiptPath,
+    this.isRecurring = false,
+    this.recurringFrequency,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>
@@ -77,6 +94,10 @@ class Transaction {
     DateTime? timestamp,
     String? notes,
     String? createdBy,
+    ExpenseCategory? category,
+    String? receiptPath,
+    bool? isRecurring,
+    String? recurringFrequency,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -90,6 +111,10 @@ class Transaction {
       timestamp: timestamp ?? this.timestamp,
       notes: notes ?? this.notes,
       createdBy: createdBy ?? this.createdBy,
+      category: category ?? this.category,
+      receiptPath: receiptPath ?? this.receiptPath,
+      isRecurring: isRecurring ?? this.isRecurring,
+      recurringFrequency: recurringFrequency ?? this.recurringFrequency,
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/transaction.dart';
+import '../models/expense_category.dart';
 import '../../../../shared/providers/services_provider.dart';
 
 part 'transactions_provider.g.dart';
@@ -55,4 +56,31 @@ double groupTotalSpend(GroupTotalSpendRef ref, String groupId) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);
   return debtCalculator.calculateTotalGroupSpend(transactions);
+}
+
+@riverpod
+Map<ExpenseCategory, double> groupCategorySpending(
+  GroupCategorySpendingRef ref,
+  String groupId,
+) {
+  final transactions = ref.watch(groupTransactionsProvider(groupId));
+  final categoryTotals = <ExpenseCategory, double>{};
+  
+  for (var transaction in transactions) {
+    if (transaction.type.name == 'expense') {
+      categoryTotals[transaction.category] =
+          (categoryTotals[transaction.category] ?? 0.0) + transaction.totalAmount;
+    }
+  }
+  
+  return categoryTotals;
+}
+
+@riverpod
+List<Transaction> recurringExpenses(
+  RecurringExpensesRef ref,
+  String groupId,
+) {
+  final transactions = ref.watch(groupTransactionsProvider(groupId));
+  return transactions.where((t) => t.isRecurring && t.type.name == 'expense').toList();
 }

@@ -4,12 +4,92 @@ import '../models/group.dart';
 import '../models/user.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
-import '../../expenses/providers/transactions_provider.dart';
 import '../../../shared/providers/services_provider.dart';
 import '../../../shared/utils/dialogs.dart';
 import '../../../shared/utils/currency.dart';
 import '../widgets/add_member_manually_dialog.dart';
 import '../widgets/edit_member_dialog.dart';
+
+class _DeleteGroupDialog extends StatefulWidget {
+  const _DeleteGroupDialog();
+
+  @override
+  State<_DeleteGroupDialog> createState() => _DeleteGroupDialogState();
+}
+
+class _DeleteGroupDialogState extends State<_DeleteGroupDialog> {
+  final TextEditingController _confirmController = TextEditingController();
+  bool _isValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _confirmController.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    _confirmController.removeListener(_onTextChanged);
+    _confirmController.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    final isValid = _confirmController.text.trim().toLowerCase() == 'delete';
+    if (isValid != _isValid) {
+      setState(() {
+        _isValid = isValid;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Delete Group'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'This action cannot be undone. All expenses and settlements in this group will be permanently deleted.',
+            style: TextStyle(color: Colors.red),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Type "delete" to confirm:',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _confirmController,
+            decoration: const InputDecoration(
+              hintText: 'delete',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _isValid ? () => Navigator.pop(context, true) : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.grey.shade300,
+            disabledForegroundColor: Colors.grey.shade600,
+          ),
+          child: const Text('Delete Group'),
+        ),
+      ],
+    );
+  }
+}
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   final Group group;
@@ -237,75 +317,39 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
   }
 
   Future<void> _deleteGroup() async {
-    final TextEditingController confirmController = TextEditingController();
-    
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Group'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'This action cannot be undone. All expenses and settlements in this group will be permanently deleted.',
-              style: TextStyle(color: Colors.red),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Type "delete" to confirm:',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: confirmController,
-              decoration: const InputDecoration(
-                hintText: 'delete',
-                border: OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (confirmController.text.trim().toLowerCase() == 'delete') {
-                Navigator.pop(context, true);
-              } else {
-                Navigator.pop(context, false);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete Group'),
-          ),
-        ],
-      ),
+      builder: (dialogContext) => const _DeleteGroupDialog(),
     );
-
-    confirmController.dispose();
 
     if (confirmed != true || !mounted) return;
 
     try {
+      // Store references before deletion to avoid context issues
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      
       final groupsNotifier = ref.read(groupsProvider.notifier);
+      
+      // Pop all screens to get back to groups list (pop settings screen and group detail screen)
+      navigator.pop(); // Pop settings screen
+      navigator.pop(); // Pop group detail screen
+      
+      // Now delete the group
       await groupsNotifier.deleteGroup(widget.group.id);
       
-      if (mounted) {
-        Navigator.pop(context); // Go back to groups list
-        showSnackBar(context, 'Group deleted successfully');
-      }
+      // Show success message
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Group deleted successfully'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        showSnackBar(context, 'Error deleting group: $e', isError: true);
-      }
+      // Since we already popped, we can't show error in original context
+      // The error will be logged but not shown to user
+      debugPrint('Error deleting group: $e');
     }
   }
 
@@ -343,88 +387,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     }
   }
 
-  Future<void> _importData() async {
-    final choice = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Import Data'),
-        content: const Text('How would you like to import the data?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'replace'),
-            child: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.refresh),
-                SizedBox(height: 4),
-                Text('Replace All', textAlign: TextAlign.center),
-                Text(
-                  '(Delete existing data)',
-                  style: TextStyle(fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'merge'),
-            child: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.merge),
-                SizedBox(height: 4),
-                Text('Merge', textAlign: TextAlign.center),
-                Text(
-                  '(Keep existing data)',
-                  style: TextStyle(fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
 
-    if (choice == null || !mounted) return;
-
-    try {
-      final exportService = ref.read(exportImportServiceProvider);
-      
-      // Show loading
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-
-      final success = await exportService.importData(
-        mergeWithExisting: choice == 'merge',
-      );
-      
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        
-        if (success) {
-          // Refresh all providers
-          ref.invalidate(usersProvider);
-          ref.invalidate(groupsProvider);
-          ref.invalidate(transactionsProvider);
-          
-          showSnackBar(context, 'Data imported successfully');
-        } else {
-          showSnackBar(context, 'Import cancelled', isError: false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        showSnackBar(context, 'Error importing data: $e', isError: true);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -634,7 +597,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'Data Management',
+                    'Export',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -643,18 +606,11 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.file_upload),
+                  leading: const Icon(Icons.share),
                   title: const Text('Export Group Data'),
-                  subtitle: const Text('Share this group\'s data as a file'),
+                  subtitle: const Text('Share this group\'s expenses and members as a file'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: _exportGroupData,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.file_download),
-                  title: const Text('Import Data'),
-                  subtitle: const Text('Import data from a file'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: _importData,
                 ),
               ],
             ),

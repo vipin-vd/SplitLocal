@@ -6,6 +6,7 @@ import '../providers/transactions_provider.dart';
 import '../../groups/providers/groups_provider.dart';
 import '../../groups/providers/users_provider.dart';
 import '../../../shared/utils/formatters.dart';
+import 'add_expense_screen.dart';
 
 class ExpenseListScreen extends ConsumerStatefulWidget {
   final String groupId;
@@ -23,6 +24,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
   ExpenseCategory? _selectedCategory;
   String _searchQuery = '';
   DateTimeRange? _dateRange;
+  bool _sortLatestFirst = true; // true = latest first, false = oldest first
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +65,15 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
       return true;
     }).toList();
 
+    // Sort transactions based on selected order
+    filteredTransactions.sort((a, b) {
+      if (_sortLatestFirst) {
+        return b.timestamp.compareTo(a.timestamp); // Latest first
+      } else {
+        return a.timestamp.compareTo(b.timestamp); // Oldest first
+      }
+    });
+
     // Calculate category breakdown
     final categoryTotals = <ExpenseCategory, double>{};
     for (var transaction in allTransactions) {
@@ -76,6 +87,45 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
       appBar: AppBar(
         title: const Text('All Expenses'),
         actions: [
+          PopupMenuButton<bool>(
+            icon: Icon(_sortLatestFirst ? Icons.arrow_downward : Icons.arrow_upward),
+            tooltip: 'Sort',
+            onSelected: (value) {
+              setState(() {
+                _sortLatestFirst = value;
+              });
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: true,
+                child: Row(
+                  children: [
+                    const Icon(Icons.arrow_downward, size: 20),
+                    const SizedBox(width: 12),
+                    const Text('Latest First'),
+                    if (_sortLatestFirst) ...[  
+                      const Spacer(),
+                      const Icon(Icons.check, color: Colors.green, size: 20),
+                    ],
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: false,
+                child: Row(
+                  children: [
+                    const Icon(Icons.arrow_upward, size: 20),
+                    const SizedBox(width: 12),
+                    const Text('Oldest First'),
+                    if (!_sortLatestFirst) ...[  
+                      const Spacer(),
+                      const Icon(Icons.check, color: Colors.green, size: 20),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.pie_chart),
             onPressed: () {
@@ -471,11 +521,95 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
                   transaction.recurringFrequency?.toUpperCase() ?? 'Yes',
                 ),
               ],
+              const SizedBox(height: 24),
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showDeleteConfirmation(context, transaction);
+                      },
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      label: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddExpenseScreen(
+                              groupId: transaction.groupId,
+                              transaction: transaction,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _showDeleteConfirmation(
+    BuildContext context,
+    Transaction transaction,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Expense'),
+        content: Text(
+          'Are you sure you want to delete "${transaction.description}"?\\n\\n'
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref.read(transactionsProvider.notifier).deleteTransaction(transaction.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Expense deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildDetailRow(String label, String value) {

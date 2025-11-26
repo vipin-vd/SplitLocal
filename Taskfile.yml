@@ -160,7 +160,7 @@ tasks:
   android:
     desc: Run on Android emulator/device
     cmds:
-      - flutter run -d android
+      - flutter run -d emulator-5554
 
   macos:
     desc: Run on macOS desktop

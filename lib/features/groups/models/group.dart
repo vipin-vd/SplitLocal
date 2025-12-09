@@ -31,6 +31,10 @@ class Group {
   @JsonKey(defaultValue: 'INR')
   final String currency; // Currency code (e.g., 'INR', 'USD', 'EUR')
 
+  @HiveField(8, defaultValue: false)
+  @JsonKey(defaultValue: false)
+  final bool isFriendGroup;
+
   Group({
     required this.id,
     required this.name,
@@ -40,6 +44,7 @@ class Group {
     required this.createdAt,
     this.updatedAt,
     this.currency = 'INR', // Default to Indian Rupee
+    this.isFriendGroup = false,
   });
 
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
@@ -54,6 +59,7 @@ class Group {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? currency,
+    bool? isFriendGroup,
   }) {
     return Group(
       id: id ?? this.id,
@@ -64,9 +70,11 @@ class Group {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       currency: currency ?? this.currency,
+      isFriendGroup: isFriendGroup ?? this.isFriendGroup,
     );
   }
 
   @override
-  String toString() => 'Group(id: $id, name: $name, members: ${memberIds.length})';
+  String toString() =>
+      'Group(id: $id, name: $name, members: ${memberIds.length})';
 }

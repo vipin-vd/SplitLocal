@@ -65,14 +65,15 @@ Map<ExpenseCategory, double> groupCategorySpending(
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final categoryTotals = <ExpenseCategory, double>{};
-  
+
   for (var transaction in transactions) {
     if (transaction.type.name == 'expense') {
       categoryTotals[transaction.category] =
-          (categoryTotals[transaction.category] ?? 0.0) + transaction.totalAmount;
+          (categoryTotals[transaction.category] ?? 0.0) +
+              transaction.totalAmount;
     }
   }
-  
+
   return categoryTotals;
 }
 
@@ -82,5 +83,7 @@ List<Transaction> recurringExpenses(
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
-  return transactions.where((t) => t.isRecurring && t.type.name == 'expense').toList();
+  return transactions
+      .where((t) => t.isRecurring && t.type.name == 'expense')
+      .toList();
 }

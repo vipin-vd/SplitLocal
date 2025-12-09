@@ -29,9 +29,8 @@ class ContactsService {
 
     // Extract name and phone
     final name = fullContact.displayName;
-    final phoneNumber = fullContact.phones.isNotEmpty
-        ? fullContact.phones.first.number
-        : null;
+    final phoneNumber =
+        fullContact.phones.isNotEmpty ? fullContact.phones.first.number : null;
 
     return {
       'name': name,

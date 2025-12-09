@@ -20,7 +20,7 @@ final deviceOwnerProvider = AutoDisposeProvider<User?>.internal(
 );
 
 typedef DeviceOwnerRef = AutoDisposeProviderRef<User?>;
-String _$usersHash() => r'b04bacee4d89186e0c7db557526bf6a755041b2a';
+String _$usersHash() => r'e23377476e50c30c1ace2b4d1bf2171b08fe930f';
 
 /// See also [Users].
 @ProviderFor(Users)

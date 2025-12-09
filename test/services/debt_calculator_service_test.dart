@@ -113,7 +113,7 @@ void main() {
 
       // Should have 2 transfers: B->A (30) and C->A (30)
       expect(simplified.length, equals(2));
-      
+
       final bToA = simplified.firstWhere(
         (d) => d.fromUserId == 'B' && d.toUserId == 'A',
       );
@@ -159,7 +159,7 @@ void main() {
       // B owes 0 (paid 100, owes 50 = +50)
       // C owes 50 (paid 0, owes 50 = -50)
       // D owes 50 (paid 0, owes 50 = -50)
-      
+
       // Simplified should be: C->A (25), C->B (25), D->A (25), D->B (25)
       // OR more simplified: C->A (50), D->B (50)
       expect(simplified.length, lessThanOrEqualTo(4));

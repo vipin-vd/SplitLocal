@@ -14,7 +14,8 @@ class DebtDetail {
   });
 
   @override
-  String toString() => 'DebtDetail(from: $fromUserId, to: $toUserId, amount: $amount)';
+  String toString() =>
+      'DebtDetail(from: $fromUserId, to: $toUserId, amount: $amount)';
 }
 
 /// Represents the net balance for a user (positive = they are owed, negative = they owe)
@@ -34,7 +35,7 @@ class NetBalance {
 class DebtCalculatorService {
   /// Calculate net balances for all members in a group
   /// Handles multi-payer scenarios correctly
-  /// 
+  ///
   /// Logic:
   /// 1. For each transaction, calculate what each person paid vs. what they owe
   /// 2. Net balance = (total paid) - (total owed)
@@ -46,7 +47,7 @@ class DebtCalculatorService {
     for (final transaction in transactions) {
       if (transaction.type == TransactionType.expense) {
         // Process expense: payers vs splits
-        
+
         // Add what each person paid
         transaction.payers.forEach((userId, amountPaid) {
           netBalances[userId] = (netBalances[userId] ?? 0.0) + amountPaid;
@@ -60,7 +61,7 @@ class DebtCalculatorService {
         // Process payment: reduces debt directly
         // Payer gives money (negative for them)
         // Recipient receives money (positive for them)
-        
+
         transaction.payers.forEach((payerId, amount) {
           netBalances[payerId] = (netBalances[payerId] ?? 0.0) - amount;
         });
@@ -116,7 +117,7 @@ class DebtCalculatorService {
 
   /// Simplify debts using greedy algorithm
   /// Minimizes the number of transactions needed to settle all debts
-  /// 
+  ///
   /// Algorithm:
   /// 1. Calculate net balance for each user
   /// 2. Separate into debtors (negative) and creditors (positive)
@@ -126,7 +127,7 @@ class DebtCalculatorService {
   /// 6. Update balances and repeat until all settled
   List<DebtDetail> simplifyDebts(List<Transaction> transactions) {
     final netBalances = computeNetBalances(transactions);
-    
+
     // Separate into debtors and creditors
     final List<NetBalance> debtors = [];
     final List<NetBalance> creditors = [];
@@ -155,9 +156,8 @@ class DebtCalculatorService {
       final creditor = creditors[creditorIndex];
 
       // Transfer minimum of what debtor owes and what creditor is owed
-      final transferAmount = debtor.balance < creditor.balance
-          ? debtor.balance
-          : creditor.balance;
+      final transferAmount =
+          debtor.balance < creditor.balance ? debtor.balance : creditor.balance;
 
       simplifiedDebts.add(DebtDetail(
         fromUserId: debtor.userId,

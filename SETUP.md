@@ -1,4 +1,6 @@
-# Setup Guide for SplitLocal
+# Setup Guide for SplitLocal (Consolidated)
+
+Prefer `GETTING_STARTED.md` for full platform-specific setup and troubleshooting. This document remains as a supplemental reference.
 
 This guide will walk you through setting up the SplitLocal development environment and building the app.
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CurrencySelectorDialog extends StatelessWidget {
   final String currentCurrency;
-  
+
   const CurrencySelectorDialog({
     super.key,
     required this.currentCurrency,
@@ -59,7 +59,7 @@ class CurrencySelectorDialog extends StatelessWidget {
               itemBuilder: (context, index) {
                 final currency = currencies[index];
                 final isSelected = currency['code'] == currentCurrency;
-                
+
                 return ListTile(
                   leading: Text(
                     currency['symbol']!,

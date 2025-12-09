@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Dart code generation
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Format check
+        run: |
+          flutter format . --set-exit-if-changed
+
+      - name: Analyze
+        run: flutter analyze --no-pub
+
+      - name: Test
+        run: flutter test --no-pub
+
+      - name: iOS Pod install (skip failures)
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          cd ios
+          pod install --repo-update || true

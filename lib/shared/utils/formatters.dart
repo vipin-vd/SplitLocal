@@ -35,7 +35,8 @@ class DateFormatter {
   static final DateFormat _shortDateFormat = DateFormat('MMM dd');
   static final DateFormat _fullDateFormat = DateFormat('EEEE, MMMM dd, yyyy');
   static final DateFormat _timeFormat = DateFormat('hh:mm a');
-  static final DateFormat _dateTimeFormat = DateFormat('MMM dd, yyyy • hh:mm a');
+  static final DateFormat _dateTimeFormat =
+      DateFormat('MMM dd, yyyy • hh:mm a');
 
   static String formatDate(DateTime date) {
     return _dateFormat.format(date);

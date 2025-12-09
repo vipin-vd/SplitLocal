@@ -1,657 +1,506 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:splitlocal/features/groups/screens/select_friends_screen.dart';
 import '../models/group.dart';
 import '../models/user.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
-import '../../../shared/providers/services_provider.dart';
+import '../providers/group_settings_provider.dart';
+import '../../expenses/providers/transactions_provider.dart';
 import '../../../shared/utils/dialogs.dart';
 import '../../../shared/utils/currency.dart';
 import '../widgets/add_member_manually_dialog.dart';
 import '../widgets/edit_member_dialog.dart';
 
-class _DeleteGroupDialog extends StatefulWidget {
-  const _DeleteGroupDialog();
+class GroupSettingsScreen extends ConsumerWidget {
+  final Group group;
+
+  const GroupSettingsScreen({super.key, required this.group});
 
   @override
-  State<_DeleteGroupDialog> createState() => _DeleteGroupDialogState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentGroup = ref.watch(selectedGroupProvider(group.id));
+
+    if (currentGroup == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Group Settings')),
+        body: const Center(child: Text('Group not found')),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Group Settings')),
+      body: ListView(
+        children: [
+          _CurrencySection(group: currentGroup),
+          _MembersSection(group: currentGroup),
+          _GroupInfoSection(group: currentGroup),
+          _DataManagementSection(group: currentGroup),
+          _LeaveGroupSection(group: currentGroup),
+          _DangerZoneSection(group: currentGroup),
+        ],
+      ),
+    );
+  }
 }
 
-class _DeleteGroupDialogState extends State<_DeleteGroupDialog> {
-  final TextEditingController _confirmController = TextEditingController();
-  bool _isValid = false;
+class _CurrencySection extends ConsumerWidget {
+  final Group group;
+  const _CurrencySection({required this.group});
 
   @override
-  void initState() {
-    super.initState();
-    _confirmController.addListener(_onTextChanged);
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: ListTile(
+        title: const Text('Group Currency'),
+        subtitle:
+            Text('Current: ${CurrencyHelper.getCurrency(group.currency).name}'),
+        trailing: DropdownButton<String>(
+          value: group.currency,
+          items: CurrencyHelper.supportedCurrencies.map((currency) {
+            return DropdownMenuItem(
+              value: currency.code,
+              child: Text('${currency.symbol} ${currency.code}'),
+            );
+          }).toList(),
+          onChanged: (value) async {
+            if (value != null && value != group.currency) {
+              final confirmed = await showConfirmDialog(context,
+                  title: 'Change Currency',
+                  message:
+                      'Changing currency will not convert existing amounts. Are you sure?');
+              if (confirmed == true) {
+                final logic =
+                    ref.read(groupSettingsScreenLogicProvider.notifier);
+                await logic.updateGroup(group.copyWith(currency: value));
+              }
+            }
+          },
+        ),
+      ),
+    );
   }
+}
 
-  @override
-  void dispose() {
-    _confirmController.removeListener(_onTextChanged);
-    _confirmController.dispose();
-    super.dispose();
-  }
+class _MembersSection extends ConsumerWidget {
+  final Group group;
+  const _MembersSection({required this.group});
 
-  void _onTextChanged() {
-    final isValid = _confirmController.text.trim().toLowerCase() == 'delete';
-    if (isValid != _isValid) {
-      setState(() {
-        _isValid = isValid;
-      });
+  Future<void> _addMembers(BuildContext context, WidgetRef ref) async {
+    final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+    final choice = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Add Member'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, 'manual'),
+                    child: const Text('Enter Manually')),
+                TextButton(
+                    onPressed: () => Navigator.pop(context, 'contacts'),
+                    child: const Text('From Contacts')),
+                TextButton(
+                    onPressed: () => Navigator.pop(context, 'friends'),
+                    child: const Text('From Friends')),
+              ],
+            ));
+
+    if (choice == 'manual') {
+      final user = await showDialog<User>(
+          context: context,
+          builder: (context) => const AddMemberManuallyDialog());
+      if (user != null) await logic.addMemberManually(group, user);
+    } else if (choice == 'contacts') {
+      await logic.addMemberFromContacts(group);
+    } else if (choice == 'friends') {
+      final selectedFriends = await Navigator.push<List<User>>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SelectFriendsScreen(),
+        ),
+      );
+      if (selectedFriends != null) {
+        for (final friend in selectedFriends) {
+          await logic.addMemberManually(group, friend);
+        }
+      }
     }
   }
 
   @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final members = ref
+        .watch(usersProvider)
+        .where((u) => group.memberIds.contains(u.id))
+        .toList();
+    final deviceOwner = ref.watch(deviceOwnerProvider);
+    final netBalances = ref.watch(groupNetBalancesProvider(group.id));
+    final isCreator = deviceOwner != null && group.createdBy == deviceOwner.id;
+
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        children: [
+          ListTile(
+            title: const Text('Members',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            trailing: isCreator
+                ? TextButton.icon(
+                    onPressed: () => _addMembers(context, ref),
+                    icon: const Icon(Icons.person_add),
+                    label: const Text('Add'))
+                : null,
+          ),
+          ...members.map((user) => ListTile(
+                title: Text(user.name),
+                trailing: user.isDeviceOwner
+                    ? const Chip(label: Text('You'))
+                    : isCreator
+                        ? Row(mainAxisSize: MainAxisSize.min, children: [
+                            IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () async {
+                                  final updatedUser = await showDialog<User>(
+                                      context: context,
+                                      builder: (context) =>
+                                          EditMemberDialog(user: user));
+                                  if (updatedUser != null) {
+                                    ref
+                                        .read(groupSettingsScreenLogicProvider
+                                            .notifier)
+                                        .updateUser(updatedUser);
+                                  }
+                                }),
+                            _RemoveButtonWithGuard(
+                              user: user,
+                              group: group,
+                              balance: netBalances[user.id] ?? 0.0,
+                            ),
+                          ])
+                        : null,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class _RemoveButtonWithGuard extends ConsumerWidget {
+  final User user;
+  final Group group;
+  final double balance;
+
+  const _RemoveButtonWithGuard({
+    required this.user,
+    required this.group,
+    required this.balance,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasDebt = balance.abs() >= 0.01;
+
+    if (hasDebt) {
+      return Tooltip(
+        message: 'Outstanding debts must be settled before removing',
+        child: IconButton(
+          icon: const Icon(Icons.remove_circle),
+          onPressed: () => _showDebtDialog(context, ref),
+        ),
+      );
+    }
+
+    return IconButton(
+      icon: const Icon(Icons.remove_circle),
+      onPressed: () => _showRemoveConfirmation(context, ref),
+    );
+  }
+
+  Future<void> _showDebtDialog(BuildContext context, WidgetRef ref) async {
+    final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+    final balanceInfo =
+        logic.getMemberBalanceInfo(user, balance, group.currency);
+
+    final suggestions = [
+      'Add a payment transaction between ${user.name} and another group member',
+      'Adjust or delete related expenses to settle the balance',
+      'Have ${user.name} settle their outstanding amount',
+    ];
+
+    await showSettleDebtsDialog(
+      context,
+      title: 'Cannot Remove Member',
+      memberName: user.name,
+      debtInfo: balanceInfo,
+      suggestions: suggestions,
+      actionText: 'Back',
+    );
+  }
+
+  Future<void> _showRemoveConfirmation(
+      BuildContext context, WidgetRef ref) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Remove member?',
+      message: 'Are you sure you want to remove ${user.name}?',
+    );
+
+    if (confirmed == true && context.mounted) {
+      final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+      final success = await logic.removeMember(group, user.id);
+      if (success && context.mounted) {
+        showSnackBar(context, '${user.name} has been removed from the group');
+      }
+    }
+  }
+}
+
+class _GroupInfoSection extends StatelessWidget {
+  final Group group;
+  const _GroupInfoSection({required this.group});
+
+  @override
   Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Group Information',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+          ListTile(title: const Text('Group Name'), subtitle: Text(group.name)),
+          if (group.description != null)
+            ListTile(
+                title: const Text('Description'),
+                subtitle: Text(group.description!)),
+          ListTile(
+              title: const Text('Created'),
+              subtitle: Text(group.createdAt.toString().split('.')[0])),
+        ],
+      ),
+    );
+  }
+}
+
+class _DataManagementSection extends ConsumerWidget {
+  final Group group;
+  const _DataManagementSection({required this.group});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: ListTile(
+        leading: const Icon(Icons.share),
+        title: const Text('Export Group Data'),
+        onTap: () async {
+          final success = await ref
+              .read(groupSettingsScreenLogicProvider.notifier)
+              .exportGroup(group.id);
+          if (success) showSnackBar(context, 'Group data exported');
+        },
+      ),
+    );
+  }
+}
+
+class _DangerZoneSection extends ConsumerWidget {
+  final Group group;
+  const _DangerZoneSection({required this.group});
+
+  Future<void> _deleteGroup(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => const _DeleteGroupDialog());
+    if (confirmed == true && context.mounted) {
+      final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+      final success = await logic.deleteGroup(group.id);
+      if (success && context.mounted) {
+        Navigator.of(context)
+          ..pop()
+          ..pop();
+        showSnackBar(context, 'Group deleted');
+      } else if (context.mounted) {
+        // Show debt warning dialog
+        _showDeleteBlockedDialog(context, ref);
+      }
+    }
+  }
+
+  Future<void> _showDeleteBlockedDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final netBalances = ref.read(groupNetBalancesProvider(group.id));
+    final users = ref.read(usersProvider);
+    final outstandingMembers = <String>[];
+
+    for (final entry in netBalances.entries) {
+      if (entry.value.abs() >= 0.01) {
+        final member = users.firstWhere(
+          (u) => u.id == entry.key,
+          orElse: () => null as User,
+        );
+        if (member != null) {
+          final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+          outstandingMembers.add(
+            logic.getMemberBalanceInfo(member, entry.value, group.currency),
+          );
+        }
+      }
+    }
+
+    await showSettleDebtsDialog(
+      context,
+      title: 'Cannot Delete Group',
+      memberName: 'This group',
+      debtInfo: 'Outstanding balances:\n• ${outstandingMembers.join('\n• ')}',
+      suggestions: [
+        'Settle all outstanding member balances',
+        'Add payment transactions to clear debts',
+        'Adjust or delete expenses as needed',
+      ],
+      actionText: 'Back',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final deviceOwner = ref.watch(deviceOwnerProvider);
+    final isCreator = deviceOwner != null && group.createdBy == deviceOwner.id;
+
+    if (!isCreator) {
+      return const SizedBox.shrink(); // Only show for group creator
+    }
+
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      color: Colors.red.shade50,
+      child: ListTile(
+        leading: Icon(Icons.delete_forever, color: Colors.red.shade700),
+        title:
+            Text('Delete Group', style: TextStyle(color: Colors.red.shade900)),
+        onTap: () => _deleteGroup(context, ref),
+      ),
+    );
+  }
+}
+
+class _LeaveGroupSection extends ConsumerWidget {
+  final Group group;
+  const _LeaveGroupSection({required this.group});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final deviceOwner = ref.watch(deviceOwnerProvider);
+    final netBalances = ref.watch(groupNetBalancesProvider(group.id));
+    final myBalance =
+        deviceOwner == null ? 0.0 : (netBalances[deviceOwner.id] ?? 0.0);
+    final canLeave = myBalance.abs() < 0.01;
+
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      color: canLeave ? null : Colors.grey.shade200,
+      child: ListTile(
+        leading: const Icon(Icons.exit_to_app),
+        title: const Text('Leave Group'),
+        subtitle: canLeave
+            ? null
+            : Text(
+                'You have outstanding debts (${CurrencyHelper.getCurrency(group.currency).symbol}${myBalance.abs().toStringAsFixed(2)}) that must be settled before leaving',
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+              ),
+        enabled: canLeave && deviceOwner != null,
+        onTap: canLeave && deviceOwner != null
+            ? () => _showLeaveConfirmation(context, ref, deviceOwner!)
+            : !canLeave && deviceOwner != null
+                ? () => _showDebtDialog(context, ref, deviceOwner!, myBalance)
+                : null,
+      ),
+    );
+  }
+
+  Future<void> _showLeaveConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    User deviceOwner,
+  ) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Leave Group?',
+      message: 'Are you sure you want to leave "${group.name}"?',
+      confirmText: 'Leave',
+    );
+
+    if (confirmed == true && context.mounted) {
+      final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+      final success = await logic.removeMember(group, deviceOwner.id);
+      if (success && context.mounted) {
+        Navigator.of(context).pop();
+        showSnackBar(context, 'You left the group');
+      }
+    }
+  }
+
+  Future<void> _showDebtDialog(
+    BuildContext context,
+    WidgetRef ref,
+    User deviceOwner,
+    double myBalance,
+  ) async {
+    final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+    final balanceInfo =
+        logic.getMemberBalanceInfo(deviceOwner, myBalance, group.currency);
+
+    final suggestions = [
+      'Add a payment transaction to settle your balance',
+      'Adjust or delete related expenses to settle your balance',
+      'Ask other members for assistance in settling the account',
+    ];
+
+    await showSettleDebtsDialog(
+      context,
+      title: 'Cannot Leave Group',
+      memberName: 'You',
+      debtInfo: balanceInfo,
+      suggestions: suggestions,
+      actionText: 'Back',
+    );
+  }
+}
+
+class _DeleteGroupDialog extends ConsumerWidget {
+  const _DeleteGroupDialog();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(deleteGroupDialogProvider);
+    final controller = provider.$1;
+    final isValid = provider.$2;
+
     return AlertDialog(
       title: const Text('Delete Group'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'This action cannot be undone. All expenses and settlements in this group will be permanently deleted.',
-            style: TextStyle(color: Colors.red),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Type "delete" to confirm:',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _confirmController,
-            decoration: const InputDecoration(
-              hintText: 'delete',
-              border: OutlineInputBorder(),
-            ),
-            autofocus: true,
-          ),
+              'This action cannot be undone. All data will be lost. Type "delete" to confirm.'),
+          TextField(controller: controller, autofocus: true),
         ],
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
-        ),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel')),
         ElevatedButton(
-          onPressed: _isValid ? () => Navigator.pop(context, true) : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.grey.shade300,
-            disabledForegroundColor: Colors.grey.shade600,
-          ),
-          child: const Text('Delete Group'),
+          onPressed: isValid ? () => Navigator.pop(context, true) : null,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          child: const Text('Delete'),
         ),
       ],
-    );
-  }
-}
-
-class GroupSettingsScreen extends ConsumerStatefulWidget {
-  final Group group;
-
-  const GroupSettingsScreen({
-    super.key,
-    required this.group,
-  });
-
-  @override
-  ConsumerState<GroupSettingsScreen> createState() => _GroupSettingsScreenState();
-}
-
-class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
-  Future<void> _addMembers() async {
-    final choice = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Member'),
-        content: const Text('How would you like to add a member?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'manual'),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.edit),
-                SizedBox(width: 8),
-                Text('Enter Manually'),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'contacts'),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.contacts),
-                SizedBox(width: 8),
-                Text('From Contacts'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (choice == null || !mounted) return;
-
-    if (choice == 'manual') {
-      await _addMemberManually();
-    } else {
-      await _addMemberFromContacts();
-    }
-  }
-
-  Future<void> _addMemberManually() async {
-    final user = await showDialog<User>(
-      context: context,
-      builder: (context) => const AddMemberManuallyDialog(),
-    );
-
-    if (user == null || !mounted) return;
-
-    try {
-      final usersNotifier = ref.read(usersProvider.notifier);
-      final groupsNotifier = ref.read(groupsProvider.notifier);
-
-      // Check if user with same phone exists
-      if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) {
-        final existingUsers = ref.read(usersProvider);
-        final existing = existingUsers.where((u) => u.phoneNumber == user.phoneNumber).firstOrNull;
-        
-        if (existing != null) {
-          if (!widget.group.memberIds.contains(existing.id)) {
-            final updatedMemberIds = [...widget.group.memberIds, existing.id];
-            final updatedGroup = widget.group.copyWith(
-              memberIds: updatedMemberIds,
-              updatedAt: DateTime.now(),
-            );
-            
-            await groupsNotifier.updateGroup(updatedGroup);
-            
-            if (mounted) {
-              showSnackBar(context, 'Existing member ${existing.name} added to group');
-            }
-          } else {
-            if (mounted) {
-              showSnackBar(context, '${existing.name} is already a member');
-            }
-          }
-          return;
-        }
-      }
-
-      // Add new user
-      await usersNotifier.addUser(user);
-      
-      final updatedMemberIds = [...widget.group.memberIds, user.id];
-      final updatedGroup = widget.group.copyWith(
-        memberIds: updatedMemberIds,
-        updatedAt: DateTime.now(),
-      );
-      
-      await groupsNotifier.updateGroup(updatedGroup);
-      
-      if (mounted) {
-        showSnackBar(context, '${user.name} added successfully');
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context, 'Error adding member: $e', isError: true);
-      }
-    }
-  }
-
-  Future<void> _addMemberFromContacts() async {
-    final contactsService = ref.read(contactsServiceProvider);
-    
-    try {
-      final contacts = await contactsService.pickContact();
-      if (contacts == null) return;
-
-      final usersNotifier = ref.read(usersProvider.notifier);
-      final groupsNotifier = ref.read(groupsProvider.notifier);
-      
-      final user = await usersNotifier.createUserFromContact(contacts);
-      if (!widget.group.memberIds.contains(user.id)) {
-        final updatedMemberIds = [...widget.group.memberIds, user.id];
-        final updatedGroup = widget.group.copyWith(
-          memberIds: updatedMemberIds,
-          updatedAt: DateTime.now(),
-        );
-        
-        await groupsNotifier.updateGroup(updatedGroup);
-        
-        if (mounted) {
-          showSnackBar(context, 'Member added successfully');
-        }
-      } else {
-        if (mounted) {
-          showSnackBar(context, 'Contact is already a member');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        // Show manual entry dialog if contacts fail
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Cannot Access Contacts'),
-            content: Text('Error: $e\n\nWould you like to add the member manually instead?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _addMemberManually();
-                },
-                child: const Text('Add Manually'),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _removeMember(String userId) async {
-    final user = ref.read(usersProvider.notifier).getUser(userId);
-    if (user == null) return;
-
-    final confirmed = await showConfirmDialog(
-      context,
-      title: 'Remove Member',
-      message: 'Remove ${user.name} from this group?',
-    );
-
-    if (confirmed != true || !mounted) return;
-
-    try {
-      final groupsNotifier = ref.read(groupsProvider.notifier);
-      final updatedMemberIds = widget.group.memberIds.where((id) => id != userId).toList();
-      
-      final updatedGroup = widget.group.copyWith(
-        memberIds: updatedMemberIds,
-        updatedAt: DateTime.now(),
-      );
-      
-      await groupsNotifier.updateGroup(updatedGroup);
-      
-      if (mounted) {
-        showSnackBar(context, '${user.name} removed from group');
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context, 'Error removing member: $e', isError: true);
-      }
-    }
-  }
-
-  Future<void> _editMember(User member) async {
-    final updatedUser = await showDialog<User>(
-      context: context,
-      builder: (context) => EditMemberDialog(user: member),
-    );
-
-    if (updatedUser == null || !mounted) return;
-
-    try {
-      final usersNotifier = ref.read(usersProvider.notifier);
-      await usersNotifier.updateUser(updatedUser);
-      
-      if (mounted) {
-        showSnackBar(context, '${updatedUser.name} updated successfully');
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context, 'Error updating member: $e', isError: true);
-      }
-    }
-  }
-
-  Future<void> _deleteGroup() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => const _DeleteGroupDialog(),
-    );
-
-    if (confirmed != true || !mounted) return;
-
-    try {
-      // Store references before deletion to avoid context issues
-      final navigator = Navigator.of(context);
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      
-      final groupsNotifier = ref.read(groupsProvider.notifier);
-      
-      // Pop all screens to get back to groups list (pop settings screen and group detail screen)
-      navigator.pop(); // Pop settings screen
-      navigator.pop(); // Pop group detail screen
-      
-      // Now delete the group
-      await groupsNotifier.deleteGroup(widget.group.id);
-      
-      // Show success message
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Group deleted successfully'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } catch (e) {
-      // Since we already popped, we can't show error in original context
-      // The error will be logged but not shown to user
-      debugPrint('Error deleting group: $e');
-    }
-  }
-
-  Future<void> _exportGroupData() async {
-    try {
-      final exportService = ref.read(exportImportServiceProvider);
-      
-      // Show loading
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-
-      final success = await exportService.exportGroup(widget.group.id);
-      
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        
-        if (success) {
-          showSnackBar(context, 'Group data exported successfully');
-        } else {
-          showSnackBar(context, 'Export cancelled', isError: false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        showSnackBar(context, 'Error exporting data: $e', isError: true);
-      }
-    }
-  }
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    // Watch the group for updates instead of using widget.group
-    final currentGroup = ref.watch(selectedGroupProvider(widget.group.id));
-    
-    // If group is deleted or not found, show error
-    if (currentGroup == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Group Settings'),
-        ),
-        body: const Center(
-          child: Text('Group not found'),
-        ),
-      );
-    }
-    
-    final users = ref.watch(usersProvider);
-    final members = users.where((u) => currentGroup.memberIds.contains(u.id)).toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Group Settings'),
-      ),
-      body: ListView(
-        children: [
-          // Currency Section
-          Card(
-            margin: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Currency',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  title: const Text('Group Currency'),
-                  subtitle: Text(
-                    'Current: ${CurrencyHelper.getCurrency(currentGroup.currency).name}',
-                  ),
-                  trailing: DropdownButton<String>(
-                    value: currentGroup.currency,
-                    items: CurrencyHelper.supportedCurrencies.map((currency) {
-                      return DropdownMenuItem(
-                        value: currency.code,
-                        child: Text('${currency.symbol} ${currency.code}'),
-                      );
-                    }).toList(),
-                    onChanged: (value) async {
-                      if (value != null && value != currentGroup.currency) {
-                        final confirmed = await showConfirmDialog(
-                          context,
-                          title: 'Change Currency',
-                          message: 'Changing currency will not convert existing amounts. Are you sure?',
-                        );
-
-                        if (confirmed == true && mounted) {
-                          try {
-                            final groupsNotifier = ref.read(groupsProvider.notifier);
-                            final updatedGroup = currentGroup.copyWith(
-                              currency: value,
-                              updatedAt: DateTime.now(),
-                            );
-                            
-                            await groupsNotifier.updateGroup(updatedGroup);
-                            
-                            if (mounted) {
-                              showSnackBar(context, 'Currency updated to $value');
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              showSnackBar(context, 'Error updating currency: $e', isError: true);
-                            }
-                          }
-                        }
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Members Section
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Members',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: _addMembers,
-                        icon: const Icon(Icons.person_add),
-                        label: const Text('Add'),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                if (members.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(
-                      child: Text('No members yet'),
-                    ),
-                  )
-                else
-                  ...members.map((user) {
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(user.name[0].toUpperCase()),
-                      ),
-                      title: Text(user.name),
-                      subtitle: user.phoneNumber != null
-                          ? Text(user.phoneNumber!)
-                          : const Text('No phone number'),
-                      trailing: user.isDeviceOwner
-                          ? const Chip(
-                              label: Text('You'),
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                            )
-                          : Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit_outlined),
-                                  color: Theme.of(context).primaryColor,
-                                  onPressed: () => _editMember(user),
-                                  tooltip: 'Edit member',
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  color: Colors.red,
-                                  onPressed: () => _removeMember(user.id),
-                                  tooltip: 'Remove member',
-                                ),
-                              ],
-                            ),
-                    );
-                  }).toList(),
-              ],
-            ),
-          ),
-
-          // Group Info Section
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Group Information',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  title: const Text('Group Name'),
-                  subtitle: Text(currentGroup.name),
-                ),
-                if (currentGroup.description != null)
-                  ListTile(
-                    title: const Text('Description'),
-                    subtitle: Text(currentGroup.description!),
-                  ),
-                ListTile(
-                  title: const Text('Created'),
-                  subtitle: Text(
-                    currentGroup.createdAt.toString().split('.')[0],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Data Management Section
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Export',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.share),
-                  title: const Text('Export Group Data'),
-                  subtitle: const Text('Share this group\'s expenses and members as a file'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: _exportGroupData,
-                ),
-              ],
-            ),
-          ),
-
-          // Danger Zone Section
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            color: Colors.red.shade50,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Danger Zone',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red.shade900,
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(Icons.delete_forever, color: Colors.red.shade700),
-                  title: Text(
-                    'Delete Group',
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  subtitle: const Text(
-                    'Permanently delete this group and all its data',
-                  ),
-                  trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red.shade700),
-                  onTap: _deleteGroup,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

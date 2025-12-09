@@ -8,12 +8,17 @@ class LocalStorageService {
   static const String groupsBoxName = 'groups';
   static const String transactionsBoxName = 'transactions';
   static const String settingsBoxName = 'settings';
+  static const String friendsBoxName = 'friends';
+  static const String hiddenFriendsBoxName = 'hidden_friends';
 
   // Box getters - boxes are already opened in main.dart
   Box<User> get _usersBox => Hive.box<User>(usersBoxName);
   Box<Group> get _groupsBox => Hive.box<Group>(groupsBoxName);
-  Box<Transaction> get _transactionsBox => Hive.box<Transaction>(transactionsBoxName);
+  Box<Transaction> get _transactionsBox =>
+      Hive.box<Transaction>(transactionsBoxName);
   Box<dynamic> get _settingsBox => Hive.box(settingsBoxName);
+  Box<String> get _friendsBox => Hive.box<String>(friendsBoxName);
+  Box<String> get _hiddenFriendsBox => Hive.box<String>(hiddenFriendsBoxName);
 
   /// Initialize is no longer needed as boxes are opened in main.dart
   /// Kept for backward compatibility but does nothing
@@ -44,6 +49,41 @@ class LocalStorageService {
 
   Future<void> deleteUser(String id) async {
     await _usersBox.delete(id);
+  }
+
+  // ==================== FRIENDS ====================
+
+  Future<void> addFriendId(String userId) async {
+    await _friendsBox.put(userId, userId);
+  }
+
+  List<String> getAllFriendIds() {
+    return _friendsBox.values.toList();
+  }
+
+  Future<void> deleteFriendId(String userId) async {
+    await _friendsBox.delete(userId);
+  }
+
+  Future<void> addHiddenFriendId(String userId) async {
+    if (!Hive.isBoxOpen(hiddenFriendsBoxName)) {
+      await Hive.openBox<String>(hiddenFriendsBoxName);
+    }
+    await _hiddenFriendsBox.put(userId, userId);
+  }
+
+  List<String> getAllHiddenFriendIds() {
+    if (!Hive.isBoxOpen(hiddenFriendsBoxName)) {
+      return [];
+    }
+    return _hiddenFriendsBox.values.toList();
+  }
+
+  Future<void> removeHiddenFriendId(String userId) async {
+    if (!Hive.isBoxOpen(hiddenFriendsBoxName)) {
+      return;
+    }
+    await _hiddenFriendsBox.delete(userId);
   }
 
   // ==================== GROUPS ====================
@@ -84,9 +124,7 @@ class LocalStorageService {
   }
 
   List<Transaction> getTransactionsByGroup(String groupId) {
-    return _transactionsBox.values
-        .where((t) => t.groupId == groupId)
-        .toList()
+    return _transactionsBox.values.where((t) => t.groupId == groupId).toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
@@ -126,7 +164,8 @@ class LocalStorageService {
   }
 
   /// Import and restore database from JSON
-  Future<void> importFromJson(Map<String, dynamic> json) async {
+  Future<void> importFromJson(Map<String, dynamic> json,
+      {bool merge = false}) async {
     // Validate schema
     if (!json.containsKey('users') ||
         !json.containsKey('groups') ||
@@ -134,10 +173,12 @@ class LocalStorageService {
       throw Exception('Invalid JSON format: missing required keys');
     }
 
-    // Clear existing data
-    await _usersBox.clear();
-    await _groupsBox.clear();
-    await _transactionsBox.clear();
+    if (!merge) {
+      // Clear existing data
+      await _usersBox.clear();
+      await _groupsBox.clear();
+      await _transactionsBox.clear();
+    }
 
     // Import users
     final users = (json['users'] as List)
@@ -157,8 +198,7 @@ class LocalStorageService {
 
     // Import transactions
     final transactions = (json['transactions'] as List)
-        .map((txJson) =>
-            Transaction.fromJson(txJson as Map<String, dynamic>))
+        .map((txJson) => Transaction.fromJson(txJson as Map<String, dynamic>))
         .toList();
     for (final transaction in transactions) {
       await saveTransaction(transaction);

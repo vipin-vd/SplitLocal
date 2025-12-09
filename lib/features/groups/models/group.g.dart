@@ -25,13 +25,14 @@ class GroupAdapter extends TypeAdapter<Group> {
       createdAt: fields[5] as DateTime,
       updatedAt: fields[6] as DateTime?,
       currency: fields[7] as String,
+      isFriendGroup: fields[8] == null ? false : fields[8] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Group obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class GroupAdapter extends TypeAdapter<Group> {
       ..writeByte(6)
       ..write(obj.updatedAt)
       ..writeByte(7)
-      ..write(obj.currency);
+      ..write(obj.currency)
+      ..writeByte(8)
+      ..write(obj.isFriendGroup);
   }
 
   @override
@@ -77,6 +80,7 @@ Group _$GroupFromJson(Map<String, dynamic> json) => Group(
           ? null
           : DateTime.parse(json['updatedAt'] as String),
       currency: json['currency'] as String? ?? 'INR',
+      isFriendGroup: json['isFriendGroup'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
@@ -88,4 +92,5 @@ Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'currency': instance.currency,
+      'isFriendGroup': instance.isFriendGroup,
     };

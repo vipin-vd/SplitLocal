@@ -11,24 +11,26 @@ import 'features/expenses/models/expense_category.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   await Hive.initFlutter();
-  
+
   // Register adapters with unique type IDs
-  Hive.registerAdapter(UserAdapter());              // typeId: 0
-  Hive.registerAdapter(GroupAdapter());             // typeId: 1
-  Hive.registerAdapter(TransactionTypeAdapter());   // typeId: 2
-  Hive.registerAdapter(SplitModeAdapter());         // typeId: 3
-  Hive.registerAdapter(TransactionAdapter());       // typeId: 4
-  Hive.registerAdapter(ExpenseCategoryAdapter());   // typeId: 5
-  
+  Hive.registerAdapter(UserAdapter()); // typeId: 0
+  Hive.registerAdapter(GroupAdapter()); // typeId: 1
+  Hive.registerAdapter(TransactionTypeAdapter()); // typeId: 2
+  Hive.registerAdapter(SplitModeAdapter()); // typeId: 3
+  Hive.registerAdapter(TransactionAdapter()); // typeId: 4
+  Hive.registerAdapter(ExpenseCategoryAdapter()); // typeId: 5
+
   // Open boxes
   await Hive.openBox<User>('users');
   await Hive.openBox<Group>('groups');
   await Hive.openBox<Transaction>('transactions');
-  await Hive.openBox('settings');  // Non-typed box for settings
-  
+  await Hive.openBox('settings'); // Non-typed box for settings
+  await Hive.openBox<String>('friends');
+  await Hive.openBox<String>('hidden_friends');
+
   runApp(
     const ProviderScope(
       child: SplitLocalApp(),

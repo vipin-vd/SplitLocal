@@ -1,6 +1,11 @@
-# 🚀 Quick Start Guide
+# 🚀 Quick Start Guide (Consolidated)
 
-Get SplitLocal running in 3 minutes!
+This guide is now consolidated. Prefer:
+- `README.md` for the shortest quick start
+- `GETTING_STARTED.md` for detailed setup and troubleshooting
+- `TASK_COMMANDS.md` for complete task reference
+
+The content below remains for convenience.
 
 ## Prerequisites
 

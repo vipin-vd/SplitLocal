@@ -6,7 +6,8 @@ class AddMemberManuallyDialog extends StatefulWidget {
   const AddMemberManuallyDialog({super.key});
 
   @override
-  State<AddMemberManuallyDialog> createState() => _AddMemberManuallyDialogState();
+  State<AddMemberManuallyDialog> createState() =>
+      _AddMemberManuallyDialogState();
 }
 
 class _AddMemberManuallyDialogState extends State<AddMemberManuallyDialog> {
@@ -25,7 +26,7 @@ class _AddMemberManuallyDialogState extends State<AddMemberManuallyDialog> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text.trim();
       final phone = _phoneController.text.trim();
-      
+
       final user = User(
         id: const Uuid().v4(),
         name: name,
@@ -33,7 +34,7 @@ class _AddMemberManuallyDialogState extends State<AddMemberManuallyDialog> {
         isDeviceOwner: false,
         createdAt: DateTime.now(),
       );
-      
+
       Navigator.of(context).pop(user);
     }
   }

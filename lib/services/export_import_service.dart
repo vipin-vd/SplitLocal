@@ -15,7 +15,7 @@ class ExportImportService {
     try {
       // Get the data to export
       final data = storageService.exportToJson();
-      
+
       // If groupId is provided, filter to only that group's data
       if (groupId != null) {
         final filteredData = _filterDataByGroup(data, groupId);
@@ -28,7 +28,7 @@ class ExportImportService {
 
       // Get temporary directory
       final directory = await getTemporaryDirectory();
-      final fileName = groupId != null 
+      final fileName = groupId != null
           ? 'splitlocal_group_${groupId}_${DateTime.now().millisecondsSinceEpoch}.json'
           : 'splitlocal_backup_${DateTime.now().millisecondsSinceEpoch}.json';
       final filePath = '${directory.path}/$fileName';
@@ -40,7 +40,8 @@ class ExportImportService {
       // Share the file
       final result = await Share.shareXFiles(
         [XFile(filePath)],
-        subject: groupId != null ? 'SplitLocal Group Data' : 'SplitLocal Backup',
+        subject:
+            groupId != null ? 'SplitLocal Group Data' : 'SplitLocal Backup',
         text: 'Import this file in SplitLocal app to view the expense data.',
       );
 
@@ -92,12 +93,13 @@ class ExportImportService {
   }
 
   /// Filter export data to include only a specific group
-  Map<String, dynamic> _filterDataByGroup(Map<String, dynamic> data, String groupId) {
+  Map<String, dynamic> _filterDataByGroup(
+      Map<String, dynamic> data, String groupId) {
     final groups = data['groups'] as List;
     final group = groups.cast<Map<String, dynamic>>().firstWhere(
-      (g) => g['id'] == groupId,
-      orElse: () => <String, dynamic>{},
-    );
+          (g) => g['id'] == groupId,
+          orElse: () => <String, dynamic>{},
+        );
 
     if (group.isEmpty) {
       throw Exception('Group not found');
@@ -140,14 +142,12 @@ class ExportImportService {
   Future<void> _mergeData(Map<String, dynamic> data) async {
     // Get existing data
     final existingData = storageService.exportToJson();
-    
+
     // Create maps for quick lookup
-    final existingUserIds = (existingData['users'] as List)
-        .map((u) => u['id'] as String)
-        .toSet();
-    final existingGroupIds = (existingData['groups'] as List)
-        .map((g) => g['id'] as String)
-        .toSet();
+    final existingUserIds =
+        (existingData['users'] as List).map((u) => u['id'] as String).toSet();
+    final existingGroupIds =
+        (existingData['groups'] as List).map((g) => g['id'] as String).toSet();
     final existingTransactionIds = (existingData['transactions'] as List)
         .map((t) => t['id'] as String)
         .toSet();
@@ -156,12 +156,12 @@ class ExportImportService {
     final newUsers = (data['users'] as List)
         .where((u) => !existingUserIds.contains(u['id']))
         .toList();
-    
+
     // Merge groups (skip duplicates)
     final newGroups = (data['groups'] as List)
         .where((g) => !existingGroupIds.contains(g['id']))
         .toList();
-    
+
     // Merge transactions (skip duplicates)
     final newTransactions = (data['transactions'] as List)
         .where((t) => !existingTransactionIds.contains(t['id']))
@@ -173,7 +173,10 @@ class ExportImportService {
       'exportedAt': DateTime.now().toIso8601String(),
       'users': [...existingData['users'] as List, ...newUsers],
       'groups': [...existingData['groups'] as List, ...newGroups],
-      'transactions': [...existingData['transactions'] as List, ...newTransactions],
+      'transactions': [
+        ...existingData['transactions'] as List,
+        ...newTransactions
+      ],
     };
 
     // Import merged data
@@ -190,7 +193,7 @@ class ExportImportService {
     final data = storageService.exportToJson();
     final jsonString = jsonEncode(data);
     final bytes = utf8.encode(jsonString).length;
-    
+
     if (bytes < 1024) {
       return '$bytes B';
     } else if (bytes < 1024 * 1024) {

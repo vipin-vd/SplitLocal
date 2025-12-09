@@ -3,7 +3,7 @@ import '../models/expense_category.dart';
 
 class CategorySelectorDialog extends StatelessWidget {
   final ExpenseCategory currentCategory;
-  
+
   const CategorySelectorDialog({
     super.key,
     required this.currentCategory,
@@ -39,7 +39,7 @@ class CategorySelectorDialog extends StatelessWidget {
               itemBuilder: (context, index) {
                 final category = ExpenseCategory.values[index];
                 final isSelected = category == currentCategory;
-                
+
                 return ListTile(
                   leading: Icon(
                     category.icon,

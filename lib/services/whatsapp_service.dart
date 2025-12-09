@@ -14,13 +14,13 @@ class WhatsAppService {
     required String message,
   }) async {
     final encodedMessage = Uri.encodeComponent(message);
-    
+
     // Remove any non-digit characters from phone number
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'\D'), '');
-    
+
     // WhatsApp URL scheme
     final url = 'https://wa.me/$cleanPhone?text=$encodedMessage';
-    
+
     return await _launchUrl(url);
   }
 
@@ -128,7 +128,8 @@ Thanks for staying on top of it! 😊
     final buffer = StringBuffer();
     buffer.writeln('📊 Group Summary: $groupName');
     buffer.writeln('');
-    buffer.writeln('Total Group Spend: $currency${totalSpend.toStringAsFixed(2)}');
+    buffer.writeln(
+        'Total Group Spend: $currency${totalSpend.toStringAsFixed(2)}');
     buffer.writeln('');
     buffer.writeln('Balances:');
     buffer.writeln('─────────────');
@@ -137,9 +138,11 @@ Thanks for staying on top of it! 😊
       final user = users[userId];
       if (user != null) {
         if (balance > 0.01) {
-          buffer.writeln('${user.name} is owed $currency${balance.toStringAsFixed(2)}');
+          buffer.writeln(
+              '${user.name} is owed $currency${balance.toStringAsFixed(2)}');
         } else if (balance < -0.01) {
-          buffer.writeln('${user.name} owes $currency${balance.abs().toStringAsFixed(2)}');
+          buffer.writeln(
+              '${user.name} owes $currency${balance.abs().toStringAsFixed(2)}');
         } else {
           buffer.writeln('${user.name} is settled up ✓');
         }
@@ -168,7 +171,7 @@ Thanks for staying on top of it! 😊
     for (final debt in simplifiedDebts) {
       final fromUser = users[debt.fromUserId];
       final toUser = users[debt.toUserId];
-      
+
       if (fromUser != null && toUser != null) {
         buffer.writeln(
           '${fromUser.name} pays ${toUser.name} $currency${debt.amount.toStringAsFixed(2)}',
@@ -177,7 +180,8 @@ Thanks for staying on top of it! 😊
     }
 
     buffer.writeln('');
-    buffer.writeln('Once these transfers are made, everyone will be settled up! ✨');
+    buffer.writeln(
+        'Once these transfers are made, everyone will be settled up! ✨');
 
     return buffer.toString();
   }
@@ -185,7 +189,7 @@ Thanks for staying on top of it! 😊
   /// Launch URL helper
   Future<bool> _launchUrl(String urlString) async {
     final uri = Uri.parse(urlString);
-    
+
     if (await canLaunchUrl(uri)) {
       return await launchUrl(
         uri,

@@ -22,7 +22,8 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user.name);
-    _phoneController = TextEditingController(text: widget.user.phoneNumber ?? '');
+    _phoneController =
+        TextEditingController(text: widget.user.phoneNumber ?? '');
   }
 
   @override
@@ -36,12 +37,12 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text.trim();
       final phone = _phoneController.text.trim();
-      
+
       final updatedUser = widget.user.copyWith(
         name: name,
         phoneNumber: phone.isEmpty ? null : phone,
       );
-      
+
       Navigator.of(context).pop(updatedUser);
     }
   }

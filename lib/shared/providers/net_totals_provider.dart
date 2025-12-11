@@ -14,11 +14,11 @@ Map<String, double> allNetBalances(AllNetBalancesRef ref) {
 
   final allTransactions = ref.watch(transactionsProvider);
   final debtCalculator = DebtCalculatorService();
-  final simplifiedDebts = debtCalculator.simplifyDebts(allTransactions);
+  final actualDebts = debtCalculator.getActualDebts(allTransactions);
 
-  // Build net balances relative to device owner
+  // Build net balances relative to device owner (bilateral)
   final net = <String, double>{};
-  for (final debt in simplifiedDebts) {
+  for (final debt in actualDebts) {
     if (debt.fromUserId == me.id) {
       // I owe to someone
       net[debt.toUserId] = (net[debt.toUserId] ?? 0.0) - debt.amount;

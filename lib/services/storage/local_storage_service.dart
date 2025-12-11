@@ -165,7 +165,7 @@ class LocalStorageService {
 
   /// Import and restore database from JSON
   Future<void> importFromJson(Map<String, dynamic> json,
-      {bool merge = false}) async {
+      {bool merge = false,}) async {
     // Validate schema
     if (!json.containsKey('users') ||
         !json.containsKey('groups') ||

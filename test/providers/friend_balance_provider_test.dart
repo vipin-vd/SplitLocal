@@ -105,11 +105,11 @@ void main() {
               phoneNumber: null,
               isDeviceOwner: true,
               createdAt: DateTime(2024, 01, 01),
-            )),
+            ),),
         groupsProvider.overrideWith(() => _FakeGroups(groups)),
         friendsProvider.overrideWith(() => _FakeFriends(friends)),
         transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
-      ]);
+      ],);
     });
 
     tearDown(() => container.dispose());
@@ -157,11 +157,11 @@ void main() {
               phoneNumber: null,
               isDeviceOwner: true,
               createdAt: DateTime(  2024, 01, 01),
-            )),
+            ),),
         groupsProvider.overrideWith(() => _FakeGroups(groups2)),
         friendsProvider.overrideWith(() => _FakeFriends(friends2)),
         transactionsProvider.overrideWith(() => _EmptyTransactions()),
-      ]);
+      ],);
 
       expect(isolated.read(friendBalanceProvider(friendId)), 0);
       expect(isolated.read(allFriendBalancesProvider)[friendId], 0);

@@ -119,6 +119,7 @@ class _MemberList extends ConsumerWidget {
     final notifier = ref.read(createGroupFormProvider.notifier);
 
     if (choice == 'manual') {
+      if (!context.mounted) return;
       final user = await showDialog<User>(
         context: context,
         builder: (context) => const AddMemberManuallyDialog(),
@@ -129,6 +130,7 @@ class _MemberList extends ConsumerWidget {
     } else if (choice == 'contacts') {
       await notifier.addMemberFromContacts();
     } else if (choice == 'friends') {
+      if (!context.mounted) return;
       final selectedFriends = await Navigator.push<List<User>>(
         context,
         MaterialPageRoute(

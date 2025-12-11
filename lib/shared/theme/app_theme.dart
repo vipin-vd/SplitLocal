@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Primary colors
@@ -24,8 +25,10 @@ class AppColors {
 
   // Text colors
   static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textDisabled = Color(0xFFBDBDBD);
+  static const Color textSecondary =
+      Color(0xFF616161); // Improved contrast (was 0xFF757575)
+  static const Color textDisabled =
+      Color(0xFF9E9E9E); // Improved from 0xFFBDBDBD
 
   // Balance colors
   static const Color positive = Color(0xFF4CAF50);
@@ -34,21 +37,113 @@ class AppColors {
 }
 
 class AppTheme {
+  // Custom text theme using Google Fonts
+  static TextTheme get _textTheme {
+    return GoogleFonts.interTextTheme().copyWith(
+      // Display styles - Poppins for impact
+      displayLarge: GoogleFonts.poppins(
+        fontSize: 57,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      displayMedium: GoogleFonts.poppins(
+        fontSize: 45,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      displaySmall: GoogleFonts.poppins(
+        fontSize: 36,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      // Headlines - Poppins for emphasis
+      headlineLarge: GoogleFonts.poppins(
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      headlineMedium: GoogleFonts.poppins(
+        fontSize: 28,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      headlineSmall: GoogleFonts.poppins(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      // Titles - Inter for readability
+      titleLarge: GoogleFonts.inter(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      titleMedium: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      titleSmall: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      // Body - Inter for clean reading
+      bodyLarge: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      bodySmall: GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textSecondary,
+      ),
+      // Labels
+      labelLarge: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      ),
+      labelMedium: GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      ),
+      labelSmall: GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+      ),
+    );
+  }
+
   static ThemeData get lightTheme {
     return ThemeData(
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
+      textTheme: _textTheme,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.surface,
         error: AppColors.error,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
@@ -65,6 +160,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
+          textStyle: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -74,6 +173,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
+          textStyle: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -82,6 +185,15 @@ class AppTheme {
         ),
         filled: true,
         fillColor: AppColors.surface,
+        labelStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        hintStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textSecondary,
+        ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.accent,

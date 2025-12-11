@@ -41,7 +41,7 @@ class GroupDetailScreenLogic {
     buffer.writeln('📊 Group Summary: ${group.name}');
     buffer.writeln('');
     buffer.writeln(
-        'Total Group Spend: ${CurrencyFormatter.format(totalSpend, currencyCode: group.currency)}');
+        'Total Group Spend: ${CurrencyFormatter.format(totalSpend, currencyCode: group.currency)}',);
     buffer.writeln('');
     buffer.writeln('Payments Made:');
     buffer.writeln('─────────────');
@@ -49,7 +49,7 @@ class GroupDetailScreenLogic {
     for (final member in members) {
       final paid = totalPaidByUser[member.id] ?? 0.0;
       buffer.writeln(
-          '${member.name} paid ${CurrencyFormatter.format(paid, currencyCode: group.currency)}');
+          '${member.name} paid ${CurrencyFormatter.format(paid, currencyCode: group.currency)}',);
     }
 
     buffer.writeln('');
@@ -60,10 +60,10 @@ class GroupDetailScreenLogic {
       final balance = netBalances[member.id] ?? 0.0;
       if (balance > 0.01) {
         buffer.writeln(
-            '${member.name} is owed ${CurrencyFormatter.format(balance.abs(), currencyCode: group.currency)}');
+            '${member.name} is owed ${CurrencyFormatter.format(balance.abs(), currencyCode: group.currency)}',);
       } else if (balance < -0.01) {
         buffer.writeln(
-            '${member.name} owes ${CurrencyFormatter.format(balance.abs(), currencyCode: group.currency)}');
+            '${member.name} owes ${CurrencyFormatter.format(balance.abs(), currencyCode: group.currency)}',);
       } else {
         buffer.writeln('${member.name} is settled up ✓');
       }

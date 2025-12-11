@@ -124,8 +124,10 @@ class _DescriptionAndAmountSection extends ConsumerWidget {
             labelText: 'Description',
             hintText: 'e.g., Dinner at restaurant',
             prefixIcon: IconButton(
-              icon: Icon(formState.category.icon,
-                  color: formState.category.color),
+              icon: Icon(
+                formState.category.icon,
+                color: formState.category.color,
+              ),
               onPressed: () => _openCategorySelector(context),
               tooltip: 'Select Category',
             ),
@@ -147,7 +149,8 @@ class _DescriptionAndAmountSection extends ConsumerWidget {
             prefixIcon: IconButton(
               icon: Text(
                 CurrencySelectorDialog.getCurrencySymbol(
-                    formState.selectedCurrency),
+                  formState.selectedCurrency,
+                ),
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
@@ -221,7 +224,9 @@ class _PaidByAndSplitSection extends ConsumerWidget {
   }
 
   Future<void> _openSplitMethodScreen(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     if (formState.descriptionController.text.trim().isEmpty) {
       showSnackBar(context, 'Please enter a description first', isError: true);
       return;
@@ -268,7 +273,10 @@ class _PaidByAndSplitSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.3),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -318,9 +326,9 @@ class _PaidByAndSplitSection extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: colorScheme.withOpacity(0.1),
+              color: colorScheme.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.withOpacity(0.3)),
+              border: Border.all(color: colorScheme.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -388,7 +396,7 @@ class _RecurringExpenseSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: DropdownButtonFormField<String>(
-                value: formState.recurringFrequency,
+                initialValue: formState.recurringFrequency,
                 decoration: const InputDecoration(
                   labelText: 'Frequency',
                   border: OutlineInputBorder(),
@@ -449,9 +457,11 @@ class _SaveButton extends StatelessWidget {
                   width: 24,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(formState.initialTransaction != null
-                  ? 'Update Expense'
-                  : 'Add Expense'),
+              : Text(
+                  formState.initialTransaction != null
+                      ? 'Update Expense'
+                      : 'Add Expense',
+                ),
         ),
       ),
     );

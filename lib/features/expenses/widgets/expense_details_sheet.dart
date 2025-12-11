@@ -96,7 +96,8 @@ class ExpenseDetailsSheet extends ConsumerWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: transaction.category.color.withOpacity(0.2),
+                  backgroundColor:
+                      transaction.category.color.withValues(alpha: 0.2),
                   radius: 24,
                   child: Icon(
                     transaction.category.icon,

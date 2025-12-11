@@ -1,5 +1,3 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:splitlocal/features/groups/models/user.dart';
 
 void main() {
   // Commented out to focus on calculation tests

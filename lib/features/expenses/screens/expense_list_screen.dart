@@ -74,12 +74,12 @@ class _SortButton extends ConsumerWidget {
         PopupMenuItem(
             value: true,
             child: Text('Latest First',
-                style: TextStyle(color: sortLatestFirst ? Colors.blue : null))),
+                style: TextStyle(color: sortLatestFirst ? Colors.blue : null),),),
         PopupMenuItem(
             value: false,
             child: Text('Oldest First',
                 style:
-                    TextStyle(color: !sortLatestFirst ? Colors.blue : null))),
+                    TextStyle(color: !sortLatestFirst ? Colors.blue : null),),),
       ],
     );
   }
@@ -99,7 +99,7 @@ class _CategoryBreakdownButton extends ConsumerWidget {
         showModalBottomSheet(
           context: context,
           builder: (context) => _CategoryBreakdown(
-              categoryTotals: totals, currency: group!.currency),
+              categoryTotals: totals, currency: group!.currency,),
         );
       },
     );
@@ -131,7 +131,7 @@ class _SearchBar extends ConsumerWidget {
                       icon: const Icon(Icons.clear),
                       onPressed: () => ref
                           .read(expenseListFilterProvider.notifier)
-                          .setSearchQuery(''))
+                          .setSearchQuery(''),)
                   : null,
         ),
         onChanged: (value) =>
@@ -157,13 +157,13 @@ class _FilterChips extends ConsumerWidget {
           FilterChip(
             label: Text(filter.dateRange == null
                 ? 'All Time'
-                : '${DateFormatter.formatShort(filter.dateRange!.start)} - ${DateFormatter.formatShort(filter.dateRange!.end)}'),
+                : '${DateFormatter.formatShort(filter.dateRange!.start)} - ${DateFormatter.formatShort(filter.dateRange!.end)}',),
             selected: filter.dateRange != null,
             onSelected: (_) async {
               final picked = await showDateRangePicker(
                   context: context,
                   firstDate: DateTime(2020),
-                  lastDate: DateTime.now());
+                  lastDate: DateTime.now(),);
               if (picked != null) notifier.setDateRange(picked);
             },
             onDeleted: filter.dateRange != null
@@ -178,7 +178,7 @@ class _FilterChips extends ConsumerWidget {
                   onSelected: (selected) =>
                       notifier.setCategory(selected ? category : null),
                 ),
-              )),
+              ),),
         ],
       ),
     );
@@ -200,7 +200,7 @@ class _ResultsCount extends ConsumerWidget {
         children: [
           Text('${expenses.length} expenses'),
           Text(
-              'Total: ${CurrencyFormatter.format(expenses.fold(0.0, (sum, t) => sum + t.totalAmount), currencyCode: group!.currency)}'),
+              'Total: ${CurrencyFormatter.format(expenses.fold(0.0, (sum, t) => sum + t.totalAmount), currencyCode: group!.currency)}',),
         ],
       ),
     );
@@ -246,7 +246,7 @@ class _CategoryBreakdown extends StatelessWidget {
   final String currency;
 
   const _CategoryBreakdown(
-      {required this.categoryTotals, required this.currency});
+      {required this.categoryTotals, required this.currency,});
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +260,7 @@ class _CategoryBreakdown extends StatelessWidget {
       child: Column(
         children: [
           const Text('Category Breakdown',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
           ...sortedCategories.map((entry) {
             final percentage = (entry.value / total * 100).toStringAsFixed(1);
             return Row(
@@ -268,7 +268,7 @@ class _CategoryBreakdown extends StatelessWidget {
                 Icon(entry.key.icon),
                 Expanded(child: Text(entry.key.displayName)),
                 Text(CurrencyFormatter.format(entry.value,
-                    currencyCode: currency)),
+                    currencyCode: currency,),),
                 Text('$percentage%'),
               ],
             );

@@ -171,7 +171,7 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
                     fillColor: Theme.of(context)
                         .colorScheme
                         .surfaceContainerHighest
-                        .withOpacity(0.35),
+                        .withValues(alpha: 0.35),
                     prefixIcon: const Icon(Icons.search, size: 20),
                     suffixIcon: currentQuery.isNotEmpty
                         ? IconButton(

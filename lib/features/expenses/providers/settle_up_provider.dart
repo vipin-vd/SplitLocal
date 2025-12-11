@@ -80,7 +80,7 @@ class SettleUpForm extends _$SettleUpForm {
   void setFromSuggestion(String payerId, String recipientId, double amount) {
     state.amountController.text = amount.toStringAsFixed(2);
     state = state.copyWith(
-        payerId: payerId, recipientId: recipientId, clearErrorMessage: true);
+        payerId: payerId, recipientId: recipientId, clearErrorMessage: true,);
   }
 
   Future<bool> savePayment(String groupId) async {
@@ -91,7 +91,7 @@ class SettleUpForm extends _$SettleUpForm {
     }
     if (state.payerId == state.recipientId) {
       state = state.copyWith(
-          errorMessage: 'Payer and recipient cannot be the same');
+          errorMessage: 'Payer and recipient cannot be the same',);
       return false;
     }
 
@@ -100,7 +100,7 @@ class SettleUpForm extends _$SettleUpForm {
     final deviceOwner = ref.read(deviceOwnerProvider);
     if (deviceOwner == null) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Device owner not found');
+          isSaving: false, errorMessage: 'Device owner not found',);
       return false;
     }
 

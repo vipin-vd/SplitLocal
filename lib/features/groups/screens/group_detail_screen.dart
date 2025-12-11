@@ -81,29 +81,34 @@ class _AppBarActions extends ConsumerWidget {
               Text(summaryText),
               if (membersWithPhone.isNotEmpty) ...[
                 const Divider(),
-                ...membersWithPhone.map((member) => OutlinedButton.icon(
-                      icon: const Icon(Icons.chat),
-                      label: Text(member.name),
-                      onPressed: () async {
-                        final cleanPhone =
-                            member.phoneNumber!.replaceAll(RegExp(r'\D'), '');
-                        final encodedMessage = Uri.encodeComponent(summaryText);
-                        final url =
-                            'https://wa.me/$cleanPhone?text=$encodedMessage';
-                        if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url),
-                              mode: LaunchMode.externalApplication);
-                        }
-                      },
-                    )),
+                ...membersWithPhone.map(
+                  (member) => OutlinedButton.icon(
+                    icon: const Icon(Icons.chat),
+                    label: Text(member.name),
+                    onPressed: () async {
+                      final cleanPhone =
+                          member.phoneNumber!.replaceAll(RegExp(r'\D'), '');
+                      final encodedMessage = Uri.encodeComponent(summaryText);
+                      final url =
+                          'https://wa.me/$cleanPhone?text=$encodedMessage';
+                      if (await canLaunchUrl(Uri.parse(url))) {
+                        await launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
+                    },
+                  ),
+                ),
               ],
             ],
           ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: summaryText));
@@ -120,49 +125,51 @@ class _AppBarActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final deviceOwner = ref.watch(deviceOwnerProvider);
-    return Row(children: [
-      IconButton(
-        icon: const Icon(Icons.share),
-        tooltip: 'Share',
-        onPressed: () => _shareGroupSummary(context, ref),
-      ),
-      IconButton(
-        icon: const Icon(Icons.insights),
-        tooltip: 'Insights',
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => GroupInsightsScreen(groupId: groupId),
-          ),
-        ),
-      ),
-      if (deviceOwner != null && deviceOwner.isDeviceOwner)
+    return Row(
+      children: [
         IconButton(
-          icon: const Icon(Icons.admin_panel_settings),
-          tooltip: 'Admin Report',
+          icon: const Icon(Icons.share),
+          tooltip: 'Share',
+          onPressed: () => _shareGroupSummary(context, ref),
+        ),
+        IconButton(
+          icon: const Icon(Icons.insights),
+          tooltip: 'Insights',
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AdminDebtViewScreen(groupId: groupId),
+              builder: (_) => GroupInsightsScreen(groupId: groupId),
             ),
           ),
         ),
-      IconButton(
-        icon: const Icon(Icons.settings),
-        tooltip: 'Settings',
-        onPressed: () {
-          final group = ref.read(selectedGroupProvider(groupId));
-          if (group != null) {
-            Navigator.push(
+        if (deviceOwner != null && deviceOwner.isDeviceOwner)
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            tooltip: 'Admin Report',
+            onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => GroupSettingsScreen(group: group),
+                builder: (_) => AdminDebtViewScreen(groupId: groupId),
               ),
-            );
-          }
-        },
-      ),
-    ]);
+            ),
+          ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: 'Settings',
+          onPressed: () {
+            final group = ref.read(selectedGroupProvider(groupId));
+            if (group != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => GroupSettingsScreen(group: group),
+                ),
+              );
+            }
+          },
+        ),
+      ],
+    );
   }
 }
 
@@ -186,41 +193,58 @@ class _GroupStatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Group Summary',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Group Summary',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Total Group Spend:'),
-              Text(
-                  CurrencyFormatter.format(totalSpend,
-                      currencyCode: group.currency),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-            ]),
-            const SizedBox(height: 8),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Members:'),
-              Text('${members.length}'),
-            ]),
-            if (deviceOwner != null) ...[
-              const Divider(height: 24),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Your Balance:'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total Group Spend:'),
                 Text(
                   CurrencyFormatter.format(
-                      (netBalances[deviceOwner.id] ?? 0.0).abs(),
-                      currencyCode: group.currency),
-                  style: TextStyle(
+                    totalSpend,
+                    currencyCode: group.currency,
+                  ),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: (netBalances[deviceOwner.id] ?? 0.0) > 0
-                        ? Colors.green
-                        : (netBalances[deviceOwner.id] ?? 0.0) < 0
-                            ? Colors.red
-                            : Colors.grey,
                   ),
                 ),
-              ]),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Members:'),
+                Text('${members.length}'),
+              ],
+            ),
+            if (deviceOwner != null) ...[
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Your Balance:'),
+                  Text(
+                    CurrencyFormatter.format(
+                      (netBalances[deviceOwner.id] ?? 0.0).abs(),
+                      currencyCode: group.currency,
+                    ),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: (netBalances[deviceOwner.id] ?? 0.0) > 0
+                          ? Colors.green
+                          : (netBalances[deviceOwner.id] ?? 0.0) < 0
+                              ? Colors.red
+                              : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
               Text(
                 (netBalances[deviceOwner.id] ?? 0.0) > 0
                     ? 'You are owed'
@@ -258,48 +282,64 @@ class _BalancesSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Balances',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Row(children: [
-                Text(showSimplifiedDebts ? 'Simplified' : 'Actual',
-                    style: const TextStyle(fontSize: 12)),
-                Switch(
-                    value: showSimplifiedDebts,
-                    onChanged: (_) => ref
-                        .read(showSimplifiedDebtsProvider.notifier)
-                        .toggle()),
-              ]),
-            ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Balances',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      showSimplifiedDebts ? 'Simplified' : 'Actual',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Switch(
+                      value: showSimplifiedDebts,
+                      onChanged: (_) => ref
+                          .read(showSimplifiedDebtsProvider.notifier)
+                          .toggle(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             ...members.map((member) {
               final balance = netBalances[member.id] ?? 0.0;
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                          child: Text(member.isDeviceOwner
-                              ? '${member.name} (You)'
-                              : member.name)),
-                      Text(
-                        balance > 0
-                            ? '+${CurrencyFormatter.format(balance, currencyCode: group.currency)}'
-                            : balance < 0
-                                ? CurrencyFormatter.format(balance,
-                                    currencyCode: group.currency)
-                                : 'Settled',
-                        style: TextStyle(
-                          color: balance > 0
-                              ? Colors.green
-                              : balance < 0
-                                  ? Colors.red
-                                  : Colors.grey,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        member.isDeviceOwner
+                            ? '${member.name} (You)'
+                            : member.name,
                       ),
-                    ]),
+                    ),
+                    Text(
+                      balance > 0
+                          ? '+${CurrencyFormatter.format(balance, currencyCode: group.currency)}'
+                          : balance < 0
+                              ? CurrencyFormatter.format(
+                                  balance,
+                                  currencyCode: group.currency,
+                                )
+                              : 'Settled',
+                      style: TextStyle(
+                        color: balance > 0
+                            ? Colors.green
+                            : balance < 0
+                                ? Colors.red
+                                : Colors.grey,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               );
             }),
           ],
@@ -326,52 +366,71 @@ class _RecentTransactions extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Recent Transactions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextButton(
-                onPressed: () => Navigator.push(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Recent Transactions',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => ExpenseListScreen(groupId: groupId))),
-                child: const Text('View All'),
-              ),
-            ]),
+                      builder: (_) => ExpenseListScreen(groupId: groupId),
+                    ),
+                  ),
+                  child: const Text('View All'),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             if (transactions.isEmpty)
               const Center(
-                  child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text('No transactions yet',
-                          style: TextStyle(color: Colors.grey))))
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text(
+                    'No transactions yet',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
             else
               ...transactions.take(5).map((transaction) {
                 final payer = users.firstWhere(
-                    (u) => transaction.payers.keys.first == u.id,
-                    orElse: () => users.first);
+                  (u) => transaction.payers.keys.first == u.id,
+                  orElse: () => users.first,
+                );
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: transaction.type.name == 'expense'
-                        ? transaction.category.color.withOpacity(0.8)
+                        ? transaction.category.color.withValues(alpha: 0.8)
                         : Colors.green,
                     child: Icon(
-                        transaction.type.name == 'expense'
-                            ? transaction.category.icon
-                            : Icons.payments,
-                        color: Colors.white),
+                      transaction.type.name == 'expense'
+                          ? transaction.category.icon
+                          : Icons.payments,
+                      color: Colors.white,
+                    ),
                   ),
-                  title: Row(children: [
-                    Expanded(child: Text(transaction.description)),
-                    if (transaction.isRecurring)
-                      const Icon(Icons.repeat, size: 16, color: Colors.blue),
-                  ]),
+                  title: Row(
+                    children: [
+                      Expanded(child: Text(transaction.description)),
+                      if (transaction.isRecurring)
+                        const Icon(Icons.repeat, size: 16, color: Colors.blue),
+                    ],
+                  ),
                   subtitle: Text(
-                      '${payer.name} • ${transaction.category.displayName} • ${DateFormatter.formatRelative(transaction.timestamp)}'),
+                    '${payer.name} • ${transaction.category.displayName} • ${DateFormatter.formatRelative(transaction.timestamp)}',
+                  ),
                   trailing: Text(
-                      CurrencyFormatter.format(transaction.totalAmount,
-                          currencyCode: group.currency),
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                    CurrencyFormatter.format(
+                      transaction.totalAmount,
+                      currencyCode: group.currency,
+                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 );
               }),
           ],

@@ -137,7 +137,7 @@ class _AddExpenseTargetSelectorState
     // Filter out friend groups and apply search
     final groups = allGroups
         .where((g) =>
-            !g.isFriendGroup && g.name.toLowerCase().contains(_searchQuery))
+            !g.isFriendGroup && g.name.toLowerCase().contains(_searchQuery),)
         .toList();
 
     if (groups.isEmpty) {

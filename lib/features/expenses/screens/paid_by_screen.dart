@@ -29,8 +29,9 @@ class PaidByScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Who Paid?'),
         leading: IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context)),
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -38,8 +39,11 @@ class PaidByScreen extends ConsumerWidget {
               if (result != null) {
                 Navigator.pop(context, result);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Payers total must equal total amount')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Payers total must equal total amount'),
+                  ),
+                );
               }
             },
             child: const Text(
@@ -59,9 +63,10 @@ class PaidByScreen extends ConsumerWidget {
           _PayerModeToggle(provider: provider),
           if (state.isMultiplePayers) _RemainingAmountIndicator(state: state),
           _MemberList(
-              provider: provider,
-              members: members,
-              deviceOwnerId: deviceOwnerId),
+            provider: provider,
+            members: members,
+            deviceOwnerId: deviceOwnerId,
+          ),
         ],
       ),
     );
@@ -105,13 +110,15 @@ class _RemainingAmountIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       color: isValid
-          ? Colors.green.withOpacity(0.1)
-          : Colors.orange.withOpacity(0.1),
+          ? Colors.green.withValues(alpha: 0.1)
+          : Colors.orange.withValues(alpha: 0.1),
       child: Row(
         children: [
-          Text(isValid
-              ? 'All set!'
-              : 'Remaining: ${CurrencyFormatter.format(remaining)}'),
+          Text(
+            isValid
+                ? 'All set!'
+                : 'Remaining: ${CurrencyFormatter.format(remaining)}',
+          ),
         ],
       ),
     );
@@ -123,35 +130,54 @@ class _MemberList extends ConsumerWidget {
   final List<User> members;
   final String deviceOwnerId;
 
-  const _MemberList(
-      {required this.provider,
-      required this.members,
-      required this.deviceOwnerId});
+  const _MemberList({
+    required this.provider,
+    required this.members,
+    required this.deviceOwnerId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(provider);
     final notifier = ref.read(provider.notifier);
 
-    return Expanded(
-      child: ListView.builder(
-        itemCount: members.length,
-        itemBuilder: (context, index) {
-          final member = members[index];
-          final isDeviceOwner = member.id == deviceOwnerId;
+    if (state.isMultiplePayers) {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: members.length,
+          itemBuilder: (context, index) {
+            final member = members[index];
+            final isDeviceOwner = member.id == deviceOwnerId;
+            return _MultiplePayerItem(
+              controller: state.controllers[member.id]!,
+              member: member,
+              isDeviceOwner: isDeviceOwner,
+            );
+          },
+        ),
+      );
+    }
 
-          return state.isMultiplePayers
-              ? _MultiplePayerItem(
-                  controller: state.controllers[member.id]!,
-                  member: member,
-                  isDeviceOwner: isDeviceOwner)
-              : _SinglePayerItem(
-                  member: member,
-                  isDeviceOwner: isDeviceOwner,
-                  groupValue: state.selectedSinglePayer,
-                  onChanged: (value) => notifier.setSinglePayer(value!),
-                );
+    // Single payer mode - use RadioGroup for managing selection
+    return Expanded(
+      child: RadioGroup<String>(
+        groupValue: state.selectedSinglePayer ?? '',
+        onChanged: (value) {
+          if (value != null) {
+            notifier.setSinglePayer(value);
+          }
         },
+        child: ListView.builder(
+          itemCount: members.length,
+          itemBuilder: (context, index) {
+            final member = members[index];
+            final isDeviceOwner = member.id == deviceOwnerId;
+            return _SinglePayerItem(
+              member: member,
+              isDeviceOwner: isDeviceOwner,
+            );
+          },
+        ),
       ),
     );
   }
@@ -162,10 +188,11 @@ class _MultiplePayerItem extends StatelessWidget {
   final User member;
   final bool isDeviceOwner;
 
-  const _MultiplePayerItem(
-      {required this.controller,
-      required this.member,
-      required this.isDeviceOwner});
+  const _MultiplePayerItem({
+    required this.controller,
+    required this.member,
+    required this.isDeviceOwner,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -187,22 +214,17 @@ class _MultiplePayerItem extends StatelessWidget {
 class _SinglePayerItem extends StatelessWidget {
   final User member;
   final bool isDeviceOwner;
-  final String? groupValue;
-  final ValueChanged<String?> onChanged;
 
-  const _SinglePayerItem(
-      {required this.member,
-      required this.isDeviceOwner,
-      required this.groupValue,
-      required this.onChanged});
+  const _SinglePayerItem({
+    required this.member,
+    required this.isDeviceOwner,
+  });
 
   @override
   Widget build(BuildContext context) {
     return RadioListTile<String>(
       title: Text(isDeviceOwner ? 'You' : member.name),
       value: member.id,
-      groupValue: groupValue,
-      onChanged: onChanged,
     );
   }
 }

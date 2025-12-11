@@ -63,7 +63,7 @@ class _ExportCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Export Data',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () =>
@@ -99,13 +99,13 @@ class _ImportCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Import Data',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () async {
                 final merge = await showDialog<bool>(
                     context: context,
-                    builder: (context) => const _ImportModeDialog());
+                    builder: (context) => const _ImportModeDialog(),);
                 if (merge != null) notifier.importFromFile(merge);
               },
               icon: const Icon(Icons.file_upload),
@@ -124,7 +124,7 @@ class _ImportCard extends ConsumerWidget {
               controller: state.importController,
               decoration: const InputDecoration(
                   labelText: 'JSON Data',
-                  hintText: 'Paste your backup data here'),
+                  hintText: 'Paste your backup data here',),
               maxLines: 8,
             ),
             const SizedBox(height: 16),
@@ -132,7 +132,7 @@ class _ImportCard extends ConsumerWidget {
               onPressed: () async {
                 final merge = await showDialog<bool>(
                     context: context,
-                    builder: (context) => const _ImportModeDialog());
+                    builder: (context) => const _ImportModeDialog(),);
                 if (merge != null) notifier.importFromText(merge);
               },
               icon: const Icon(Icons.restore),
@@ -155,10 +155,10 @@ class _ImportModeDialog extends StatelessWidget {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Merge')),
+            child: const Text('Merge'),),
         TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Replace')),
+            child: const Text('Replace'),),
       ],
     );
   }
@@ -174,7 +174,7 @@ class _WarningCard extends StatelessWidget {
       child: const Padding(
         padding: EdgeInsets.all(12),
         child: Text(
-            'Important: Importing will overwrite existing data unless merged. Keep your backups safe.'),
+            'Important: Importing will overwrite existing data unless merged. Keep your backups safe.',),
       ),
     );
   }

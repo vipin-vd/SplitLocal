@@ -1,5 +1,3 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:splitlocal/shared/utils/formatters.dart';
 
 void main() {
   // Commented out to focus on calculation tests

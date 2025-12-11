@@ -34,7 +34,7 @@ class TransactionTile extends StatelessWidget {
 
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: transaction.category.color.withOpacity(0.2),
+        backgroundColor: transaction.category.color.withValues(alpha: 0.2),
         child: Icon(
           transaction.category.icon,
           color: transaction.category.color,

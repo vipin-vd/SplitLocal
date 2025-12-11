@@ -95,7 +95,7 @@ class GroupSettingsScreenLogic extends _$GroupSettingsScreenLogic {
   Future<bool> removeMember(Group group, String userId) async {
     final netBalances = ref.read(groupNetBalancesProvider(group.id));
     final userBalance = netBalances[userId] ?? 0.0;
-    final balanceThreshold = 0.01;
+    const balanceThreshold = 0.01;
 
     // Check if user has outstanding balance
     if (userBalance.abs() >= balanceThreshold) {
@@ -103,7 +103,7 @@ class GroupSettingsScreenLogic extends _$GroupSettingsScreenLogic {
     }
 
     final updatedGroup = group.copyWith(
-        memberIds: group.memberIds.where((id) => id != userId).toList());
+        memberIds: group.memberIds.where((id) => id != userId).toList(),);
     await ref.read(groupsProvider.notifier).updateGroup(updatedGroup);
     return true; // Removal successful
   }
@@ -121,7 +121,7 @@ class GroupSettingsScreenLogic extends _$GroupSettingsScreenLogic {
     if (group == null) return false;
 
     final netBalances = ref.read(groupNetBalancesProvider(groupId));
-    final balanceThreshold = 0.01;
+    const balanceThreshold = 0.01;
 
     // Check if any member has outstanding balance
     for (final balance in netBalances.values) {

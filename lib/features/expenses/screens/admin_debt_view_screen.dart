@@ -26,13 +26,13 @@ class AdminDebtViewScreen extends ConsumerWidget {
     if (group == null) {
       return Scaffold(
           appBar: AppBar(title: const Text('Admin View')),
-          body: const Center(child: Text('Group not found')));
+          body: const Center(child: Text('Group not found')),);
     }
 
     if (deviceOwner == null || !deviceOwner.isDeviceOwner) {
       return Scaffold(
           appBar: AppBar(title: const Text('Admin View')),
-          body: const Center(child: Text('Admin Only')));
+          body: const Center(child: Text('Admin Only')),);
     }
 
     return Scaffold(
@@ -75,16 +75,16 @@ class _RemovalBlockedBanner extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              const Icon(Icons.info, color: Colors.red),
-              const SizedBox(width: 12),
-              const Expanded(
+            const Row(children: [
+              Icon(Icons.info, color: Colors.red),
+              SizedBox(width: 12),
+              Expanded(
                 child: Text(
                   'Removal blocked: Outstanding debts exist. Please settle up before removing or leaving.',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-            ]),
+            ],),
             const SizedBox(height: 12),
             Row(children: [
               OutlinedButton.icon(
@@ -123,7 +123,7 @@ class _RemovalBlockedBanner extends ConsumerWidget {
                       }
                     : null,
               ),
-            ]),
+            ],),
           ],
         ),
       ),
@@ -145,7 +145,7 @@ class _AdminNoticeCard extends StatelessWidget {
             Icon(Icons.admin_panel_settings),
             SizedBox(width: 12),
             Expanded(
-                child: Text('Admin View: Only you can see this information')),
+                child: Text('Admin View: Only you can see this information'),),
           ],
         ),
       ),
@@ -175,13 +175,13 @@ class _WhoPaidWhatCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Who Paid What',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             ...members.map((member) {
               final totalPaid =
                   debtCalculator.getUserTotalPaid(member.id, transactions);
               return _MemberSummaryRow(
-                  member: member, value: totalPaid, currency: group.currency);
-            })
+                  member: member, value: totalPaid, currency: group.currency,);
+            }),
           ],
         ),
       ),
@@ -208,13 +208,13 @@ class _MemberShareCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Each Member\'s Share',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             ...members.map((member) {
               final totalShare =
                   debtCalculator.getUserTotalShare(member.id, transactions);
               return _MemberSummaryRow(
-                  member: member, value: totalShare, currency: group.currency);
-            })
+                  member: member, value: totalShare, currency: group.currency,);
+            }),
           ],
         ),
       ),
@@ -240,12 +240,12 @@ class _NetBalancesCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Net Balances',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             ...members.map((member) {
               final balance = netBalances[member.id] ?? 0.0;
               return _BalanceRow(
-                  member: member, balance: balance, currency: group.currency);
-            })
+                  member: member, balance: balance, currency: group.currency,);
+            }),
           ],
         ),
       ),
@@ -273,7 +273,7 @@ class _SettleUpCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('How to Settle Up',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
             if (simplifiedDebts.isEmpty)
               const Text('All Settled Up!')
             else
@@ -281,23 +281,23 @@ class _SettleUpCard extends ConsumerWidget {
                   // Filter out any debts that reference users no longer in the group
                   .where((debt) =>
                       members.any((u) => u.id == debt.fromUserId) &&
-                      members.any((u) => u.id == debt.toUserId))
+                      members.any((u) => u.id == debt.toUserId),)
                   .map((debt) {
                 // Safe resolution of users; avoids StateError: No element
                 final fromUser = members.firstWhere(
                     (u) => u.id == debt.fromUserId,
                     orElse: () =>
                         // Fallback should never hit due to the where() above
-                        members.first);
+                        members.first,);
                 final toUser = members.firstWhere((u) => u.id == debt.toUserId,
-                    orElse: () => members.first);
+                    orElse: () => members.first,);
                 return _DebtRow(
                   from: fromUser,
                   to: toUser,
                   amount: debt.amount,
                   currency: group.currency,
                 );
-              })
+              }),
           ],
         ),
       ),
@@ -311,7 +311,7 @@ class _MemberSummaryRow extends StatelessWidget {
   final String currency;
 
   const _MemberSummaryRow(
-      {required this.member, required this.value, required this.currency});
+      {required this.member, required this.value, required this.currency,});
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +335,7 @@ class _BalanceRow extends StatelessWidget {
   final String currency;
 
   const _BalanceRow(
-      {required this.member, required this.balance, required this.currency});
+      {required this.member, required this.balance, required this.currency,});
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +351,7 @@ class _BalanceRow extends StatelessWidget {
             style: TextStyle(
                 color: balance > 0
                     ? Colors.green
-                    : (balance < 0 ? Colors.red : Colors.grey)),
+                    : (balance < 0 ? Colors.red : Colors.grey),),
           ),
         ],
       ),
@@ -369,7 +369,7 @@ class _DebtRow extends StatelessWidget {
       {required this.from,
       required this.to,
       required this.amount,
-      required this.currency});
+      required this.currency,});
 
   @override
   Widget build(BuildContext context) {

@@ -29,10 +29,12 @@ class FriendDetailScreen extends ConsumerWidget {
     final me = ref.watch(deviceOwnerProvider);
     final allGroups = ref.watch(groupsProvider);
     final sharedGroups = allGroups
-        .where((g) =>
-            !g.isFriendGroup &&
-            g.memberIds.contains(me!.id) &&
-            g.memberIds.contains(friend.id))
+        .where(
+          (g) =>
+              !g.isFriendGroup &&
+              g.memberIds.contains(me!.id) &&
+              g.memberIds.contains(friend.id),
+        )
         .toList();
     final friendGroup = ref.watch(friendGroupProvider(friend.id));
 
@@ -114,10 +116,12 @@ class _FloatingActionButtons extends ConsumerWidget {
     if (allSettleableGroups.length == 1) {
       // Single group - navigate directly
       final deviceOwner = ref.read(deviceOwnerProvider);
-      final balance = ref.read(groupBalanceWithFriendProvider(
-        allSettleableGroups.first.id,
-        friend.id,
-      ));
+      final balance = ref.read(
+        groupBalanceWithFriendProvider(
+          allSettleableGroups.first.id,
+          friend.id,
+        ),
+      );
 
       // If balance > 0, friend owes you (you receive payment)
       // If balance < 0, you owe friend (you pay)
@@ -159,10 +163,12 @@ class _FloatingActionButtons extends ConsumerWidget {
 
     if (selectedGroup != null && context.mounted) {
       final deviceOwner = ref.read(deviceOwnerProvider);
-      final balance = ref.read(groupBalanceWithFriendProvider(
-        selectedGroup.id,
-        friend.id,
-      ));
+      final balance = ref.read(
+        groupBalanceWithFriendProvider(
+          selectedGroup.id,
+          friend.id,
+        ),
+      );
 
       // If balance > 0, friend owes you (you receive payment)
       // If balance < 0, you owe friend (you pay)
@@ -232,7 +238,7 @@ class _BalanceSummary extends StatelessWidget {
     final isPositive = balance > 0;
     final isZero = balance.abs() < 0.01;
     // Keep a soothing, neutral background and only color the amount text.
-    final containerColor = scheme.surfaceVariant;
+    final containerColor = scheme.surfaceContainerHighest;
     final onContainerColor = scheme.onSurfaceVariant;
 
     return Card(
@@ -257,7 +263,7 @@ class _BalanceSummary extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: onContainerColor.withOpacity(0.12),
+                    color: onContainerColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

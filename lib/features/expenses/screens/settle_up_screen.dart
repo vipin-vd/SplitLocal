@@ -69,7 +69,7 @@ class SettleUpScreen extends ConsumerWidget {
     if (group == null) {
       return Scaffold(
           appBar: AppBar(title: const Text('Settle Up')),
-          body: const Center(child: Text('Group not found')));
+          body: const Center(child: Text('Group not found')),);
     }
 
     return Scaffold(
@@ -108,7 +108,7 @@ class _SuggestedSettlements extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Suggested Settlements',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
               ...simplifiedDebts.map((debt) {
                 final payer =
                     members.firstWhere((u) => u.id == debt.fromUserId);
@@ -117,13 +117,13 @@ class _SuggestedSettlements extends ConsumerWidget {
                 return ListTile(
                   title: Text('${payer.name} → ${recipient.name}'),
                   trailing: Text(CurrencyFormatter.format(debt.amount,
-                      currencyCode: group.currency)),
+                      currencyCode: group.currency,),),
                   onTap: () => ref
                       .read(settleUpFormProvider.notifier)
                       .setFromSuggestion(
-                          debt.fromUserId, debt.toUserId, debt.amount),
+                          debt.fromUserId, debt.toUserId, debt.amount,),
                 );
-              })
+              }),
             ],
           );
   }
@@ -138,31 +138,31 @@ class _RecordPaymentForm extends ConsumerWidget {
     final state = ref.watch(settleUpFormProvider);
     final notifier = ref.read(settleUpFormProvider.notifier);
     final members = ref.watch(usersProvider).where((u) =>
-        ref.watch(selectedGroupProvider(groupId))!.memberIds.contains(u.id));
+        ref.watch(selectedGroupProvider(groupId))!.memberIds.contains(u.id),);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Record Payment',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          value: state.payerId,
+          initialValue: state.payerId,
           decoration: const InputDecoration(labelText: 'Payer'),
           items: members
               .map((member) =>
-                  DropdownMenuItem(value: member.id, child: Text(member.name)))
+                  DropdownMenuItem(value: member.id, child: Text(member.name)),)
               .toList(),
           onChanged: (value) => notifier.setPayer(value),
           validator: (value) => value == null ? 'Please select a payer' : null,
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: state.recipientId,
+          initialValue: state.recipientId,
           decoration: const InputDecoration(labelText: 'Recipient'),
           items: members
               .map((member) =>
-                  DropdownMenuItem(value: member.id, child: Text(member.name)))
+                  DropdownMenuItem(value: member.id, child: Text(member.name)),)
               .toList(),
           onChanged: (value) => notifier.setRecipient(value),
           validator: (value) =>

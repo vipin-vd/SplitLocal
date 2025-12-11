@@ -54,10 +54,10 @@ class BackupRestore extends _$BackupRestore {
       final data = ref.read(localStorageServiceProvider).exportToJson();
       await Clipboard.setData(ClipboardData(text: jsonEncode(data)));
       state = state.copyWith(
-          isProcessing: false, successMessage: 'Data exported to clipboard!');
+          isProcessing: false, successMessage: 'Data exported to clipboard!',);
     } catch (e) {
       state = state.copyWith(
-          isProcessing: false, errorMessage: 'Export failed: $e');
+          isProcessing: false, errorMessage: 'Export failed: $e',);
     }
   }
 
@@ -67,13 +67,13 @@ class BackupRestore extends _$BackupRestore {
       final success = await ref.read(exportImportServiceProvider).exportData();
       if (success) {
         state = state.copyWith(
-            isProcessing: false, successMessage: 'Data exported as file!');
+            isProcessing: false, successMessage: 'Data exported as file!',);
       } else {
         state = state.copyWith(isProcessing: false);
       }
     } catch (e) {
       state = state.copyWith(
-          isProcessing: false, errorMessage: 'Export failed: $e');
+          isProcessing: false, errorMessage: 'Export failed: $e',);
     }
   }
 
@@ -86,13 +86,13 @@ class BackupRestore extends _$BackupRestore {
       if (success) {
         _invalidateProviders();
         state = state.copyWith(
-            isProcessing: false, successMessage: 'Data imported successfully!');
+            isProcessing: false, successMessage: 'Data imported successfully!',);
       } else {
         state = state.copyWith(isProcessing: false);
       }
     } catch (e) {
       state = state.copyWith(
-          isProcessing: false, errorMessage: 'Import failed: $e');
+          isProcessing: false, errorMessage: 'Import failed: $e',);
     }
   }
 
@@ -113,10 +113,10 @@ class BackupRestore extends _$BackupRestore {
           .importFromJson(data, merge: merge);
       _invalidateProviders();
       state = state.copyWith(
-          isProcessing: false, successMessage: 'Data imported successfully!');
+          isProcessing: false, successMessage: 'Data imported successfully!',);
     } catch (e) {
       state = state.copyWith(
-          isProcessing: false, errorMessage: 'Import failed: $e');
+          isProcessing: false, errorMessage: 'Import failed: $e',);
     }
   }
 

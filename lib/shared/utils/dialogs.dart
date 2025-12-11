@@ -92,7 +92,7 @@ Future<bool?> showSettleDebtsDialog(
                     ),
                     Expanded(
                         child: Text(suggestion,
-                            style: const TextStyle(fontSize: 13))),
+                            style: const TextStyle(fontSize: 13),),),
                   ],
                 ),
               ),

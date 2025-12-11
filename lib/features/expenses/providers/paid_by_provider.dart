@@ -41,13 +41,13 @@ class PaidByState {
 class PaidBy extends _$PaidBy {
   @override
   PaidByState build(List<User> members, Map<String, double> initialPayers,
-      double totalAmount, String deviceOwnerId) {
+      double totalAmount, String deviceOwnerId,) {
     final payers = Map<String, double>.from(initialPayers);
     final controllers = <String, TextEditingController>{};
     for (final member in members) {
       final amount = payers[member.id] ?? 0.0;
       controllers[member.id] = TextEditingController(
-          text: amount > 0 ? amount.toStringAsFixed(2) : '');
+          text: amount > 0 ? amount.toStringAsFixed(2) : '',);
       controllers[member.id]!.addListener(() => _updatePayer(member.id));
     }
 

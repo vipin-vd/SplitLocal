@@ -94,7 +94,7 @@ List<Transaction> filteredExpenses(FilteredExpensesRef ref, String groupId) {
 
 @riverpod
 Map<ExpenseCategory, double> categoryTotals(
-    CategoryTotalsRef ref, String groupId) {
+    CategoryTotalsRef ref, String groupId,) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final totals = <ExpenseCategory, double>{};
   for (var t in transactions) {

@@ -74,24 +74,28 @@ void main() {
         ),
       ];
 
-      container = ProviderContainer(overrides: [
-        deviceOwnerProvider.overrideWith((ref) => User(
+      container = ProviderContainer(
+        overrides: [
+          deviceOwnerProvider.overrideWith(
+            (ref) => User(
               id: meId,
               name: 'Me',
               phoneNumber: null,
               isDeviceOwner: true,
-              createdAt: null,
-            )),
-        transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
-      ]);
+              createdAt: DateTime(2024, 1, 1),
+            ),
+          ),
+          transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
+        ],
+      );
     });
 
     tearDown(() => container.dispose());
 
     test('allNetBalancesProvider builds map of net vs others', () {
       final net = container.read(allNetBalancesProvider);
-      // Me owes A: 10 (minus tiny 0.005)
-      expect((net[aId] ?? 0).toStringAsFixed(3), (-9.995).toStringAsFixed(3));
+      // Me owes A: 10 + 0.005 = 10.005
+      expect((net[aId] ?? 0).toStringAsFixed(3), (-10.005).toStringAsFixed(3));
       // B owes Me: 15
       expect((net[bId] ?? 0).toStringAsFixed(3), (15.0).toStringAsFixed(3));
     });
@@ -103,23 +107,27 @@ void main() {
 
       // owed: 15 (from B)
       expect(owed.toStringAsFixed(2), '15.00');
-      // owes: 9.995 (to A)
-      expect(owes.toStringAsFixed(3), '9.995');
-      // net: 15 - 9.995 = 5.005
-      expect(net.toStringAsFixed(3), '5.005');
+      // owes: 10.005 (to A)
+      expect(owes.toStringAsFixed(3), '10.005');
+      // net: 15 - 10.005 = 4.995
+      expect(net.toStringAsFixed(3), '4.995');
     });
 
     test('empty transactions => all zeros', () {
-      final empty = ProviderContainer(overrides: [
-        deviceOwnerProvider.overrideWith((ref) => User(
+      final empty = ProviderContainer(
+        overrides: [
+          deviceOwnerProvider.overrideWith(
+            (ref) => User(
               id: meId,
               name: 'Me',
               phoneNumber: null,
               isDeviceOwner: true,
-              createdAt: null,
-            )),
-        transactionsProvider.overrideWith(() => _EmptyTransactions()),
-      ]);
+              createdAt: DateTime(2024, 1, 1),
+            ),
+          ),
+          transactionsProvider.overrideWith(() => _EmptyTransactions()),
+        ],
+      );
 
       expect(empty.read(allNetBalancesProvider), isEmpty);
       expect(empty.read(totalOwedToUserGlobalProvider), 0);
@@ -130,11 +138,10 @@ void main() {
     });
 
     test('no device owner => zeros', () {
-      class _EmptyTransactions2 extends Transactions {
-        @override
-        List<Transaction> build() => <Transaction>[];
-    test('no device owner => zeros', () {
-      final noOwner = ProviderContainer(overrides: [sEmpty);
+      final noOwner = ProviderContainer(overrides: [
+        deviceOwnerProvider.overrideWith((ref) => null),
+        transactionsProvider.overrideWith(() => _EmptyTransactions()),
+      ],);
       expect(noOwner.read(totalOwedToUserGlobalProvider), 0);
       expect(noOwner.read(totalUserOwesGlobalProvider), 0);
       expect(noOwner.read(netBalanceGlobalProvider), 0);

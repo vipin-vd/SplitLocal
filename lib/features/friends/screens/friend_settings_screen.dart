@@ -41,9 +41,9 @@ class _FriendInfoSection extends ConsumerWidget {
       margin: const EdgeInsets.all(16),
       child: Column(
         children: [
-          ListTile(
-            title: const Text('Friend Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const ListTile(
+            title: Text('Friend Information',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
           ),
           ListTile(
             leading: const Icon(Icons.person),
@@ -103,7 +103,7 @@ class _ActionsSection extends ConsumerWidget {
     final message =
         'Hey ${friend.name}! Let\'s use SplitLocal to track our shared expenses easily.';
     final whatsappUrl = Uri.parse(
-        'https://wa.me/${friend.phoneNumber!.replaceAll(RegExp(r'\D'), '')}?text=${Uri.encodeComponent(message)}');
+        'https://wa.me/${friend.phoneNumber!.replaceAll(RegExp(r'\D'), '')}?text=${Uri.encodeComponent(message)}',);
 
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
@@ -135,7 +135,7 @@ class _ActionsSection extends ConsumerWidget {
             title: const Text('Send Invite'),
             subtitle: friend.phoneNumber == null
                 ? const Text('No phone number available',
-                    style: TextStyle(fontSize: 12, color: Colors.grey))
+                    style: TextStyle(fontSize: 12, color: Colors.grey),)
                 : null,
             onTap: () => _sendInvite(context),
           ),
@@ -176,7 +176,7 @@ class _DangerZoneSection extends ConsumerWidget {
           id: group.id,
           name: group.name,
           canLeave: canLeave,
-        ));
+        ),);
       }
     }
 
@@ -239,15 +239,15 @@ class _DangerZoneSection extends ConsumerWidget {
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red)),
+                    color: Colors.red,),),
           ),
           ListTile(
             leading: const Icon(Icons.delete_forever, color: Colors.red),
             title: const Text('Delete Friend',
-                style: TextStyle(color: Colors.red)),
+                style: TextStyle(color: Colors.red),),
             subtitle: const Text(
                 'Remove from friends list (shared data preserved).\nIf balances exist in any group, you must settle or remove them from the group first.',
-                style: TextStyle(fontSize: 12)),
+                style: TextStyle(fontSize: 12),),
             onTap: () => _deleteFriend(context, ref),
           ),
         ],

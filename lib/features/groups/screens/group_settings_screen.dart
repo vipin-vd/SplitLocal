@@ -66,10 +66,12 @@ class _CurrencySection extends ConsumerWidget {
           }).toList(),
           onChanged: (value) async {
             if (value != null && value != group.currency) {
-              final confirmed = await showConfirmDialog(context,
-                  title: 'Change Currency',
-                  message:
-                      'Changing currency will not convert existing amounts. Are you sure?');
+              final confirmed = await showConfirmDialog(
+                context,
+                title: 'Change Currency',
+                message:
+                    'Changing currency will not convert existing amounts. Are you sure?',
+              );
               if (confirmed == true) {
                 final logic =
                     ref.read(groupSettingsScreenLogicProvider.notifier);
@@ -90,30 +92,37 @@ class _MembersSection extends ConsumerWidget {
   Future<void> _addMembers(BuildContext context, WidgetRef ref) async {
     final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
     final choice = await showDialog<String>(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: const Text('Add Member'),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'manual'),
-                    child: const Text('Enter Manually')),
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'contacts'),
-                    child: const Text('From Contacts')),
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'friends'),
-                    child: const Text('From Friends')),
-              ],
-            ));
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Member'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'manual'),
+            child: const Text('Enter Manually'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'contacts'),
+            child: const Text('From Contacts'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'friends'),
+            child: const Text('From Friends'),
+          ),
+        ],
+      ),
+    );
 
     if (choice == 'manual') {
+      if (!context.mounted) return;
       final user = await showDialog<User>(
-          context: context,
-          builder: (context) => const AddMemberManuallyDialog());
+        context: context,
+        builder: (context) => const AddMemberManuallyDialog(),
+      );
       if (user != null) await logic.addMemberManually(group, user);
     } else if (choice == 'contacts') {
       await logic.addMemberFromContacts(group);
     } else if (choice == 'friends') {
+      if (!context.mounted) return;
       final selectedFriends = await Navigator.push<List<User>>(
         context,
         MaterialPageRoute(
@@ -143,43 +152,55 @@ class _MembersSection extends ConsumerWidget {
       child: Column(
         children: [
           ListTile(
-            title: const Text('Members',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            title: const Text(
+              'Members',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             trailing: isCreator
                 ? TextButton.icon(
                     onPressed: () => _addMembers(context, ref),
                     icon: const Icon(Icons.person_add),
-                    label: const Text('Add'))
+                    label: const Text('Add'),
+                  )
                 : null,
           ),
-          ...members.map((user) => ListTile(
-                title: Text(user.name),
-                trailing: user.isDeviceOwner
-                    ? const Chip(label: Text('You'))
-                    : isCreator
-                        ? Row(mainAxisSize: MainAxisSize.min, children: [
+          ...members.map(
+            (user) => ListTile(
+              title: Text(user.name),
+              trailing: user.isDeviceOwner
+                  ? const Chip(label: Text('You'))
+                  : isCreator
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () async {
-                                  final updatedUser = await showDialog<User>(
-                                      context: context,
-                                      builder: (context) =>
-                                          EditMemberDialog(user: user));
-                                  if (updatedUser != null) {
-                                    ref
-                                        .read(groupSettingsScreenLogicProvider
-                                            .notifier)
-                                        .updateUser(updatedUser);
-                                  }
-                                }),
+                              icon: const Icon(Icons.edit),
+                              onPressed: () async {
+                                final updatedUser = await showDialog<User>(
+                                  context: context,
+                                  builder: (context) =>
+                                      EditMemberDialog(user: user),
+                                );
+                                if (updatedUser != null) {
+                                  ref
+                                      .read(
+                                        groupSettingsScreenLogicProvider
+                                            .notifier,
+                                      )
+                                      .updateUser(updatedUser);
+                                }
+                              },
+                            ),
                             _RemoveButtonWithGuard(
                               user: user,
                               group: group,
                               balance: netBalances[user.id] ?? 0.0,
                             ),
-                          ])
-                        : null,
-              )),
+                          ],
+                        )
+                      : null,
+            ),
+          ),
         ],
       ),
     );
@@ -239,7 +260,9 @@ class _RemoveButtonWithGuard extends ConsumerWidget {
   }
 
   Future<void> _showRemoveConfirmation(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final confirmed = await showConfirmDialog(
       context,
       title: 'Remove member?',
@@ -268,17 +291,22 @@ class _GroupInfoSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('Group Information',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Group Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
           ListTile(title: const Text('Group Name'), subtitle: Text(group.name)),
           if (group.description != null)
             ListTile(
-                title: const Text('Description'),
-                subtitle: Text(group.description!)),
+              title: const Text('Description'),
+              subtitle: Text(group.description!),
+            ),
           ListTile(
-              title: const Text('Created'),
-              subtitle: Text(group.createdAt.toString().split('.')[0])),
+            title: const Text('Created'),
+            subtitle: Text(group.createdAt.toString().split('.')[0]),
+          ),
         ],
       ),
     );
@@ -300,7 +328,9 @@ class _DataManagementSection extends ConsumerWidget {
           final success = await ref
               .read(groupSettingsScreenLogicProvider.notifier)
               .exportGroup(group.id);
-          if (success) showSnackBar(context, 'Group data exported');
+          if (success && context.mounted) {
+            showSnackBar(context, 'Group data exported');
+          }
         },
       ),
     );
@@ -313,8 +343,9 @@ class _DangerZoneSection extends ConsumerWidget {
 
   Future<void> _deleteGroup(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => const _DeleteGroupDialog());
+      context: context,
+      builder: (dialogContext) => const _DeleteGroupDialog(),
+    );
     if (confirmed == true && context.mounted) {
       final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
       final success = await logic.deleteGroup(group.id);
@@ -340,16 +371,12 @@ class _DangerZoneSection extends ConsumerWidget {
 
     for (final entry in netBalances.entries) {
       if (entry.value.abs() >= 0.01) {
-        final member = users.firstWhere(
-          (u) => u.id == entry.key,
-          orElse: () => null as User,
+        final member = users.where((u) => u.id == entry.key).firstOrNull;
+        if (member == null) continue;
+        final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
+        outstandingMembers.add(
+          logic.getMemberBalanceInfo(member, entry.value, group.currency),
         );
-        if (member != null) {
-          final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
-          outstandingMembers.add(
-            logic.getMemberBalanceInfo(member, entry.value, group.currency),
-          );
-        }
       }
     }
 
@@ -415,9 +442,9 @@ class _LeaveGroupSection extends ConsumerWidget {
               ),
         enabled: canLeave && deviceOwner != null,
         onTap: canLeave && deviceOwner != null
-            ? () => _showLeaveConfirmation(context, ref, deviceOwner!)
+            ? () => _showLeaveConfirmation(context, ref, deviceOwner)
             : !canLeave && deviceOwner != null
-                ? () => _showDebtDialog(context, ref, deviceOwner!, myBalance)
+                ? () => _showDebtDialog(context, ref, deviceOwner, myBalance)
                 : null,
       ),
     );
@@ -487,14 +514,16 @@ class _DeleteGroupDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
-              'This action cannot be undone. All data will be lost. Type "delete" to confirm.'),
+            'This action cannot be undone. All data will be lost. Type "delete" to confirm.',
+          ),
           TextField(controller: controller, autofocus: true),
         ],
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel')),
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
         ElevatedButton(
           onPressed: isValid ? () => Navigator.pop(context, true) : null,
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

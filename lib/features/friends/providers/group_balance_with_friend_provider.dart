@@ -7,7 +7,7 @@ part 'group_balance_with_friend_provider.g.dart';
 
 @riverpod
 double groupBalanceWithFriend(
-    GroupBalanceWithFriendRef ref, String groupId, String friendId) {
+    GroupBalanceWithFriendRef ref, String groupId, String friendId,) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return 0.0;
 

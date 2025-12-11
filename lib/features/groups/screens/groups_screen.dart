@@ -5,6 +5,7 @@ import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
 import '../providers/group_filter_provider.dart';
 import '../../../shared/utils/formatters.dart';
+import '../../../shared/widgets/animated_balance_text.dart';
 import '../../../shared/widgets/app_bar_search.dart';
 import '../../expenses/providers/transactions_provider.dart';
 import '../../expenses/widgets/add_expense_target_selector.dart';
@@ -55,8 +56,10 @@ class GroupsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Backup & Restore',
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const BackupRestoreScreen())),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BackupRestoreScreen()),
+            ),
           ),
         ],
         bottom: const PreferredSize(
@@ -84,8 +87,10 @@ class GroupsScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const CreateGroupScreen())),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CreateGroupScreen()),
+        ),
         child: const Icon(Icons.add),
       ),
     );
@@ -127,7 +132,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
           Expanded(
             child: _TotalItem(
               label: 'Net',
-              value: CurrencyFormatter.format(net),
+              amount: net,
               color: netColor,
               semanticsLabel: 'Overall group balance',
             ),
@@ -136,7 +141,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
           Expanded(
             child: _TotalItem(
               label: "You're owed",
-              value: CurrencyFormatter.format(owedToUser),
+              amount: owedToUser,
               color: owedToUser > 0.01 ? Colors.green : scheme.onSurfaceVariant,
               semanticsLabel: "You're owed across groups",
             ),
@@ -145,7 +150,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
           Expanded(
             child: _TotalItem(
               label: 'You owe',
-              value: CurrencyFormatter.format(userOwes),
+              amount: userOwes,
               color: userOwes > 0.01 ? Colors.red : scheme.onSurfaceVariant,
               semanticsLabel: 'You owe across groups',
             ),
@@ -159,13 +164,13 @@ class _GroupsTotalsSummary extends ConsumerWidget {
 class _TotalItem extends StatelessWidget {
   const _TotalItem({
     required this.label,
-    required this.value,
+    required this.amount,
     required this.color,
     required this.semanticsLabel,
   });
 
   final String label;
-  final String value;
+  final double amount;
   final Color color;
   final String semanticsLabel;
 
@@ -184,10 +189,10 @@ class _TotalItem extends StatelessWidget {
                 textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
+          AnimatedBalanceText(
+            amount: amount,
+            color: color,
             style: textTheme.titleMedium?.copyWith(
-              color: color,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -202,18 +207,62 @@ class _EmptyGroupsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.group_add, size: 80, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('No groups yet',
-              style: TextStyle(fontSize: 18, color: Colors.grey)),
-          SizedBox(height: 8),
-          Text('Create your first group to start tracking expenses',
-              style: TextStyle(color: Colors.grey)),
-        ],
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Animated container with icon
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.group_add_rounded,
+                size: 56,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Ready to split expenses?',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Create a group for your next trip, shared apartment, or any expense you want to split with friends.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CreateGroupScreen()),
+              ),
+              icon: const Icon(Icons.add),
+              label: const Text('Create Your First Group'),
+              style: FilledButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -237,29 +286,38 @@ class _GroupListItem extends ConsumerWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF6C63FF),
-          child: Text(group.name.substring(0, 1).toUpperCase(),
-              style: const TextStyle(color: Colors.white)),
+          child: Text(
+            group.name.substring(0, 1).toUpperCase(),
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-        title: Text(group.name,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(
+          group.name,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${group.memberIds.length} members'),
             Text(
-                'Total spend: ${CurrencyFormatter.format(totalSpend, currencyCode: group.currency)}',
-                style: const TextStyle(fontSize: 12)),
+              'Total spend: ${CurrencyFormatter.format(totalSpend, currencyCode: group.currency)}',
+              style: const TextStyle(fontSize: 12),
+            ),
           ],
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(myBalance > 0 ? 'You\'re owed' : 'You owe',
-                style: const TextStyle(fontSize: 11)),
             Text(
-              CurrencyFormatter.format(myBalance.abs(),
-                  currencyCode: group.currency),
+              myBalance > 0 ? 'You\'re owed' : 'You owe',
+              style: const TextStyle(fontSize: 11),
+            ),
+            Text(
+              CurrencyFormatter.format(
+                myBalance.abs(),
+                currencyCode: group.currency,
+              ),
               style: TextStyle(
                 color: myBalance > 0
                     ? Colors.green
@@ -272,9 +330,11 @@ class _GroupListItem extends ConsumerWidget {
           ],
         ),
         onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => GroupDetailScreen(groupId: group.id))),
+          context,
+          MaterialPageRoute(
+            builder: (_) => GroupDetailScreen(groupId: group.id),
+          ),
+        ),
       ),
     );
   }

@@ -43,7 +43,7 @@ class AccountScreen extends ConsumerWidget {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(fontStyle: FontStyle.italic))
+                  ?.copyWith(fontStyle: FontStyle.italic),),
         ],
       ),
     );

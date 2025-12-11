@@ -42,7 +42,7 @@ class SplitMethodState {
 class SplitMethod extends _$SplitMethod {
   @override
   SplitMethodState build(List<User> members, SplitMode initialMode,
-      Map<String, double> initialSplits, double totalAmount) {
+      Map<String, double> initialSplits, double totalAmount,) {
     final splits = Map<String, double>.from(initialSplits);
     final selectedMembers = initialSplits.entries
         .where((e) => e.value > 0)
@@ -52,7 +52,7 @@ class SplitMethod extends _$SplitMethod {
 
     for (final member in members) {
       controllers[member.id] = TextEditingController(
-          text: splits[member.id]?.toStringAsFixed(2) ?? '0.00');
+          text: splits[member.id]?.toStringAsFixed(2) ?? '0.00',);
     }
 
     ref.onDispose(() {
@@ -68,7 +68,7 @@ class SplitMethod extends _$SplitMethod {
             ? Set.from(members.map((m) => m.id))
             : selectedMembers,
         controllers: controllers,
-        totalAmount: totalAmount);
+        totalAmount: totalAmount,);
 
     // Initial calculation
     return _calculateSplits(initialState);
@@ -110,7 +110,7 @@ class SplitMethod extends _$SplitMethod {
           for (final memberId in state.controllers.keys) {
             if (!state.selectedMembers.contains(memberId)) {
               newSplits[memberId] = 0;
-              state.controllers[memberId]?.text = "0.00";
+              state.controllers[memberId]?.text = '0.00';
             }
           }
         }

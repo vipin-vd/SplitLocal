@@ -32,7 +32,7 @@ class SplitMethodScreen extends ConsumerWidget {
         title: const Text('Split Method'),
         leading: IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context)),
+            onPressed: () => Navigator.pop(context),),
         actions: [
           TextButton(
             onPressed: () {
@@ -41,7 +41,7 @@ class SplitMethodScreen extends ConsumerWidget {
                 Navigator.pop(context, result);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Invalid split')));
+                    const SnackBar(content: Text('Invalid split')),);
               }
             },
             child: const Text(
@@ -63,7 +63,7 @@ class SplitMethodScreen extends ConsumerWidget {
           _MemberList(
               provider: provider,
               members: members,
-              deviceOwnerId: deviceOwnerId),
+              deviceOwnerId: deviceOwnerId,),
           const Divider(),
           _Summary(provider: provider),
         ],
@@ -90,7 +90,7 @@ class _SplitModeSelector extends ConsumerWidget {
                   selected: state.splitMode == mode,
                   onSelected: (selected) =>
                       {if (selected) notifier.setSplitMode(mode)},
-                ))
+                ),)
             .toList(),
       ),
     );
@@ -105,7 +105,7 @@ class _MemberList extends ConsumerWidget {
   const _MemberList(
       {required this.provider,
       required this.members,
-      required this.deviceOwnerId});
+      required this.deviceOwnerId,});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -168,7 +168,7 @@ class _Summary extends ConsumerWidget {
           : state.totalAmount / state.selectedMembers.length;
       return ListTile(
           title: Text('${CurrencyFormatter.format(amountPerPerson)}/person'),
-          trailing: Text('${state.selectedMembers.length} people'));
+          trailing: Text('${state.selectedMembers.length} people'),);
     }
 
     String totalLabel;

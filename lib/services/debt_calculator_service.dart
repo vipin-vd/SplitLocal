@@ -94,7 +94,7 @@ class DebtCalculatorService {
                 fromUserId: owerId,
                 toUserId: payerId,
                 amount: debtAmount,
-              ));
+              ),);
             }
           });
         });
@@ -106,7 +106,7 @@ class DebtCalculatorService {
               fromUserId: recipientId,
               toUserId: payerId,
               amount: -amount, // Negative to show debt reduction
-            ));
+            ),);
           });
         });
       }
@@ -163,7 +163,7 @@ class DebtCalculatorService {
         fromUserId: debtor.userId,
         toUserId: creditor.userId,
         amount: transferAmount,
-      ));
+      ),);
 
       // Update balances
       debtors[debtorIndex] = NetBalance(

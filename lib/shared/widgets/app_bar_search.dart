@@ -33,9 +33,11 @@ class AppBarSearch<T extends SearchFilterNotifier>
 }
 
 class _AppBarSearchState<T extends SearchFilterNotifier>
-    extends ConsumerState<AppBarSearch<T>> {
+    extends ConsumerState<AppBarSearch<T>> with SingleTickerProviderStateMixin {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
+  late final AnimationController _animationController;
+  late final Animation<double> _animation;
   Timer? _debounceTimer;
   bool _isExpanded = false;
 
@@ -44,30 +46,19 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
     super.initState();
     _controller = TextEditingController();
     _focusNode = FocusNode();
-    _isExpanded = false;
 
-    // Collapse when focus is lost (e.g., screen switch or tap outside)
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && _isExpanded) {
-        if (mounted) {
-          setState(() {
-            _isExpanded = false;
-          });
-        }
-      }
-    });
-  }
+    // Animation setup for smooth transition
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuad,
+    );
 
-  @override
-  void didUpdateWidget(AppBarSearch<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Collapse when the widget updates (e.g., screen change in navigation)
-    if (_isExpanded) {
-      setState(() {
-        _isExpanded = false;
-      });
-      _focusNode.unfocus();
-    }
+    // Sync initial state if needed, though usually starts collapsed
   }
 
   @override
@@ -75,17 +66,30 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
     _debounceTimer?.cancel();
     _controller.dispose();
     _focusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   void _expand() {
     setState(() => _isExpanded = true);
-    _focusNode.requestFocus();
+    _animationController.forward();
+    // Small delay to ensure widget is built before requesting focus
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) _focusNode.requestFocus();
+    });
   }
 
   void _collapse() {
-    setState(() => _isExpanded = false);
+    if (!_isExpanded) return;
+
     _focusNode.unfocus();
+    _animationController.reverse().then((_) {
+      if (mounted) {
+        setState(() => _isExpanded = false);
+        _controller.clear();
+        _updateQuery('');
+      }
+    });
   }
 
   void _clear() {
@@ -99,7 +103,9 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
   void _updateQuery(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(Duration(milliseconds: widget.debounceMs), () {
-      widget.getNotifier(ref).setSearchQuery(query);
+      if (mounted) {
+        widget.getNotifier(ref).setSearchQuery(query);
+      }
     });
   }
 
@@ -114,7 +120,7 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         if (_controller.text.isNotEmpty) {
           _clear();
-        } else if (_isExpanded) {
+        } else {
           _collapse();
         }
       }
@@ -124,6 +130,8 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
   @override
   Widget build(BuildContext context) {
     final currentQuery = ref.watch(widget.queryProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     ref.listen<String>(
       widget.queryProvider,
@@ -134,94 +142,111 @@ class _AppBarSearchState<T extends SearchFilterNotifier>
             TextPosition(offset: _controller.text.length),
           );
         }
-        if (next.isEmpty && _isExpanded) {
-          _collapse();
-        }
+        // Removed auto-collapse on empty query
       },
     );
 
-    return KeyboardListener(
-      focusNode: FocusNode(),
-      onKeyEvent: _handleKeyEvent,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(scale: animation, child: child),
-          );
-        },
-        child: _isExpanded
-            ? SizedBox(
-                key: const ValueKey('expanded'),
-                width: double.infinity,
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  decoration: InputDecoration(
-                    hintText: widget.hintText,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withValues(alpha: 0.35),
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: currentQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, size: 20),
-                            onPressed: _clear,
-                            tooltip: 'Clear',
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.close, size: 20),
-                            onPressed: _collapse,
-                            tooltip: 'Close',
-                          ),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(24)),
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(24)),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(24)),
-                    ),
+    // Handle back button to close search
+    return PopScope(
+      canPop: !_isExpanded,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _collapse();
+      },
+      child: KeyboardListener(
+        focusNode: FocusNode(),
+        onKeyEvent: _handleKeyEvent,
+        child: SizedBox(
+          height: kToolbarHeight,
+          child: Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              // Collapsed State (Search Icon)
+              FadeTransition(
+                opacity:
+                    Tween<double>(begin: 1.0, end: 0.0).animate(_animation),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.search),
+                    tooltip: widget.semanticsLabel ?? 'Search',
+                    onPressed: _expand,
                   ),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  onChanged: _updateQuery,
-                  onSubmitted: (_) => _focusNode.unfocus(),
-                  textInputAction: TextInputAction.search,
-                ),
-              )
-            : Align(
-                key: const ValueKey('collapsed'),
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.search),
-                  tooltip: widget.semanticsLabel ?? 'Search',
-                  onPressed: _expand,
                 ),
               ),
+
+              // Expanded State (Search Bar)
+              SizeTransition(
+                sizeFactor: _animation,
+                axis: Axis.horizontal,
+                axisAlignment: 1.0, // Expand from right to left
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          decoration: InputDecoration(
+                            hintText: widget.hintText,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            prefixIcon: Icon(
+                              Icons.search,
+                              size: 20,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            suffixIcon: currentQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, size: 20),
+                                    onPressed: _clear,
+                                    tooltip: 'Clear',
+                                  )
+                                : null,
+                          ),
+                          style: theme.textTheme.bodyMedium,
+                          onChanged: _updateQuery,
+                          onSubmitted: (_) => _focusNode.unfocus(),
+                          textInputAction: TextInputAction.search,
+                          textAlignVertical: TextAlignVertical.center,
+                        ),
+                      ),
+                    ),
+                    // Close button outside the field for easier access
+                    SizeTransition(
+                      sizeFactor: _animation,
+                      axis: Axis.horizontal,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: TextButton(
+                          onPressed: _collapse,
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            minimumSize: const Size(48, 40),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-  }
-
-  @override
-  void deactivate() {
-    if (_isExpanded) {
-      _isExpanded = false;
-      _focusNode.unfocus();
-    }
-    super.deactivate();
   }
 }

@@ -63,11 +63,11 @@ class DebtCalculatorService {
         // Recipient receives money (positive for them)
 
         transaction.payers.forEach((payerId, amount) {
-          netBalances[payerId] = (netBalances[payerId] ?? 0.0) - amount;
+          netBalances[payerId] = (netBalances[payerId] ?? 0.0) + amount;
         });
 
         transaction.splits.forEach((recipientId, amount) {
-          netBalances[recipientId] = (netBalances[recipientId] ?? 0.0) + amount;
+          netBalances[recipientId] = (netBalances[recipientId] ?? 0.0) - amount;
         });
       }
     }
@@ -90,11 +90,13 @@ class DebtCalculatorService {
               final payerShare = paidAmount / transaction.totalAmount;
               final debtAmount = owedAmount * payerShare;
 
-              debts.add(DebtDetail(
-                fromUserId: owerId,
-                toUserId: payerId,
-                amount: debtAmount,
-              ),);
+              debts.add(
+                DebtDetail(
+                  fromUserId: owerId,
+                  toUserId: payerId,
+                  amount: debtAmount,
+                ),
+              );
             }
           });
         });
@@ -102,11 +104,13 @@ class DebtCalculatorService {
         // Payment reduces debt (record as negative debt or skip in actual view)
         transaction.payers.forEach((payerId, amount) {
           transaction.splits.forEach((recipientId, _) {
-            debts.add(DebtDetail(
-              fromUserId: recipientId,
-              toUserId: payerId,
-              amount: -amount, // Negative to show debt reduction
-            ),);
+            debts.add(
+              DebtDetail(
+                fromUserId: recipientId,
+                toUserId: payerId,
+                amount: -amount, // Negative to show debt reduction
+              ),
+            );
           });
         });
       }
@@ -159,11 +163,13 @@ class DebtCalculatorService {
       final transferAmount =
           debtor.balance < creditor.balance ? debtor.balance : creditor.balance;
 
-      simplifiedDebts.add(DebtDetail(
-        fromUserId: debtor.userId,
-        toUserId: creditor.userId,
-        amount: transferAmount,
-      ),);
+      simplifiedDebts.add(
+        DebtDetail(
+          fromUserId: debtor.userId,
+          toUserId: creditor.userId,
+          amount: transferAmount,
+        ),
+      );
 
       // Update balances
       debtors[debtorIndex] = NetBalance(

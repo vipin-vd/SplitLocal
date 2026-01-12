@@ -125,6 +125,7 @@ class _MemberList extends ConsumerWidget {
         builder: (context) => const AddMemberManuallyDialog(),
       );
       if (user != null) {
+        await ref.read(usersProvider.notifier).addUser(user);
         notifier.addMember(user);
       }
     } else if (choice == 'contacts') {

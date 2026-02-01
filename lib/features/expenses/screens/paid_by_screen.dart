@@ -51,7 +51,7 @@ class PaidByScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.green,
+                color: Color.fromARGB(255, 250, 250, 250),
                 letterSpacing: 0.5,
               ),
             ),

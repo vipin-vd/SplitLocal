@@ -6,8 +6,9 @@ import 'package:splitlocal/features/expenses/models/transaction.dart';
 import 'package:splitlocal/features/expenses/widgets/expense_details_sheet.dart';
 import 'package:splitlocal/features/groups/models/user.dart';
 import 'package:splitlocal/features/expenses/providers/transactions_provider.dart';
-import 'package:splitlocal/shared/providers/services_provider.dart';
-import 'package:mockito/mockito.dart';
+
+import 'package:splitlocal/features/expenses/models/transaction_type.dart';
+import 'package:splitlocal/features/expenses/models/split_mode.dart';
 
 // Mock simple transaction provider override if needed,
 // but for this UI test we might just need to prevent the provider from throwing.
@@ -24,8 +25,12 @@ void main() {
       'ExpenseDetailsSheet throws error when user is missing from users list',
       (tester) async {
     // 1. Setup Data
-    final presentUser = User(id: 'u1', name: 'Alice');
-    final missingUserId = 'u2';
+    final presentUser = User(
+      id: 'u1',
+      name: 'Alice',
+      createdAt: DateTime.now(),
+    );
+    const missingUserId = 'u2';
 
     final transaction = Transaction(
       id: 't1',
@@ -36,10 +41,12 @@ void main() {
       category: ExpenseCategory.food,
       payers: {
         presentUser.id: 50.0,
-        missingUserId: 50.0
+        missingUserId: 50.0,
       }, // u2 is paying but not in users list
       splits: {presentUser.id: 50.0, missingUserId: 50.0},
-      type: TransactionType.expense, creatorId: 'u1',
+      type: TransactionType.expense,
+      createdBy: 'u1',
+      splitMode: SplitMode.equal,
     );
 
     // 2. Pump Widget

@@ -39,11 +39,13 @@ class AccountScreen extends ConsumerWidget {
             value: false, // This will be managed by a provider later
             onChanged: null,
           ),
-          Text('Notifications feature coming soon!',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontStyle: FontStyle.italic),),
+          Text(
+            'Notifications feature coming soon!',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(fontStyle: FontStyle.italic),
+          ),
         ],
       ),
     );

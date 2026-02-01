@@ -94,7 +94,9 @@ class ExportImportService {
 
   /// Filter export data to include only a specific group
   Map<String, dynamic> _filterDataByGroup(
-      Map<String, dynamic> data, String groupId,) {
+    Map<String, dynamic> data,
+    String groupId,
+  ) {
     final groups = data['groups'] as List;
     final group = groups.cast<Map<String, dynamic>>().firstWhere(
           (g) => g['id'] == groupId,

@@ -25,14 +25,16 @@ class AdminDebtViewScreen extends ConsumerWidget {
 
     if (group == null) {
       return Scaffold(
-          appBar: AppBar(title: const Text('Admin View')),
-          body: const Center(child: Text('Group not found')),);
+        appBar: AppBar(title: const Text('Admin View')),
+        body: const Center(child: Text('Group not found')),
+      );
     }
 
     if (deviceOwner == null || !deviceOwner.isDeviceOwner) {
       return Scaffold(
-          appBar: AppBar(title: const Text('Admin View')),
-          body: const Center(child: Text('Admin Only')),);
+        appBar: AppBar(title: const Text('Admin View')),
+        body: const Center(child: Text('Admin Only')),
+      );
     }
 
     return Scaffold(
@@ -75,55 +77,60 @@ class _RemovalBlockedBanner extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(children: [
-              Icon(Icons.info, color: Colors.red),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Removal blocked: Outstanding debts exist. Please settle up before removing or leaving.',
-                  style: TextStyle(color: Colors.red),
+            const Row(
+              children: [
+                Icon(Icons.info, color: Colors.red),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Removal blocked: Outstanding debts exist. Please settle up before removing or leaving.',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
-              ),
-            ],),
+              ],
+            ),
             const SizedBox(height: 12),
-            Row(children: [
-              OutlinedButton.icon(
-                icon: const Icon(Icons.payments),
-                label: const Text('Open Settle Up'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SettleUpScreen(groupId: groupId),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.exit_to_app),
-                label: const Text('Leave Group'),
-                onPressed: canLeave
-                    ? () async {
-                        final group = ref.read(selectedGroupProvider(groupId));
-                        final owner = ref.read(deviceOwnerProvider);
-                        if (group == null || owner == null) return;
-                        final updated = group.copyWith(
-                          memberIds: group.memberIds
-                              .where((id) => id != owner.id)
-                              .toList(),
-                          updatedAt: DateTime.now(),
-                        );
-                        await ref
-                            .read(groupsProvider.notifier)
-                            .updateGroup(updated);
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.payments),
+                  label: const Text('Open Settle Up'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettleUpScreen(groupId: groupId),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.exit_to_app),
+                  label: const Text('Leave Group'),
+                  onPressed: canLeave
+                      ? () async {
+                          final group =
+                              ref.read(selectedGroupProvider(groupId));
+                          final owner = ref.read(deviceOwnerProvider);
+                          if (group == null || owner == null) return;
+                          final updated = group.copyWith(
+                            memberIds: group.memberIds
+                                .where((id) => id != owner.id)
+                                .toList(),
+                            updatedAt: DateTime.now(),
+                          );
+                          await ref
+                              .read(groupsProvider.notifier)
+                              .updateGroup(updated);
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
                         }
-                      }
-                    : null,
-              ),
-            ],),
+                      : null,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -145,7 +152,8 @@ class _AdminNoticeCard extends StatelessWidget {
             Icon(Icons.admin_panel_settings),
             SizedBox(width: 12),
             Expanded(
-                child: Text('Admin View: Only you can see this information'),),
+              child: Text('Admin View: Only you can see this information'),
+            ),
           ],
         ),
       ),
@@ -174,13 +182,18 @@ class _WhoPaidWhatCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Who Paid What',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'Who Paid What',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             ...members.map((member) {
               final totalPaid =
                   debtCalculator.getUserTotalPaid(member.id, transactions);
               return _MemberSummaryRow(
-                  member: member, value: totalPaid, currency: group.currency,);
+                member: member,
+                value: totalPaid,
+                currency: group.currency,
+              );
             }),
           ],
         ),
@@ -207,13 +220,18 @@ class _MemberShareCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Each Member\'s Share',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'Each Member\'s Share',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             ...members.map((member) {
               final totalShare =
                   debtCalculator.getUserTotalShare(member.id, transactions);
               return _MemberSummaryRow(
-                  member: member, value: totalShare, currency: group.currency,);
+                member: member,
+                value: totalShare,
+                currency: group.currency,
+              );
             }),
           ],
         ),
@@ -239,12 +257,17 @@ class _NetBalancesCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Net Balances',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'Net Balances',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             ...members.map((member) {
               final balance = netBalances[member.id] ?? 0.0;
               return _BalanceRow(
-                  member: member, balance: balance, currency: group.currency,);
+                member: member,
+                balance: balance,
+                currency: group.currency,
+              );
             }),
           ],
         ),
@@ -272,25 +295,32 @@ class _SettleUpCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('How to Settle Up',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'How to Settle Up',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             if (simplifiedDebts.isEmpty)
               const Text('All Settled Up!')
             else
               ...simplifiedDebts
                   // Filter out any debts that reference users no longer in the group
-                  .where((debt) =>
-                      members.any((u) => u.id == debt.fromUserId) &&
-                      members.any((u) => u.id == debt.toUserId),)
+                  .where(
+                (debt) =>
+                    members.any((u) => u.id == debt.fromUserId) &&
+                    members.any((u) => u.id == debt.toUserId),
+              )
                   .map((debt) {
                 // Safe resolution of users; avoids StateError: No element
                 final fromUser = members.firstWhere(
-                    (u) => u.id == debt.fromUserId,
-                    orElse: () =>
-                        // Fallback should never hit due to the where() above
-                        members.first,);
-                final toUser = members.firstWhere((u) => u.id == debt.toUserId,
-                    orElse: () => members.first,);
+                  (u) => u.id == debt.fromUserId,
+                  orElse: () =>
+                      // Fallback should never hit due to the where() above
+                      members.first,
+                );
+                final toUser = members.firstWhere(
+                  (u) => u.id == debt.toUserId,
+                  orElse: () => members.first,
+                );
                 return _DebtRow(
                   from: fromUser,
                   to: toUser,
@@ -310,8 +340,11 @@ class _MemberSummaryRow extends StatelessWidget {
   final double value;
   final String currency;
 
-  const _MemberSummaryRow(
-      {required this.member, required this.value, required this.currency,});
+  const _MemberSummaryRow({
+    required this.member,
+    required this.value,
+    required this.currency,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -334,8 +367,11 @@ class _BalanceRow extends StatelessWidget {
   final double balance;
   final String currency;
 
-  const _BalanceRow(
-      {required this.member, required this.balance, required this.currency,});
+  const _BalanceRow({
+    required this.member,
+    required this.balance,
+    required this.currency,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -349,9 +385,10 @@ class _BalanceRow extends StatelessWidget {
           Text(
             CurrencyFormatter.format(balance, currencyCode: currency),
             style: TextStyle(
-                color: balance > 0
-                    ? Colors.green
-                    : (balance < 0 ? Colors.red : Colors.grey),),
+              color: balance > 0
+                  ? Colors.green
+                  : (balance < 0 ? Colors.red : Colors.grey),
+            ),
           ),
         ],
       ),
@@ -365,11 +402,12 @@ class _DebtRow extends StatelessWidget {
   final double amount;
   final String currency;
 
-  const _DebtRow(
-      {required this.from,
-      required this.to,
-      required this.amount,
-      required this.currency,});
+  const _DebtRow({
+    required this.from,
+    required this.to,
+    required this.amount,
+    required this.currency,
+  });
 
   @override
   Widget build(BuildContext context) {

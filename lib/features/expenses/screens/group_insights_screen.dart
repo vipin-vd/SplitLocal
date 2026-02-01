@@ -62,21 +62,27 @@ class _UserStatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Your Stats',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'Your Stats',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                    child: _StatItem(
-                        label: 'You Paid',
-                        value: userTotalPaid,
-                        currency: group.currency,),),
+                  child: _StatItem(
+                    label: 'You Paid',
+                    value: userTotalPaid,
+                    currency: group.currency,
+                  ),
+                ),
                 Expanded(
-                    child: _StatItem(
-                        label: 'Your Share',
-                        value: userTotalShare,
-                        currency: group.currency,),),
+                  child: _StatItem(
+                    label: 'Your Share',
+                    value: userTotalShare,
+                    currency: group.currency,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -92,19 +98,26 @@ class _StatItem extends StatelessWidget {
   final String label;
   final double value;
   final String currency;
-  const _StatItem(
-      {required this.label, required this.value, required this.currency,});
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.currency,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
         const SizedBox(height: 4),
-        Text(CurrencyFormatter.format(value, currencyCode: currency),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+        Text(
+          CurrencyFormatter.format(value, currencyCode: currency),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -130,18 +143,22 @@ class _BalanceIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(balance > 0
-              ? 'You are owed'
-              : balance < 0
-                  ? 'You owe'
-                  : 'You are settled up',),
+          Text(
+            balance > 0
+                ? 'You are owed'
+                : balance < 0
+                    ? 'You owe'
+                    : 'You are settled up',
+          ),
           if (balance != 0)
             Text(
-                CurrencyFormatter.format(balance.abs(), currencyCode: currency),
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: balance > 0 ? Colors.green : Colors.red,),),
+              CurrencyFormatter.format(balance.abs(), currencyCode: currency),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: balance > 0 ? Colors.green : Colors.red,
+              ),
+            ),
         ],
       ),
     );
@@ -161,14 +178,18 @@ class _TotalSpendingCard extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Text('Total Group Spending',
-                style: TextStyle(fontSize: 16, color: Colors.grey),),
+            const Text(
+              'Total Group Spending',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
             const SizedBox(height: 8),
             Text(
-                CurrencyFormatter.format(totalSpend,
-                    currencyCode: group.currency,),
-                style:
-                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),),
+              CurrencyFormatter.format(
+                totalSpend,
+                currencyCode: group.currency,
+              ),
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -194,15 +215,21 @@ class _CategoryBreakdownCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Spending by Category',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            const Text(
+              'Spending by Category',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             if (sortedCategories.isEmpty)
               const Center(
-                  child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text('No expenses yet',
-                          style: TextStyle(color: Colors.grey),),),)
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text(
+                    'No expenses yet',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
             else
               ...sortedCategories.map((entry) {
                 final percentage = totalSpend > 0
@@ -230,12 +257,13 @@ class _CategorySpendItem extends StatelessWidget {
   final String currency;
   final double totalSpend;
 
-  const _CategorySpendItem(
-      {required this.category,
-      required this.value,
-      required this.percentage,
-      required this.currency,
-      required this.totalSpend,});
+  const _CategorySpendItem({
+    required this.category,
+    required this.value,
+    required this.percentage,
+    required this.currency,
+    required this.totalSpend,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,24 +276,31 @@ class _CategorySpendItem extends StatelessWidget {
               Icon(category.icon, color: category.color),
               const SizedBox(width: 12),
               Expanded(
-                  child: Text(category.displayName,
-                      style: const TextStyle(fontWeight: FontWeight.w500),),),
+                child: Text(
+                  category.displayName,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(CurrencyFormatter.format(value, currencyCode: currency),
-                      style: const TextStyle(fontWeight: FontWeight.w600),),
-                  Text('$percentage%',
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade600),),
+                  Text(
+                    CurrencyFormatter.format(value, currencyCode: currency),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    '$percentage%',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 8),
           LinearProgressIndicator(
-              value: totalSpend > 0 ? value / totalSpend : 0,
-              color: category.color,),
+            value: totalSpend > 0 ? value / totalSpend : 0,
+            color: category.color,
+          ),
         ],
       ),
     );
@@ -289,23 +324,28 @@ class _RecurringExpensesCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Recurring Expenses',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                  const Text(
+                    'Recurring Expenses',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 16),
-                  ...recurringExpenses.map((expense) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading:
-                            CircleAvatar(child: Icon(expense.category.icon)),
-                        title: Text(expense.description),
-                        subtitle: Text(
-                            '${expense.recurringFrequency?.toUpperCase() ?? 'Regular'} • ${expense.category.displayName}',),
-                        trailing: Text(
-                            CurrencyFormatter.format(expense.totalAmount,
-                                currencyCode: group.currency,),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600),),
-                      ),),
+                  ...recurringExpenses.map(
+                    (expense) => ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(child: Icon(expense.category.icon)),
+                      title: Text(expense.description),
+                      subtitle: Text(
+                        '${expense.recurringFrequency?.toUpperCase() ?? 'Regular'} • ${expense.category.displayName}',
+                      ),
+                      trailing: Text(
+                        CurrencyFormatter.format(
+                          expense.totalAmount,
+                          currencyCode: group.currency,
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -332,27 +372,31 @@ class _QuickStatsCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Quick Stats',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                  const Text(
+                    'Quick Stats',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 16),
                   _buildStatRow(
-                      'Top Category',
-                      sortedCategories.first.key.displayName,
-                      sortedCategories.first.key.icon,
-                      sortedCategories.first.key.color,),
+                    'Top Category',
+                    sortedCategories.first.key.displayName,
+                    sortedCategories.first.key.icon,
+                    sortedCategories.first.key.color,
+                  ),
                   const Divider(height: 24),
                   _buildStatRow(
-                      'Total Categories',
-                      '${categorySpending.length}',
-                      Icons.category,
-                      Colors.blue,),
+                    'Total Categories',
+                    '${categorySpending.length}',
+                    Icons.category,
+                    Colors.blue,
+                  ),
                   const Divider(height: 24),
                   _buildStatRow(
-                      'Recurring Expenses',
-                      '${recurringExpenses.length}',
-                      Icons.repeat,
-                      Colors.green,),
+                    'Recurring Expenses',
+                    '${recurringExpenses.length}',
+                    Icons.repeat,
+                    Colors.green,
+                  ),
                 ],
               ),
             ),
@@ -365,8 +409,10 @@ class _QuickStatsCard extends ConsumerWidget {
         Icon(icon, color: color),
         const SizedBox(width: 12),
         Expanded(child: Text(label)),
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),),
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
       ],
     );
   }

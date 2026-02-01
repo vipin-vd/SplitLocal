@@ -42,8 +42,10 @@ class _FriendInfoSection extends ConsumerWidget {
       child: Column(
         children: [
           const ListTile(
-            title: Text('Friend Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            title: Text(
+              'Friend Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.person),
@@ -103,7 +105,8 @@ class _ActionsSection extends ConsumerWidget {
     final message =
         'Hey ${friend.name}! Let\'s use SplitLocal to track our shared expenses easily.';
     final whatsappUrl = Uri.parse(
-        'https://wa.me/${friend.phoneNumber!.replaceAll(RegExp(r'\D'), '')}?text=${Uri.encodeComponent(message)}',);
+      'https://wa.me/${friend.phoneNumber!.replaceAll(RegExp(r'\D'), '')}?text=${Uri.encodeComponent(message)}',
+    );
 
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
@@ -134,8 +137,10 @@ class _ActionsSection extends ConsumerWidget {
             leading: const Icon(Icons.send),
             title: const Text('Send Invite'),
             subtitle: friend.phoneNumber == null
-                ? const Text('No phone number available',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),)
+                ? const Text(
+                    'No phone number available',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  )
                 : null,
             onTap: () => _sendInvite(context),
           ),
@@ -172,11 +177,13 @@ class _DangerZoneSection extends ConsumerWidget {
         final canLeave = deviceOwner == null
             ? false
             : (netBalances[deviceOwner.id] ?? 0.0).abs() < 0.01;
-        blockingGroups.add(BlockingGroup(
-          id: group.id,
-          name: group.name,
-          canLeave: canLeave,
-        ),);
+        blockingGroups.add(
+          BlockingGroup(
+            id: group.id,
+            name: group.name,
+            canLeave: canLeave,
+          ),
+        );
       }
     }
 
@@ -235,19 +242,25 @@ class _DangerZoneSection extends ConsumerWidget {
       child: Column(
         children: [
           const ListTile(
-            title: Text('Danger Zone',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,),),
+            title: Text(
+              'Danger Zone',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text('Delete Friend',
-                style: TextStyle(color: Colors.red),),
+            title: const Text(
+              'Delete Friend',
+              style: TextStyle(color: Colors.red),
+            ),
             subtitle: const Text(
-                'Remove from friends list (shared data preserved).\nIf balances exist in any group, you must settle or remove them from the group first.',
-                style: TextStyle(fontSize: 12),),
+              'Remove from friends list (shared data preserved).\nIf balances exist in any group, you must settle or remove them from the group first.',
+              style: TextStyle(fontSize: 12),
+            ),
             onTap: () => _deleteFriend(context, ref),
           ),
         ],

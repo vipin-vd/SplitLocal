@@ -244,7 +244,9 @@ class AddExpenseForm extends _$AddExpenseForm {
     final deviceOwner = ref.read(deviceOwnerProvider);
     if (deviceOwner == null) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Device owner not found',);
+        isSaving: false,
+        errorMessage: 'Device owner not found',
+      );
       return false;
     }
 
@@ -254,8 +256,9 @@ class AddExpenseForm extends _$AddExpenseForm {
         state.payers.values.fold(0.0, (sum, amount) => sum + amount);
     if ((payersTotal - totalAmount).abs() > 0.01) {
       state = state.copyWith(
-          isSaving: false,
-          errorMessage: 'Payers total must equal total amount',);
+        isSaving: false,
+        errorMessage: 'Payers total must equal total amount',
+      );
       return false;
     }
 
@@ -271,7 +274,9 @@ class AddExpenseForm extends _$AddExpenseForm {
         cleanedSplits.values.fold(0.0, (sum, amount) => sum + amount);
     if ((splitsTotal - totalAmount).abs() > 0.01) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Splits must add up to total amount',);
+        isSaving: false,
+        errorMessage: 'Splits must add up to total amount',
+      );
       return false;
     }
 
@@ -308,7 +313,9 @@ class AddExpenseForm extends _$AddExpenseForm {
       return true;
     } catch (e) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Error saving expense: $e',);
+        isSaving: false,
+        errorMessage: 'Error saving expense: $e',
+      );
       return false;
     }
   }
@@ -359,7 +366,10 @@ class AddExpenseForm extends _$AddExpenseForm {
 
   void setSplitsAndMode(SplitMode mode, Map<String, double> splits) {
     state = state.copyWith(
-        splitMode: mode, splits: splits, clearErrorMessage: true,);
+      splitMode: mode,
+      splits: splits,
+      clearErrorMessage: true,
+    );
   }
 
   void setIsRecurring(bool isRecurring) {

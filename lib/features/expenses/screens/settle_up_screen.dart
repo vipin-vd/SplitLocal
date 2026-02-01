@@ -68,8 +68,9 @@ class SettleUpScreen extends ConsumerWidget {
 
     if (group == null) {
       return Scaffold(
-          appBar: AppBar(title: const Text('Settle Up')),
-          body: const Center(child: Text('Group not found')),);
+        appBar: AppBar(title: const Text('Settle Up')),
+        body: const Center(child: Text('Group not found')),
+      );
     }
 
     return Scaffold(
@@ -107,8 +108,10 @@ class _SuggestedSettlements extends ConsumerWidget {
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Suggested Settlements',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
+              const Text(
+                'Suggested Settlements',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
               ...simplifiedDebts.map((debt) {
                 final payer =
                     members.firstWhere((u) => u.id == debt.fromUserId);
@@ -116,12 +119,18 @@ class _SuggestedSettlements extends ConsumerWidget {
                     members.firstWhere((u) => u.id == debt.toUserId);
                 return ListTile(
                   title: Text('${payer.name} → ${recipient.name}'),
-                  trailing: Text(CurrencyFormatter.format(debt.amount,
-                      currencyCode: group.currency,),),
-                  onTap: () => ref
-                      .read(settleUpFormProvider.notifier)
-                      .setFromSuggestion(
-                          debt.fromUserId, debt.toUserId, debt.amount,),
+                  trailing: Text(
+                    CurrencyFormatter.format(
+                      debt.amount,
+                      currencyCode: group.currency,
+                    ),
+                  ),
+                  onTap: () =>
+                      ref.read(settleUpFormProvider.notifier).setFromSuggestion(
+                            debt.fromUserId,
+                            debt.toUserId,
+                            debt.amount,
+                          ),
                 );
               }),
             ],
@@ -137,21 +146,29 @@ class _RecordPaymentForm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(settleUpFormProvider);
     final notifier = ref.read(settleUpFormProvider.notifier);
-    final members = ref.watch(usersProvider).where((u) =>
-        ref.watch(selectedGroupProvider(groupId))!.memberIds.contains(u.id),);
+    final members = ref.watch(usersProvider).where(
+          (u) => ref
+              .watch(selectedGroupProvider(groupId))!
+              .memberIds
+              .contains(u.id),
+        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Record Payment',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
+        const Text(
+          'Record Payment',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
           initialValue: state.payerId,
           decoration: const InputDecoration(labelText: 'Payer'),
           items: members
-              .map((member) =>
-                  DropdownMenuItem(value: member.id, child: Text(member.name)),)
+              .map(
+                (member) => DropdownMenuItem(
+                    value: member.id, child: Text(member.name)),
+              )
               .toList(),
           onChanged: (value) => notifier.setPayer(value),
           validator: (value) => value == null ? 'Please select a payer' : null,
@@ -161,8 +178,10 @@ class _RecordPaymentForm extends ConsumerWidget {
           initialValue: state.recipientId,
           decoration: const InputDecoration(labelText: 'Recipient'),
           items: members
-              .map((member) =>
-                  DropdownMenuItem(value: member.id, child: Text(member.name)),)
+              .map(
+                (member) => DropdownMenuItem(
+                    value: member.id, child: Text(member.name)),
+              )
               .toList(),
           onChanged: (value) => notifier.setRecipient(value),
           validator: (value) =>

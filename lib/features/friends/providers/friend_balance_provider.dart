@@ -15,7 +15,8 @@ double friendBalance(FriendBalanceRef ref, String friendId) {
   final allGroups = ref.watch(groupsProvider);
   final sharedGroups = allGroups
       .where(
-          (g) => g.memberIds.contains(me.id) && g.memberIds.contains(friendId),)
+        (g) => g.memberIds.contains(me.id) && g.memberIds.contains(friendId),
+      )
       .toList();
 
   if (sharedGroups.isEmpty) return 0.0;
@@ -53,8 +54,9 @@ Map<String, double> allFriendBalances(AllFriendBalancesRef ref) {
 
   for (final friend in friends) {
     final sharedGroups = allGroups
-        .where((g) =>
-            g.memberIds.contains(me.id) && g.memberIds.contains(friend.id),)
+        .where(
+          (g) => g.memberIds.contains(me.id) && g.memberIds.contains(friend.id),
+        )
         .toList();
 
     if (sharedGroups.isEmpty) {

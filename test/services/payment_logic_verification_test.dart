@@ -41,9 +41,15 @@ void main() {
 
     // Alice Start: -50. Paid 50. End: 0.
     // Bob Start: +50. Received 50. End: 0.
-    expect(balances['Alice'], closeTo(0.0, 0.01),
-        reason: 'Alice should have settled her debt');
-    expect(balances['Bob'], closeTo(0.0, 0.01),
-        reason: 'Bob should have been paid back');
+    expect(
+      balances['Alice'],
+      closeTo(0.0, 0.01),
+      reason: 'Alice should have settled her debt',
+    );
+    expect(
+      balances['Bob'],
+      closeTo(0.0, 0.01),
+      reason: 'Bob should have been paid back',
+    );
   });
 }

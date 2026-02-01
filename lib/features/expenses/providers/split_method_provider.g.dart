@@ -6,7 +6,7 @@ part of 'split_method_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$splitMethodHash() => r'86973d983894d7498491d09bcf8520c3ff948227';
+String _$splitMethodHash() => r'a14026d800fc5fd99e10ad5299fe8e753850ff89';
 
 /// Copied from Dart SDK
 class _SystemHash {

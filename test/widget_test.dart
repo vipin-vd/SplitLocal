@@ -5,7 +5,6 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-
 void main() {
   // Commented out to focus on calculation tests
   // testWidgets('App smoke test', (WidgetTester tester) async {

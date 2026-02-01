@@ -72,14 +72,19 @@ class _SortButton extends ConsumerWidget {
           .setSortOrder(latestFirst: value),
       itemBuilder: (context) => [
         PopupMenuItem(
-            value: true,
-            child: Text('Latest First',
-                style: TextStyle(color: sortLatestFirst ? Colors.blue : null),),),
+          value: true,
+          child: Text(
+            'Latest First',
+            style: TextStyle(color: sortLatestFirst ? Colors.blue : null),
+          ),
+        ),
         PopupMenuItem(
-            value: false,
-            child: Text('Oldest First',
-                style:
-                    TextStyle(color: !sortLatestFirst ? Colors.blue : null),),),
+          value: false,
+          child: Text(
+            'Oldest First',
+            style: TextStyle(color: !sortLatestFirst ? Colors.blue : null),
+          ),
+        ),
       ],
     );
   }
@@ -99,7 +104,9 @@ class _CategoryBreakdownButton extends ConsumerWidget {
         showModalBottomSheet(
           context: context,
           builder: (context) => _CategoryBreakdown(
-              categoryTotals: totals, currency: group!.currency,),
+            categoryTotals: totals,
+            currency: group!.currency,
+          ),
         );
       },
     );
@@ -131,7 +138,8 @@ class _SearchBar extends ConsumerWidget {
                       icon: const Icon(Icons.clear),
                       onPressed: () => ref
                           .read(expenseListFilterProvider.notifier)
-                          .setSearchQuery(''),)
+                          .setSearchQuery(''),
+                    )
                   : null,
         ),
         onChanged: (value) =>
@@ -155,30 +163,35 @@ class _FilterChips extends ConsumerWidget {
       child: Row(
         children: [
           FilterChip(
-            label: Text(filter.dateRange == null
-                ? 'All Time'
-                : '${DateFormatter.formatShort(filter.dateRange!.start)} - ${DateFormatter.formatShort(filter.dateRange!.end)}',),
+            label: Text(
+              filter.dateRange == null
+                  ? 'All Time'
+                  : '${DateFormatter.formatShort(filter.dateRange!.start)} - ${DateFormatter.formatShort(filter.dateRange!.end)}',
+            ),
             selected: filter.dateRange != null,
             onSelected: (_) async {
               final picked = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),);
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+              );
               if (picked != null) notifier.setDateRange(picked);
             },
             onDeleted: filter.dateRange != null
                 ? () => notifier.setDateRange(null)
                 : null,
           ),
-          ...ExpenseCategory.values.map((category) => Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: FilterChip(
-                  label: Text(category.displayName),
-                  selected: filter.category == category,
-                  onSelected: (selected) =>
-                      notifier.setCategory(selected ? category : null),
-                ),
-              ),),
+          ...ExpenseCategory.values.map(
+            (category) => Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: FilterChip(
+                label: Text(category.displayName),
+                selected: filter.category == category,
+                onSelected: (selected) =>
+                    notifier.setCategory(selected ? category : null),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -200,7 +213,8 @@ class _ResultsCount extends ConsumerWidget {
         children: [
           Text('${expenses.length} expenses'),
           Text(
-              'Total: ${CurrencyFormatter.format(expenses.fold(0.0, (sum, t) => sum + t.totalAmount), currencyCode: group!.currency)}',),
+            'Total: ${CurrencyFormatter.format(expenses.fold(0.0, (sum, t) => sum + t.totalAmount), currencyCode: group!.currency)}',
+          ),
         ],
       ),
     );
@@ -245,8 +259,10 @@ class _CategoryBreakdown extends StatelessWidget {
   final Map<ExpenseCategory, double> categoryTotals;
   final String currency;
 
-  const _CategoryBreakdown(
-      {required this.categoryTotals, required this.currency,});
+  const _CategoryBreakdown({
+    required this.categoryTotals,
+    required this.currency,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -259,16 +275,22 @@ class _CategoryBreakdown extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          const Text('Category Breakdown',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+          const Text(
+            'Category Breakdown',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           ...sortedCategories.map((entry) {
             final percentage = (entry.value / total * 100).toStringAsFixed(1);
             return Row(
               children: [
                 Icon(entry.key.icon),
                 Expanded(child: Text(entry.key.displayName)),
-                Text(CurrencyFormatter.format(entry.value,
-                    currencyCode: currency,),),
+                Text(
+                  CurrencyFormatter.format(
+                    entry.value,
+                    currencyCode: currency,
+                  ),
+                ),
                 Text('$percentage%'),
               ],
             );

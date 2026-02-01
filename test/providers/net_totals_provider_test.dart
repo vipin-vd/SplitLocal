@@ -138,10 +138,12 @@ void main() {
     });
 
     test('no device owner => zeros', () {
-      final noOwner = ProviderContainer(overrides: [
-        deviceOwnerProvider.overrideWith((ref) => null),
-        transactionsProvider.overrideWith(() => _EmptyTransactions()),
-      ],);
+      final noOwner = ProviderContainer(
+        overrides: [
+          deviceOwnerProvider.overrideWith((ref) => null),
+          transactionsProvider.overrideWith(() => _EmptyTransactions()),
+        ],
+      );
       expect(noOwner.read(totalOwedToUserGlobalProvider), 0);
       expect(noOwner.read(totalUserOwesGlobalProvider), 0);
       expect(noOwner.read(netBalanceGlobalProvider), 0);

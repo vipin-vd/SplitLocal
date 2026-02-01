@@ -91,8 +91,11 @@ Future<bool?> showSettleDebtsDialog(
                       child: Icon(Icons.check_circle_outline, size: 16),
                     ),
                     Expanded(
-                        child: Text(suggestion,
-                            style: const TextStyle(fontSize: 13),),),
+                      child: Text(
+                        suggestion,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
                   ],
                 ),
               ),

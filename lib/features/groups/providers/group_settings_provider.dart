@@ -103,7 +103,8 @@ class GroupSettingsScreenLogic extends _$GroupSettingsScreenLogic {
     }
 
     final updatedGroup = group.copyWith(
-        memberIds: group.memberIds.where((id) => id != userId).toList(),);
+      memberIds: group.memberIds.where((id) => id != userId).toList(),
+    );
     await ref.read(groupsProvider.notifier).updateGroup(updatedGroup);
     return true; // Removal successful
   }

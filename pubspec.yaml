@@ -48,6 +48,11 @@ dev_dependencies:
   riverpod_generator: ^2.3.9
   json_serializable: ^6.7.1
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.4
+  
+  # Testing
+  mockito: ^5.4.4
+  riverpod: ^2.4.9
 
 flutter:
   uses-material-design: true

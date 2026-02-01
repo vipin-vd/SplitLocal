@@ -66,7 +66,7 @@ void main() {
           name: 'Alice',
           phoneNumber: null,
           isDeviceOwner: false,
-          createdAt: DateTime(  2024, 01, 01),
+          createdAt: DateTime(2024, 01, 01),
         ),
       ];
 
@@ -98,18 +98,22 @@ void main() {
         ),
       ];
 
-      container = ProviderContainer(overrides: [
-        deviceOwnerProvider.overrideWith((ref) => User(
+      container = ProviderContainer(
+        overrides: [
+          deviceOwnerProvider.overrideWith(
+            (ref) => User(
               id: meId,
               name: 'Me',
               phoneNumber: null,
               isDeviceOwner: true,
               createdAt: DateTime(2024, 01, 01),
-            ),),
-        groupsProvider.overrideWith(() => _FakeGroups(groups)),
-        friendsProvider.overrideWith(() => _FakeFriends(friends)),
-        transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
-      ],);
+            ),
+          ),
+          groupsProvider.overrideWith(() => _FakeGroups(groups)),
+          friendsProvider.overrideWith(() => _FakeFriends(friends)),
+          transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
+        ],
+      );
     });
 
     tearDown(() => container.dispose());
@@ -147,21 +151,25 @@ void main() {
           name: 'Alice',
           phoneNumber: null,
           isDeviceOwner: false,
-          createdAt: DateTime(  2024, 01, 01),
+          createdAt: DateTime(2024, 01, 01),
         ),
       ];
-      final isolated = ProviderContainer(overrides: [
-        deviceOwnerProvider.overrideWith((ref) => User(
+      final isolated = ProviderContainer(
+        overrides: [
+          deviceOwnerProvider.overrideWith(
+            (ref) => User(
               id: meId,
               name: 'Me',
               phoneNumber: null,
               isDeviceOwner: true,
-              createdAt: DateTime(  2024, 01, 01),
-            ),),
-        groupsProvider.overrideWith(() => _FakeGroups(groups2)),
-        friendsProvider.overrideWith(() => _FakeFriends(friends2)),
-        transactionsProvider.overrideWith(() => _EmptyTransactions()),
-      ],);
+              createdAt: DateTime(2024, 01, 01),
+            ),
+          ),
+          groupsProvider.overrideWith(() => _FakeGroups(groups2)),
+          friendsProvider.overrideWith(() => _FakeFriends(friends2)),
+          transactionsProvider.overrideWith(() => _EmptyTransactions()),
+        ],
+      );
 
       expect(isolated.read(friendBalanceProvider(friendId)), 0);
       expect(isolated.read(allFriendBalancesProvider)[friendId], 0);

@@ -129,7 +129,8 @@ Thanks for staying on top of it! 😊
     buffer.writeln('📊 Group Summary: $groupName');
     buffer.writeln('');
     buffer.writeln(
-        'Total Group Spend: $currency${totalSpend.toStringAsFixed(2)}',);
+      'Total Group Spend: $currency${totalSpend.toStringAsFixed(2)}',
+    );
     buffer.writeln('');
     buffer.writeln('Balances:');
     buffer.writeln('─────────────');
@@ -139,10 +140,12 @@ Thanks for staying on top of it! 😊
       if (user != null) {
         if (balance > 0.01) {
           buffer.writeln(
-              '${user.name} is owed $currency${balance.toStringAsFixed(2)}',);
+            '${user.name} is owed $currency${balance.toStringAsFixed(2)}',
+          );
         } else if (balance < -0.01) {
           buffer.writeln(
-              '${user.name} owes $currency${balance.abs().toStringAsFixed(2)}',);
+            '${user.name} owes $currency${balance.abs().toStringAsFixed(2)}',
+          );
         } else {
           buffer.writeln('${user.name} is settled up ✓');
         }
@@ -181,7 +184,8 @@ Thanks for staying on top of it! 😊
 
     buffer.writeln('');
     buffer.writeln(
-        'Once these transfers are made, everyone will be settled up! ✨',);
+      'Once these transfers are made, everyone will be settled up! ✨',
+    );
 
     return buffer.toString();
   }

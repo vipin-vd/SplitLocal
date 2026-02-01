@@ -260,6 +260,7 @@ class _PaidByAndSplitSection extends ConsumerWidget {
           initialSplits: splitsToPass,
           totalAmount: totalAmount,
           deviceOwnerId: deviceOwner.id,
+          currencyCode: formState.selectedCurrency,
         ),
       ),
     );
@@ -333,12 +334,15 @@ class _PaidByAndSplitSection extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme,
+                Flexible(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 4),

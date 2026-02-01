@@ -124,7 +124,9 @@ class CreateGroupForm extends _$CreateGroupForm {
     final deviceOwner = ref.read(deviceOwnerProvider);
     if (deviceOwner == null) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Device owner not found',);
+        isSaving: false,
+        errorMessage: 'Device owner not found',
+      );
       return;
     }
 
@@ -149,7 +151,9 @@ class CreateGroupForm extends _$CreateGroupForm {
       state = state.copyWith(isSaving: false);
     } catch (e) {
       state = state.copyWith(
-          isSaving: false, errorMessage: 'Failed to create group: $e',);
+        isSaving: false,
+        errorMessage: 'Failed to create group: $e',
+      );
     }
   }
 

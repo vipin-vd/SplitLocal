@@ -6,7 +6,7 @@ We aim to support the latest stable release. Critical security fixes may be back
 ## Reporting a Vulnerability
 Please report security issues privately and responsibly:
 
-- Email: `dabasvipin6@gmail.com` (replace with project email)
+- Email: `dabasvipin6@gmail.com`
 - Include: description, affected versions, reproduction steps, potential impact
 - Response: We will acknowledge within 3 business days and provide an ETA.
 

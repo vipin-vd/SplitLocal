@@ -11,7 +11,8 @@ class OnboardingScreen extends ConsumerWidget {
     ref.listen(onboardingProvider.select((s) => s.isSaving), (prev, isSaving) {
       if (!isSaving && prev == true) {
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const GroupsScreen()),);
+          MaterialPageRoute(builder: (_) => const GroupsScreen()),
+        );
       }
     });
 
@@ -23,17 +24,23 @@ class OnboardingScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.account_balance_wallet,
-                  size: 80, color: Color(0xFF6C63FF),),
+              Icon(
+                Icons.account_balance_wallet,
+                size: 80,
+                color: Color(0xFF6C63FF),
+              ),
               SizedBox(height: 24),
-              Text('Welcome to SplitLocal',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,),
+              Text(
+                'Welcome to SplitLocal',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 12),
               Text(
-                  'Track and split expenses with your groups, all stored locally on your device.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                  textAlign: TextAlign.center,),
+                'Track and split expenses with your groups, all stored locally on your device.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 48),
               _OnboardingForm(),
             ],
@@ -57,15 +64,18 @@ class _OnboardingForm extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Who are you?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
+          const Text(
+            'Who are you?',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 16),
           TextFormField(
             controller: state.nameController,
             decoration: const InputDecoration(
-                labelText: 'Your Name',
-                hintText: 'e.g., John Doe',
-                prefixIcon: Icon(Icons.person),),
+              labelText: 'Your Name',
+              hintText: 'e.g., John Doe',
+              prefixIcon: Icon(Icons.person),
+            ),
             textCapitalization: TextCapitalization.words,
             validator: (value) => (value == null || value.trim().isEmpty)
                 ? 'Please enter your name'
@@ -75,16 +85,18 @@ class _OnboardingForm extends ConsumerWidget {
           TextFormField(
             controller: state.phoneController,
             decoration: const InputDecoration(
-                labelText: 'Phone Number (Optional)',
-                hintText: 'e.g., +1234567890',
-                prefixIcon: Icon(Icons.phone),),
+              labelText: 'Phone Number (Optional)',
+              hintText: 'e.g., +1234567890',
+              prefixIcon: Icon(Icons.phone),
+            ),
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed: state.isSaving ? null : notifier.completeOnboarding,
             style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
             child: state.isSaving
                 ? const CircularProgressIndicator()
                 : const Text('Get Started', style: TextStyle(fontSize: 16)),

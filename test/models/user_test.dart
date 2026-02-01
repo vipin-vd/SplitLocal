@@ -1,4 +1,3 @@
-
 void main() {
   // Commented out to focus on calculation tests
   /*

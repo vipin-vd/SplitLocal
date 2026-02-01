@@ -42,4 +42,4 @@ include: package:flutter_lints/flutter.yaml
 
 ## Code review rules
 
-- All PRs must pass `flutter analyze` and `flutter test` before merge.
+- All new code written must pass `flutter analyze` and `flutter test` before merge.

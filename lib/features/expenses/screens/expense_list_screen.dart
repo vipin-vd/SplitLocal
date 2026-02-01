@@ -280,7 +280,9 @@ class _CategoryBreakdown extends StatelessWidget {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           ...sortedCategories.map((entry) {
-            final percentage = (entry.value / total * 100).toStringAsFixed(1);
+            final percentage = total == 0
+                ? '0.0'
+                : (entry.value / total * 100).toStringAsFixed(1);
             return Row(
               children: [
                 Icon(entry.key.icon),
@@ -291,6 +293,7 @@ class _CategoryBreakdown extends StatelessWidget {
                     currencyCode: currency,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Text('$percentage%'),
               ],
             );

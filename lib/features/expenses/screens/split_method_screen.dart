@@ -91,20 +91,22 @@ class _SplitModeSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(provider);
     final notifier = ref.read(provider.notifier);
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Wrap(
-        spacing: 8,
-        children: SplitMode.values
-            .map(
-              (mode) => ChoiceChip(
-                label: Text(mode.name),
-                selected: state.splitMode == mode,
-                onSelected: (selected) =>
-                    {if (selected) notifier.setSplitMode(mode)},
-              ),
-            )
-            .toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
+        children: [
+          for (final mode in SplitMode.values) ...[
+            ChoiceChip(
+              label: Text(mode.name),
+              selected: state.splitMode == mode,
+              onSelected: (selected) {
+                if (selected) notifier.setSplitMode(mode);
+              },
+            ),
+            if (mode != SplitMode.values.last) const SizedBox(width: 8),
+          ],
+        ],
       ),
     );
   }

@@ -153,9 +153,9 @@ tasks:
       - flutter devices
 
   ios:
-    desc: Run on iOS simulator/device (usage: task ios -- <device_id>)
+    desc: Run on iOS simulator/device (usage - task ios -- <device_id>)
     cmds:
-      - flutter run -d {{.CLI_ARGS | default "ios"}}
+      - flutter run -d {{.CLI_ARGS | default "6F433674-73AD-4DC8-9300-98C0D3E6B9BC"}}
 
   android:
     desc: Run on Android emulator/device

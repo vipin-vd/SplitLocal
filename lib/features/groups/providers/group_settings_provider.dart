@@ -140,6 +140,11 @@ class GroupSettingsScreenLogic extends _$GroupSettingsScreenLogic {
     return await exportService.exportGroup(groupId);
   }
 
+  Future<void> exportGroupToClipboard(String groupId) async {
+    final exportService = ref.read(exportImportServiceProvider);
+    await exportService.exportGroupToClipboard(groupId);
+  }
+
   /// Helper to get formatted member balance info for debt settlement dialogs
   String getMemberBalanceInfo(User user, double balance, String currency) {
     final currencySymbol = CurrencyHelper.getCurrency(currency).symbol;

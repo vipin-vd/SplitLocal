@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/settings/providers/onboarding_provider.dart';
-import '../../groups/screens/groups_screen.dart';
+import '../../home/screens/home_screen.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -11,39 +11,43 @@ class OnboardingScreen extends ConsumerWidget {
     ref.listen(onboardingProvider.select((s) => s.isSaving), (prev, isSaving) {
       if (!isSaving && prev == true) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const GroupsScreen()),
-        );
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        ); // Redirect to HomeScreen to show bottom nav bar
       }
     });
 
     return const Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Icon(
-                Icons.account_balance_wallet,
-                size: 80,
-                color: Color(0xFF6C63FF),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet,
+                    size: 80,
+                    color: Color(0xFF6C63FF),
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Welcome to SplitLocal',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Track and split expenses with your groups, all stored locally on your device.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 48),
+                  _OnboardingForm(),
+                ],
               ),
-              SizedBox(height: 24),
-              Text(
-                'Welcome to SplitLocal',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Track and split expenses with your groups, all stored locally on your device.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 48),
-              _OnboardingForm(),
-            ],
+            ),
           ),
         ),
       ),

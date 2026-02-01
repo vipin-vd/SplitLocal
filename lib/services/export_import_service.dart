@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -183,6 +184,36 @@ class ExportImportService {
 
     // Import merged data
     await storageService.importFromJson(mergedData);
+  }
+
+  /// Export only a specific group's data to clipboard
+  Future<void> exportGroupToClipboard(String groupId) async {
+    final data = storageService.exportToJson();
+    final filteredData = _filterDataByGroup(data, groupId);
+    final jsonString = const JsonEncoder.withIndent('  ').convert(filteredData);
+    await Clipboard.setData(ClipboardData(text: jsonString));
+  }
+
+  /// Import data from JSON string
+  Future<void> importFromText(String jsonString,
+      {bool mergeWithExisting = false}) async {
+    try {
+      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // Validate the data
+      if (!_isValidExportData(data)) {
+        throw Exception('Invalid SplitLocal data format');
+      }
+
+      if (mergeWithExisting) {
+        await _mergeData(data);
+      } else {
+        // Clear and import
+        await storageService.importFromJson(data);
+      }
+    } catch (e) {
+      throw Exception('Failed to import data: $e');
+    }
   }
 
   /// Export only a specific group's data

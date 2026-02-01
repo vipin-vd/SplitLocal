@@ -321,17 +321,34 @@ class _DataManagementSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: ListTile(
-        leading: const Icon(Icons.share),
-        title: const Text('Export Group Data'),
-        onTap: () async {
-          final success = await ref
-              .read(groupSettingsScreenLogicProvider.notifier)
-              .exportGroup(group.id);
-          if (success && context.mounted) {
-            showSnackBar(context, 'Group data exported');
-          }
-        },
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.share),
+            title: const Text('Export as File'),
+            onTap: () async {
+              final success = await ref
+                  .read(groupSettingsScreenLogicProvider.notifier)
+                  .exportGroup(group.id);
+              if (success && context.mounted) {
+                showSnackBar(context, 'Group data exported');
+              }
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.copy),
+            title: const Text('Copy to Clipboard'),
+            onTap: () async {
+              await ref
+                  .read(groupSettingsScreenLogicProvider.notifier)
+                  .exportGroupToClipboard(group.id);
+              if (context.mounted) {
+                showSnackBar(context, 'Group data copied to clipboard');
+              }
+            },
+          ),
+        ],
       ),
     );
   }

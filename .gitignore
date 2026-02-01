@@ -52,10 +52,17 @@ unlinked_spec.ds
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
+# Android secrets
+**/android/key.properties
+# Android secrets
+**/android/key.properties
 **/android/local.properties
+**/*.jks
+**/*.jks
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+*.keystore
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

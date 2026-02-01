@@ -118,11 +118,9 @@ class BackupRestore extends _$BackupRestore {
   Future<void> importFromText(bool merge) async {
     state = state.copyWith(isProcessing: true, clearMessages: true);
     try {
-      final data =
-          jsonDecode(state.importController.text) as Map<String, dynamic>;
-      await ref
-          .read(localStorageServiceProvider)
-          .importFromJson(data, merge: merge);
+      await ref.read(exportImportServiceProvider).importFromText(
+          state.importController.text,
+          mergeWithExisting: merge);
       _invalidateProviders();
       state = state.copyWith(
         isProcessing: false,

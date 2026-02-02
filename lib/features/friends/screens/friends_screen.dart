@@ -84,6 +84,25 @@ class FriendsScreen extends ConsumerWidget {
                     builder: (context) => const AddFriendManuallyDialog(),
                   );
                   if (newUser != null) {
+                    final currentFriends = ref.read(friendsProvider);
+                    // Check for duplicate phone number
+                    if (newUser.phoneNumber != null &&
+                        newUser.phoneNumber!.isNotEmpty) {
+                      final isDuplicate = currentFriends.any(
+                        (f) => f.phoneNumber == newUser.phoneNumber,
+                      );
+                      if (isDuplicate) {
+                        if (context.mounted) {
+                          showSnackBar(
+                            context,
+                            'A friend with this phone number already exists.',
+                            isError: true,
+                          );
+                        }
+                        return;
+                      }
+                    }
+
                     await ref.read(friendsProvider.notifier).addFriend(newUser);
                     if (context.mounted) {
                       showSnackBar(
@@ -100,6 +119,24 @@ class FriendsScreen extends ConsumerWidget {
                     final phoneNumber = contactData['phoneNumber'];
 
                     if (name.isNotEmpty) {
+                      final currentFriends = ref.read(friendsProvider);
+                      // Check for duplicate phone number
+                      if (phoneNumber != null && phoneNumber.isNotEmpty) {
+                        final isDuplicate = currentFriends.any(
+                          (f) => f.phoneNumber == phoneNumber,
+                        );
+                        if (isDuplicate) {
+                          if (context.mounted) {
+                            showSnackBar(
+                              context,
+                              'A friend with this phone number already exists.',
+                              isError: true,
+                            );
+                          }
+                          return;
+                        }
+                      }
+
                       final user = User(
                         id: const Uuid().v4(),
                         name: name,

@@ -3,7 +3,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 class ContactsService {
   /// Request permission to access contacts
   Future<bool> requestPermission() async {
-    return await FlutterContacts.requestPermission();
+    return await FlutterContacts.requestPermission(readonly: true);
   }
 
   /// Pick a contact from device contacts

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Primary colors
@@ -37,85 +36,100 @@ class AppColors {
 }
 
 class AppTheme {
-  // Custom text theme using Google Fonts
+  // Custom text theme using Local Fonts
   static TextTheme get _textTheme {
-    return GoogleFonts.interTextTheme().copyWith(
+    return const TextTheme(
       // Display styles - Poppins for impact
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 57,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
       ),
-      displayMedium: GoogleFonts.poppins(
+      displayMedium: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 45,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
       ),
-      displaySmall: GoogleFonts.poppins(
+      displaySmall: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 36,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
       ),
       // Headlines - Poppins for emphasis
-      headlineLarge: GoogleFonts.poppins(
+      headlineLarge: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 32,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
-      headlineMedium: GoogleFonts.poppins(
+      headlineMedium: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 28,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
-      headlineSmall: GoogleFonts.poppins(
+      headlineSmall: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 24,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
       // Titles - Inter for readability
-      titleLarge: GoogleFonts.inter(
+      titleLarge: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 22,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
-      titleMedium: GoogleFonts.inter(
+      titleMedium: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
-      titleSmall: GoogleFonts.inter(
+      titleSmall: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
       // Body - Inter for clean reading
-      bodyLarge: GoogleFonts.inter(
+      bodyLarge: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
       ),
-      bodySmall: GoogleFonts.inter(
+      bodySmall: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 12,
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
       ),
       // Labels
-      labelLarge: GoogleFonts.inter(
+      labelLarge: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
       ),
-      labelMedium: GoogleFonts.inter(
+      labelMedium: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 12,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
       ),
-      labelSmall: GoogleFonts.inter(
+      labelSmall: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 11,
         fontWeight: FontWeight.w500,
         color: AppColors.textSecondary,
@@ -134,12 +148,13 @@ class AppTheme {
         surface: AppColors.surface,
         error: AppColors.error,
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Poppins',
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -160,7 +175,8 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -173,7 +189,8 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -185,11 +202,13 @@ class AppTheme {
         ),
         filled: true,
         fillColor: AppColors.surface,
-        labelStyle: GoogleFonts.inter(
+        labelStyle: const TextStyle(
+          fontFamily: 'Inter',
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        hintStyle: GoogleFonts.inter(
+        hintStyle: const TextStyle(
+          fontFamily: 'Inter',
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: AppColors.textSecondary,

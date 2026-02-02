@@ -24,7 +24,7 @@ final deleteGroupDialogProvider = AutoDisposeNotifierProvider<DeleteGroupDialog,
 typedef _$DeleteGroupDialog
     = AutoDisposeNotifier<(TextEditingController, bool)>;
 String _$groupSettingsScreenLogicHash() =>
-    r'82506f375b99b9096a136f429133ab7ea073a9a7';
+    r'2eac8271e78971922200df134ce1b9118c4604cc';
 
 /// See also [GroupSettingsScreenLogic].
 @ProviderFor(GroupSettingsScreenLogic)

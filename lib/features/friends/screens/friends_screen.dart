@@ -12,7 +12,9 @@ import 'package:splitlocal/features/groups/models/user.dart';
 import 'package:splitlocal/shared/utils/dialogs.dart';
 import 'package:splitlocal/shared/widgets/animated_balance_text.dart';
 import 'package:splitlocal/shared/widgets/app_bar_search.dart';
+import 'package:splitlocal/shared/widgets/currency_selector.dart';
 import 'package:splitlocal/services/contacts_service.dart';
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class FriendsScreen extends ConsumerWidget {
@@ -74,140 +76,120 @@ class FriendsScreen extends ConsumerWidget {
           semanticsLabel: 'Search friends',
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: PopupMenuButton<String>(
-              onSelected: (value) async {
-                if (value == 'manual') {
-                  final newUser = await showDialog<User>(
-                    context: context,
-                    builder: (context) => const AddFriendManuallyDialog(),
-                  );
-                  if (newUser != null) {
-                    final currentFriends = ref.read(friendsProvider);
-                    // Check for duplicate phone number
-                    if (newUser.phoneNumber != null &&
-                        newUser.phoneNumber!.isNotEmpty) {
-                      final isDuplicate = currentFriends.any(
-                        (f) => f.phoneNumber == newUser.phoneNumber,
-                      );
-                      if (isDuplicate) {
-                        if (context.mounted) {
-                          showSnackBar(
-                            context,
-                            'A friend with this phone number already exists.',
-                            isError: true,
-                          );
-                        }
-                        return;
-                      }
-                    }
-
-                    await ref.read(friendsProvider.notifier).addFriend(newUser);
-                    if (context.mounted) {
-                      showSnackBar(
-                        context,
-                        '${newUser.name} added to friends!',
-                      );
-                    }
-                  }
-                } else if (value == 'contacts') {
-                  final contactsService = ContactsService();
-                  final contactData = await contactsService.pickContact();
-                  if (contactData != null && context.mounted) {
-                    final name = contactData['name'] ?? '';
-                    final phoneNumber = contactData['phoneNumber'];
-
-                    if (name.isNotEmpty) {
-                      final currentFriends = ref.read(friendsProvider);
-                      // Check for duplicate phone number
-                      if (phoneNumber != null && phoneNumber.isNotEmpty) {
-                        final isDuplicate = currentFriends.any(
-                          (f) => f.phoneNumber == phoneNumber,
-                        );
-                        if (isDuplicate) {
-                          if (context.mounted) {
-                            showSnackBar(
-                              context,
-                              'A friend with this phone number already exists.',
-                              isError: true,
-                            );
-                          }
-                          return;
-                        }
-                      }
-
-                      final user = User(
-                        id: const Uuid().v4(),
-                        name: name,
-                        phoneNumber: phoneNumber,
-                        isDeviceOwner: false,
-                        createdAt: DateTime.now(),
-                      );
-                      await ref.read(friendsProvider.notifier).addFriend(user);
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == 'manual') {
+                final newUser = await showDialog<User>(
+                  context: context,
+                  builder: (context) => const AddFriendManuallyDialog(),
+                );
+                if (newUser != null) {
+                  final currentFriends = ref.read(friendsProvider);
+                  // Check for duplicate phone number
+                  if (newUser.phoneNumber != null &&
+                      newUser.phoneNumber!.isNotEmpty) {
+                    final isDuplicate = currentFriends.any(
+                      (f) => f.phoneNumber == newUser.phoneNumber,
+                    );
+                    if (isDuplicate) {
                       if (context.mounted) {
                         showSnackBar(
                           context,
-                          '$name added to friends!',
+                          'A friend with this phone number already exists.',
+                          isError: true,
                         );
                       }
+                      return;
                     }
                   }
+
+                  await ref.read(friendsProvider.notifier).addFriend(newUser);
+                  if (context.mounted) {
+                    showSnackBar(
+                      context,
+                      '${newUser.name} added to friends!',
+                    );
+                  }
                 }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'manual',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit),
-                      SizedBox(width: 12),
-                      Text('Add Manually'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'contacts',
-                  child: Row(
-                    children: [
-                      Icon(Icons.contacts),
-                      SizedBox(width: 12),
-                      Text('Add From Contacts'),
-                    ],
-                  ),
-                ),
-              ],
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              } else if (value == 'contacts') {
+                // The new logic for adding from contacts
+                final contactsService = ContactsService();
+                final contactData = await contactsService.pickContact();
+                if (contactData != null && context.mounted) {
+                  final name = contactData['name'] as String;
+                  final phone = contactData['phoneNumber'] as String?;
+                  final currentFriends = ref.read(friendsProvider);
+
+                  // Check if friend with the same phone number already exists
+                  User? existingFriend;
+                  if (phone != null) {
+                    existingFriend = currentFriends.cast<User?>().firstWhere(
+                          (f) => f?.phoneNumber == phone,
+                          orElse: () => null,
+                        );
+                  }
+
+                  if (existingFriend != null) {
+                    if (context.mounted) {
+                      showSnackBar(
+                        context,
+                        '${existingFriend.name} is already your friend.',
+                        isError: true,
+                      );
+                    }
+                    return;
+                  }
+
+                  // Use a fresh UUID for the new user
+                  final newUser = User(
+                    id: const Uuid().v4(),
+                    name: name,
+                    phoneNumber: phone,
+                    createdAt: DateTime.now(),
+                  );
+
+                  await ref.read(friendsProvider.notifier).addFriend(newUser);
+
+                  if (context.mounted) {
+                    showSnackBar(
+                      context,
+                      '$name added to friends!',
+                    );
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'manual',
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Add Friend',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    Icon(Icons.edit),
+                    SizedBox(width: 12),
+                    Text('Add Manually'),
                   ],
                 ),
               ),
+              const PopupMenuItem(
+                value: 'contacts',
+                child: Row(
+                  children: [
+                    Icon(Icons.contacts),
+                    SizedBox(width: 12),
+                    Text('Add From Contacts'),
+                  ],
+                ),
+              ),
+            ],
+            tooltip: 'Add Friend',
+            icon: Icon(
+              Icons.person_add,
+              color: colorScheme.onPrimary,
             ),
           ),
         ],
         bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(64),
+          preferredSize: Size.fromHeight(100),
           child: Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: _TotalsSummary(),
@@ -398,6 +380,7 @@ class _TotalsSummary extends ConsumerWidget {
     final net = ref.watch(netBalanceGlobalProvider);
     final owedToUser = ref.watch(totalOwedToUserGlobalProvider);
     final userOwes = ref.watch(totalUserOwesGlobalProvider);
+    final currency = ref.watch(preferredCurrencyProvider);
 
     Color netColor;
     if (net.abs() < 0.01) {
@@ -407,45 +390,74 @@ class _TotalsSummary extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withAlpha((0.06 * 255).round()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _TotalItem(
-              label: 'Net',
-              amount: net,
-              color: netColor,
-              semanticsLabel: 'Overall balance',
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Balance',
+                style: TextStyle(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              CurrencySelector(
+                selectedCurrency: currency,
+                availableCurrencies: ref.watch(usedCurrenciesProvider),
+                onChanged: (val) {
+                  ref.read(preferredCurrencyProvider.notifier).setCurrency(val);
+                },
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _TotalItem(
-              label: "You're owed",
-              amount: owedToUser,
-              color: owedToUser > 0.01 ? Colors.green : scheme.onSurfaceVariant,
-              semanticsLabel: "You're owed total",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _TotalItem(
-              label: 'You owe',
-              amount: userOwes,
-              color: userOwes > 0.01 ? Colors.red : scheme.onSurfaceVariant,
-              semanticsLabel: 'You owe total',
-            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _TotalItem(
+                  label: 'Net',
+                  amount: net,
+                  color: netColor,
+                  semanticsLabel: 'Overall balance',
+                  currency: currency,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TotalItem(
+                  label: "You're owed",
+                  amount: owedToUser,
+                  color: owedToUser > 0.01
+                      ? Colors.green
+                      : scheme.onSurfaceVariant,
+                  semanticsLabel: "You're owed total",
+                  currency: currency,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TotalItem(
+                  label: 'You owe',
+                  amount: userOwes,
+                  color: userOwes > 0.01 ? Colors.red : scheme.onSurfaceVariant,
+                  semanticsLabel: 'You owe total',
+                  currency: currency,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -459,12 +471,14 @@ class _TotalItem extends StatelessWidget {
     required this.amount,
     required this.color,
     required this.semanticsLabel,
+    required this.currency,
   });
 
   final String label;
   final double amount;
   final Color color;
   final String semanticsLabel;
+  final String currency;
 
   @override
   Widget build(BuildContext context) {
@@ -484,6 +498,7 @@ class _TotalItem extends StatelessWidget {
           AnimatedBalanceText(
             amount: amount,
             color: color,
+            currencyCode: currency,
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),

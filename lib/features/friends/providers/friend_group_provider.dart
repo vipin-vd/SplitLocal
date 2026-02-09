@@ -29,7 +29,7 @@ Future<Group> friendGroup(FriendGroupRef ref, String friendId) async {
     final lastGroup = groups.isNotEmpty ? groups.last : null;
     final newGroup = Group(
       id: const Uuid().v4(),
-      name: 'Friend Group', // This name won't be displayed
+      name: 'Individual Expenses', // This name won't be displayed
       memberIds: [me!.id, friend.id],
       createdAt: DateTime.now(),
       isFriendGroup: true, // Custom flag to identify this group

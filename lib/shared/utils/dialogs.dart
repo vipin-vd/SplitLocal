@@ -1,15 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:splitlocal/shared/utils/success_message_service.dart';
 
 void showSnackBar(
   BuildContext context,
   String message, {
   bool isError = false,
 }) {
+  // Use the new success message service for success messages
+  if (!isError) {
+    showSuccessMessage(context, message);
+    return;
+  }
+
+  // Keep error messages as bottom snackbar (they need to be noticeable)
+  ScaffoldMessenger.of(context).clearSnackBars();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(message),
-      backgroundColor: isError ? Colors.red : Colors.green,
+      content: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.red,
       behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   );
 }
@@ -149,6 +171,7 @@ Future<void> showCannotRemoveFriendDialog(
   BuildContext context, {
   required String friendName,
   required List<BlockingGroup> groups,
+  String? message,
   void Function(String groupId)? onOpenGroup,
   void Function(String groupId)? onLeaveGroup,
 }) async {
@@ -162,7 +185,8 @@ Future<void> showCannotRemoveFriendDialog(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'You cannot remove $friendName yet. There are outstanding balances in the following groups. Please settle up or leave the groups first.',
+              message ??
+                  'You cannot remove $friendName yet. There are outstanding balances in the following groups. Please settle up or leave the groups first.',
             ),
             const SizedBox(height: 12),
             ...groups.map(

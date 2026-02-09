@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/expenses/providers/expense_list_provider.dart';
+import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 import '../models/expense_category.dart';
 import '../../groups/providers/groups_provider.dart';
 import '../../groups/providers/users_provider.dart';
@@ -206,14 +207,27 @@ class _ResultsCount extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expenses = ref.watch(filteredExpensesProvider(groupId));
     final group = ref.watch(selectedGroupProvider(groupId));
+
+    // Group totals by currency
+    final totalsByCurrency = <String, double>{};
+    for (final expense in expenses) {
+      final currency = expense.currency ?? group!.currency;
+      totalsByCurrency[currency] =
+          (totalsByCurrency[currency] ?? 0.0) + expense.totalAmount;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('${expenses.length} expenses'),
-          Text(
-            'Total: ${CurrencyFormatter.format(expenses.fold(0.0, (sum, t) => sum + t.totalAmount), currencyCode: group!.currency)}',
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Total: '),
+              MultiCurrencyAmountText(amounts: totalsByCurrency),
+            ],
           ),
         ],
       ),
@@ -241,12 +255,12 @@ class _ExpenseListView extends ConsumerWidget {
                 return TransactionTile(
                   transaction: transaction,
                   users: users,
-                  currency: group!.currency,
+                  currency: transaction.currency ?? group!.currency,
                   onTap: () => showExpenseDetailsSheet(
                     context: context,
                     transaction: transaction,
                     users: users,
-                    currency: group.currency,
+                    currency: transaction.currency ?? group!.currency,
                   ),
                 );
               },

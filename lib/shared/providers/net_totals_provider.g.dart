@@ -6,7 +6,7 @@ part of 'net_totals_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allNetBalancesHash() => r'05a284072a14fc84f447b4f6a0c443827620f0de';
+String _$allNetBalancesHash() => r'1aef4da899080347861e8f8d4804b8b1ede631db';
 
 /// Computes the device owner's net balances against all other users
 /// from all transactions across the app (friend groups + regular groups).

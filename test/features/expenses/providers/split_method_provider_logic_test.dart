@@ -8,7 +8,7 @@ import 'package:splitlocal/features/groups/models/user.dart';
 void main() {
   group('SplitMethodProvider Logic Tests', () {
     late List<User> members;
-    final double totalAmount = 30.0;
+    const double totalAmount = 30.0;
 
     setUp(() {
       members = [
@@ -27,7 +27,11 @@ void main() {
 
       final container = ProviderContainer();
       final provider = splitMethodProvider(
-          members, SplitMode.unequal, initialSplits, totalAmount);
+        members,
+        SplitMode.unequal,
+        initialSplits,
+        totalAmount,
+      );
 
       // Initial state
       var state = container.read(provider);
@@ -80,7 +84,11 @@ void main() {
 
       final container = ProviderContainer();
       final provider = splitMethodProvider(
-          members, SplitMode.percent, initialSplits, totalAmount);
+        members,
+        SplitMode.percent,
+        initialSplits,
+        totalAmount,
+      );
 
       // Update User 1 to 50%
       container.read(provider.notifier).updateSplit('1', '50');
@@ -105,7 +113,11 @@ void main() {
 
       final container = ProviderContainer();
       final provider = splitMethodProvider(
-          members, SplitMode.shares, initialSplits, totalAmount);
+        members,
+        SplitMode.shares,
+        initialSplits,
+        totalAmount,
+      );
 
       // Update User 1 to 2 shares
       container.read(provider.notifier).updateSplit('1', '2');
@@ -132,7 +144,11 @@ void main() {
 
       final container = ProviderContainer();
       final provider = splitMethodProvider(
-          members, SplitMode.unequal, initialSplits, totalAmount);
+        members,
+        SplitMode.unequal,
+        initialSplits,
+        totalAmount,
+      );
 
       var state = container.read(provider);
 

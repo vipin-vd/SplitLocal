@@ -163,35 +163,62 @@ class _DangerZoneSection extends ConsumerWidget {
         .map((g) => g.id)
         .toList();
 
-    // Check per-group net balance with this friend; if any non-zero, block.
-    bool hasOutstanding = false;
+    // Check per-group net balance with this friend
     final blockingGroups = <BlockingGroup>[];
+    final removableGroupIds = <String>[];
+
     for (final groupId in memberGroupIds) {
       final balance =
           ref.read(groupBalanceWithFriendProvider(groupId, friend.id));
+
+      final group = groups.firstWhere((g) => g.id == groupId);
+      final deviceOwner = ref.read(deviceOwnerProvider);
+      final netBalances = ref.read(groupNetBalancesProvider(groupId));
+      final canLeave = deviceOwner == null
+          ? false
+          : (netBalances[deviceOwner.id] ?? 0.0).abs() < 0.01;
+
+      // A group is blocking if:
+      // 1. There is an outstanding balance with the friend OR
+      // 2. It is NOT a "Friend Group" (Individual Expenses)
+      //    (Regular shared groups always block deletion until user leaves/removes)
+      bool isBlocking = false;
+
       if (balance.abs() > 0.01) {
-        hasOutstanding = true;
-        final group = groups.firstWhere((g) => g.id == groupId);
-        final deviceOwner = ref.read(deviceOwnerProvider);
-        final netBalances = ref.read(groupNetBalancesProvider(groupId));
-        final canLeave = deviceOwner == null
-            ? false
-            : (netBalances[deviceOwner.id] ?? 0.0).abs() < 0.01;
+        isBlocking = true; // Outstanding balance always blocks
+      } else if (!group.isFriendGroup) {
+        isBlocking = true; // Regular groups always block
+      }
+
+      if (isBlocking) {
         blockingGroups.add(
           BlockingGroup(
             id: group.id,
-            name: group.name,
+            name: group.isFriendGroup ? 'Individual Expenses' : group.name,
             canLeave: canLeave,
           ),
         );
+      } else {
+        // It's a Friend Group with 0 balance -> Safe to auto-remove
+        removableGroupIds.add(group.id);
       }
     }
 
-    if (hasOutstanding) {
+    if (blockingGroups.isNotEmpty) {
+      // Determine if the block is due to balances or just membership
+      // (If ANY blocking group has a balance, we say "outstanding balances")
+      // Check again strictly for balances to set the message
+      bool hasOutstanding = memberGroupIds.any((gid) =>
+          ref.read(groupBalanceWithFriendProvider(gid, friend.id)).abs() >
+          0.01,);
+
       await showCannotRemoveFriendDialog(
         context,
         friendName: friend.name,
         groups: blockingGroups,
+        message: hasOutstanding
+            ? 'You cannot remove ${friend.name} yet. There are outstanding balances in the following groups. Please settle up or leave the groups first.'
+            : 'You cannot remove ${friend.name} because you share the following groups. Please remove them from these groups first.',
         onOpenGroup: (gid) {
           Navigator.push(
             context,
@@ -214,18 +241,30 @@ class _DangerZoneSection extends ConsumerWidget {
       return;
     }
 
+    // specific warning if we are about to delete history
+    final willDeleteHistory = removableGroupIds.isNotEmpty;
+
     final confirmed = await showConfirmDialog(
       context,
-      title: 'Delete Friend',
-      message:
-          'Are you sure you want to remove ${friend.name} from your friends? This will not delete shared expenses or groups.',
-      confirmText: 'Delete',
+      title: 'Remove from Friends List',
+      message: willDeleteHistory
+          ? 'Are you sure you want to remove ${friend.name} from your friends list? This will also permanently delete your individual expense history with them.'
+          : 'Are you sure you want to remove ${friend.name} from your friends list?',
+      confirmText: 'Remove',
       cancelText: 'Cancel',
     );
 
     if (confirmed == true && context.mounted) {
+      // 1. Auto-delete removable groups (Individual Expenses)
+      final groupsNotifier = ref.read(groupsProvider.notifier);
+      for (final gid in removableGroupIds) {
+        await groupsNotifier.deleteGroup(gid);
+      }
+
+      // 2. Delete the friend
       final friendsNotifier = ref.read(friendsProvider.notifier);
       await friendsNotifier.removeFriend(friend.id);
+
       if (context.mounted) {
         Navigator.of(context).pop(); // Go back to friend detail
         Navigator.of(context).pop(); // Go back to friends list
@@ -241,20 +280,10 @@ class _DangerZoneSection extends ConsumerWidget {
       color: Colors.red.shade50,
       child: Column(
         children: [
-          const ListTile(
-            title: Text(
-              'Danger Zone',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-          ),
           ListTile(
             leading: const Icon(Icons.delete_forever, color: Colors.red),
             title: const Text(
-              'Delete Friend',
+              'Remove from Friends List',
               style: TextStyle(color: Colors.red),
             ),
             subtitle: const Text(

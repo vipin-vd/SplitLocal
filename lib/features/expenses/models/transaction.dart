@@ -60,6 +60,9 @@ class Transaction {
   @HiveField(14)
   final String? recurringFrequency; // 'daily', 'weekly', 'monthly', 'yearly'
 
+  @HiveField(15)
+  final String? currency;
+
   Transaction({
     required this.id,
     required this.groupId,
@@ -76,6 +79,7 @@ class Transaction {
     this.receiptPath,
     this.isRecurring = false,
     this.recurringFrequency,
+    this.currency,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>
@@ -98,6 +102,7 @@ class Transaction {
     String? receiptPath,
     bool? isRecurring,
     String? recurringFrequency,
+    String? currency,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -115,6 +120,7 @@ class Transaction {
       receiptPath: receiptPath ?? this.receiptPath,
       isRecurring: isRecurring ?? this.isRecurring,
       recurringFrequency: recurringFrequency ?? this.recurringFrequency,
+      currency: currency ?? this.currency,
     );
   }
 

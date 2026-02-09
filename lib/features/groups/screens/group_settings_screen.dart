@@ -8,9 +8,11 @@ import '../providers/users_provider.dart';
 import '../providers/group_settings_provider.dart';
 import '../../expenses/providers/transactions_provider.dart';
 import '../../../shared/utils/dialogs.dart';
-import '../../../shared/utils/currency.dart';
+import 'package:splitlocal/shared/utils/currency.dart';
 import '../widgets/add_member_manually_dialog.dart';
 import '../widgets/edit_member_dialog.dart';
+
+import 'package:splitlocal/shared/providers/net_totals_provider.dart';
 
 class GroupSettingsScreen extends ConsumerWidget {
   final Group group;
@@ -58,7 +60,7 @@ class _CurrencySection extends ConsumerWidget {
             Text('Current: ${CurrencyHelper.getCurrency(group.currency).name}'),
         trailing: DropdownButton<String>(
           value: group.currency,
-          items: CurrencyHelper.supportedCurrencies.map((currency) {
+          items: AppCurrency.values.map((currency) {
             return DropdownMenuItem(
               value: currency.code,
               child: Text('${currency.symbol} ${currency.code}'),
@@ -367,6 +369,8 @@ class _DangerZoneSection extends ConsumerWidget {
       final logic = ref.read(groupSettingsScreenLogicProvider.notifier);
       final success = await logic.deleteGroup(group.id);
       if (success && context.mounted) {
+        // Invalidate balance providers to refresh top bar
+        ref.invalidate(allNetBalancesProvider);
         Navigator.of(context)
           ..pop()
           ..pop();
@@ -444,21 +448,27 @@ class _LeaveGroupSection extends ConsumerWidget {
     final myBalance =
         deviceOwner == null ? 0.0 : (netBalances[deviceOwner.id] ?? 0.0);
     final canLeave = myBalance.abs() < 0.01;
+    final isCreator = deviceOwner != null && group.createdBy == deviceOwner.id;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      color: canLeave ? null : Colors.grey.shade200,
+      color: (canLeave && !isCreator) ? null : Colors.grey.shade200,
       child: ListTile(
         leading: const Icon(Icons.exit_to_app),
         title: const Text('Leave Group'),
         subtitle: canLeave
-            ? null
+            ? isCreator
+                ? const Text(
+                    'Group admin cannot leave the group. You must delete the group or transfer ownership first.',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  )
+                : null
             : Text(
                 'You have outstanding debts (${CurrencyHelper.getCurrency(group.currency).symbol}${myBalance.abs().toStringAsFixed(2)}) that must be settled before leaving',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
               ),
-        enabled: canLeave && deviceOwner != null,
-        onTap: canLeave && deviceOwner != null
+        enabled: canLeave && !isCreator && deviceOwner != null,
+        onTap: (canLeave && !isCreator && deviceOwner != null)
             ? () => _showLeaveConfirmation(context, ref, deviceOwner)
             : !canLeave && deviceOwner != null
                 ? () => _showDebtDialog(context, ref, deviceOwner, myBalance)

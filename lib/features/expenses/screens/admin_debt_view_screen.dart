@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/groups/models/user.dart';
+import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 import '../providers/transactions_provider.dart';
 import '../../groups/providers/groups_provider.dart';
 import '../../groups/providers/users_provider.dart';
@@ -173,8 +174,22 @@ class _WhoPaidWhatCard extends ConsumerWidget {
         .watch(usersProvider)
         .where((u) => group.memberIds.contains(u.id))
         .toList();
-    final debtCalculator = ref.watch(debtCalculatorServiceProvider);
     final transactions = ref.watch(groupTransactionsProvider(groupId));
+
+    // Calculate total paid by each user, grouped by currency
+    final paidByUserByCurrency = <String, Map<String, double>>{};
+    for (final member in members) {
+      paidByUserByCurrency[member.id] = <String, double>{};
+    }
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      t.payers.forEach((userId, amount) {
+        if (paidByUserByCurrency.containsKey(userId)) {
+          paidByUserByCurrency[userId]![currency] =
+              (paidByUserByCurrency[userId]![currency] ?? 0.0) + amount;
+        }
+      });
+    }
 
     return Card(
       child: Padding(
@@ -187,12 +202,9 @@ class _WhoPaidWhatCard extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ...members.map((member) {
-              final totalPaid =
-                  debtCalculator.getUserTotalPaid(member.id, transactions);
               return _MemberSummaryRow(
                 member: member,
-                value: totalPaid,
-                currency: group.currency,
+                valuesByCurrency: paidByUserByCurrency[member.id] ?? {},
               );
             }),
           ],
@@ -211,8 +223,22 @@ class _MemberShareCard extends ConsumerWidget {
     final group = ref.watch(selectedGroupProvider(groupId))!;
     final members =
         ref.watch(usersProvider).where((u) => group.memberIds.contains(u.id));
-    final debtCalculator = ref.watch(debtCalculatorServiceProvider);
     final transactions = ref.watch(groupTransactionsProvider(groupId));
+
+    // Calculate share by each user, grouped by currency
+    final shareByUserByCurrency = <String, Map<String, double>>{};
+    for (final member in members) {
+      shareByUserByCurrency[member.id] = <String, double>{};
+    }
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      t.splits.forEach((userId, amount) {
+        if (shareByUserByCurrency.containsKey(userId)) {
+          shareByUserByCurrency[userId]![currency] =
+              (shareByUserByCurrency[userId]![currency] ?? 0.0) + amount;
+        }
+      });
+    }
 
     return Card(
       child: Padding(
@@ -225,12 +251,9 @@ class _MemberShareCard extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ...members.map((member) {
-              final totalShare =
-                  debtCalculator.getUserTotalShare(member.id, transactions);
               return _MemberSummaryRow(
                 member: member,
-                value: totalShare,
-                currency: group.currency,
+                valuesByCurrency: shareByUserByCurrency[member.id] ?? {},
               );
             }),
           ],
@@ -249,7 +272,30 @@ class _NetBalancesCard extends ConsumerWidget {
     final group = ref.watch(selectedGroupProvider(groupId))!;
     final members =
         ref.watch(usersProvider).where((u) => group.memberIds.contains(u.id));
-    final netBalances = ref.watch(groupNetBalancesProvider(groupId));
+    final transactions = ref.watch(groupTransactionsProvider(groupId));
+
+    // Calculate net balances grouped by currency
+    final netBalancesByCurrency = <String, Map<String, double>>{};
+    for (final member in members) {
+      netBalancesByCurrency[member.id] = <String, double>{};
+    }
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      // Add what each payer paid
+      t.payers.forEach((userId, amount) {
+        if (netBalancesByCurrency.containsKey(userId)) {
+          netBalancesByCurrency[userId]![currency] =
+              (netBalancesByCurrency[userId]![currency] ?? 0.0) + amount;
+        }
+      });
+      // Subtract what each person owes
+      t.splits.forEach((userId, amount) {
+        if (netBalancesByCurrency.containsKey(userId)) {
+          netBalancesByCurrency[userId]![currency] =
+              (netBalancesByCurrency[userId]![currency] ?? 0.0) - amount;
+        }
+      });
+    }
 
     return Card(
       child: Padding(
@@ -262,11 +308,9 @@ class _NetBalancesCard extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ...members.map((member) {
-              final balance = netBalances[member.id] ?? 0.0;
               return _BalanceRow(
                 member: member,
-                balance: balance,
-                currency: group.currency,
+                balancesByCurrency: netBalancesByCurrency[member.id] ?? {},
               );
             }),
           ],
@@ -337,13 +381,11 @@ class _SettleUpCard extends ConsumerWidget {
 
 class _MemberSummaryRow extends StatelessWidget {
   final User member;
-  final double value;
-  final String currency;
+  final Map<String, double> valuesByCurrency;
 
   const _MemberSummaryRow({
     required this.member,
-    required this.value,
-    required this.currency,
+    required this.valuesByCurrency,
   });
 
   @override
@@ -355,7 +397,7 @@ class _MemberSummaryRow extends StatelessWidget {
           CircleAvatar(child: Text(member.name[0])),
           const SizedBox(width: 8),
           Expanded(child: Text(member.name)),
-          Text(CurrencyFormatter.format(value, currencyCode: currency)),
+          MultiCurrencyAmountText(amounts: valuesByCurrency),
         ],
       ),
     );
@@ -364,13 +406,11 @@ class _MemberSummaryRow extends StatelessWidget {
 
 class _BalanceRow extends StatelessWidget {
   final User member;
-  final double balance;
-  final String currency;
+  final Map<String, double> balancesByCurrency;
 
   const _BalanceRow({
     required this.member,
-    required this.balance,
-    required this.currency,
+    required this.balancesByCurrency,
   });
 
   @override
@@ -382,13 +422,10 @@ class _BalanceRow extends StatelessWidget {
           CircleAvatar(child: Text(member.name[0])),
           const SizedBox(width: 8),
           Expanded(child: Text(member.name)),
-          Text(
-            CurrencyFormatter.format(balance, currencyCode: currency),
-            style: TextStyle(
-              color: balance > 0
-                  ? Colors.green
-                  : (balance < 0 ? Colors.red : Colors.grey),
-            ),
+          MultiCurrencyAmountText(
+            amounts: balancesByCurrency,
+            positiveColor: Colors.green,
+            negativeColor: Colors.red,
           ),
         ],
       ),

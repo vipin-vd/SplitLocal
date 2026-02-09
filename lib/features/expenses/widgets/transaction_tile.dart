@@ -47,7 +47,7 @@ class TransactionTile extends StatelessWidget {
       trailing: Text(
         CurrencyFormatter.format(
           transaction.totalAmount,
-          currencyCode: currency,
+          currencyCode: transaction.currency ?? currency,
         ),
       ),
       onTap: onTap,

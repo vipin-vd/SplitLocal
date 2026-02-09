@@ -6,7 +6,7 @@ part of 'add_expense_form_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addExpenseFormHash() => r'c9739a824aca2d33e82705b69ced1e815742a1f8';
+String _$addExpenseFormHash() => r'c526878b6648d6541d7a9e71444d317f2599ef50';
 
 /// Copied from Dart SDK
 class _SystemHash {

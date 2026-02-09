@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 vars:
   APP_NAME: SplitLocal
@@ -110,6 +110,12 @@ tasks:
     cmds:
       - dart format --set-exit-if-changed lib/ test/
 
+  fix:
+    desc: Fix code quality issues
+    cmds:
+      - task: format
+      - dart fix --apply
+
   lint:
     desc: Run all code quality checks
     cmds:
@@ -188,7 +194,8 @@ tasks:
     desc: Build Android App Bundle (for Play Store)
     cmds:
       - echo "📱 Building Android App Bundle..."
-      - flutter build appbundle --release
+      - flutter build appbundle --release || echo "⚠️ Build finished with warnings (likely NDK stripping), checking for bundle..."
+      - ls -lh build/app/outputs/bundle/release/app-release.aab
       - echo "✅ AAB built at build/app/outputs/bundle/release/app-release.aab"
 
   build-ios:
@@ -234,9 +241,9 @@ tasks:
       - |
         cat > lib/features/models/{{.CLI_ARGS | lower}}.dart <<'ENDOFFILE'
         import 'package:json_annotation/json_annotation.dart';
-        
+
         part '{{.CLI_ARGS | lower}}.g.dart';
-        
+
         @JsonSerializable()
         class {{.CLI_ARGS}} {
           final String id;

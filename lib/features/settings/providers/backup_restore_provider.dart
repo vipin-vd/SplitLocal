@@ -119,8 +119,9 @@ class BackupRestore extends _$BackupRestore {
     state = state.copyWith(isProcessing: true, clearMessages: true);
     try {
       await ref.read(exportImportServiceProvider).importFromText(
-          state.importController.text,
-          mergeWithExisting: merge);
+            state.importController.text,
+            mergeWithExisting: merge,
+          );
       _invalidateProviders();
       state = state.copyWith(
         isProcessing: false,

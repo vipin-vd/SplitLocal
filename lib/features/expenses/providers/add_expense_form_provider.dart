@@ -297,6 +297,7 @@ class AddExpenseForm extends _$AddExpenseForm {
       category: state.category,
       isRecurring: state.isRecurring,
       recurringFrequency: state.isRecurring ? state.recurringFrequency : null,
+      currency: state.selectedCurrency,
     );
 
     try {

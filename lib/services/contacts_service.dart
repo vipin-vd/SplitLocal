@@ -8,10 +8,9 @@ class ContactsService {
 
   /// Pick a contact from device contacts
   /// Returns a map with 'name' and 'phoneNumber' keys
-  Future<Map<String, String?>?> pickContact() async {
+  Future<Map<String, dynamic>?> pickContact() async {
     // Request permission if not granted
-    final hasPermission = await requestPermission();
-    if (!hasPermission) {
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
       return null;
     }
 
@@ -34,7 +33,11 @@ class ContactsService {
 
     return {
       'name': name,
-      'phoneNumber': phoneNumber,
+      'phoneNumber': phoneNumber, // Primary/First
+      'phoneNumbers': fullContact.phones.map((p) => p.number).toList(),
+      'primaryPhoneNumber': fullContact.phones.isNotEmpty
+          ? fullContact.phones.first.number
+          : null,
     };
   }
 

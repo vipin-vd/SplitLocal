@@ -175,8 +175,10 @@ class _MemberList extends ConsumerWidget {
                       ? '0'
                       : (state.splitMode == SplitMode.shares ? '1' : '0.00'),
                   hintStyle: TextStyle(
-                    color:
-                        Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.5),
                   ),
                   suffixText: state.splitMode == SplitMode.percent
                       ? '%'
@@ -196,7 +198,8 @@ class _MemberList extends ConsumerWidget {
                     ? [FilteringTextInputFormatter.digitsOnly]
                     : [
                         FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d+\.?\d{0,2}')),
+                          RegExp(r'^\d+\.?\d{0,2}'),
+                        ),
                       ],
                 onChanged: (value) => notifier.updateSplit(member.id, value),
               ),
@@ -229,7 +232,8 @@ class _Summary extends ConsumerWidget {
           : state.totalAmount / state.selectedMembers.length;
       return ListTile(
         title: Text(
-            '${CurrencyFormatter.format(amountPerPerson, currencyCode: currencyCode)}/person'),
+          '${CurrencyFormatter.format(amountPerPerson, currencyCode: currencyCode)}/person',
+        ),
         trailing: Text('${state.selectedMembers.length} people'),
       );
     }

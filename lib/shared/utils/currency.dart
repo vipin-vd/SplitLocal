@@ -1,36 +1,36 @@
-class Currency {
+// ignore_for_file: constant_identifier_names
+
+enum AppCurrency {
+  INR('INR', '₹', 'Indian Rupee'),
+  USD('USD', '\$', 'US Dollar'),
+  EUR('EUR', '€', 'Euro'),
+  GBP('GBP', '£', 'British Pound'),
+  JPY('JPY', '¥', 'Japanese Yen'),
+  AUD('AUD', 'A\$', 'Australian Dollar'),
+  CAD('CAD', 'C\$', 'Canadian Dollar'),
+  CHF('CHF', 'Fr', 'Swiss Franc'),
+  CNY('CNY', '¥', 'Chinese Yuan'),
+  SGD('SGD', 'S\$', 'Singapore Dollar');
+
   final String code;
   final String symbol;
   final String name;
 
-  const Currency({
-    required this.code,
-    required this.symbol,
-    required this.name,
-  });
+  const AppCurrency(this.code, this.symbol, this.name);
+
+  static AppCurrency fromCode(String code) {
+    return AppCurrency.values.firstWhere(
+      (e) => e.code == code,
+      orElse: () => AppCurrency.INR,
+    );
+  }
 }
 
 class CurrencyHelper {
-  static const List<Currency> supportedCurrencies = [
-    Currency(code: 'INR', symbol: '₹', name: 'Indian Rupee'),
-    Currency(code: 'USD', symbol: '\$', name: 'US Dollar'),
-    Currency(code: 'EUR', symbol: '€', name: 'Euro'),
-    Currency(code: 'GBP', symbol: '£', name: 'British Pound'),
-    Currency(code: 'JPY', symbol: '¥', name: 'Japanese Yen'),
-    Currency(code: 'AUD', symbol: 'A\$', name: 'Australian Dollar'),
-    Currency(code: 'CAD', symbol: 'C\$', name: 'Canadian Dollar'),
-    Currency(code: 'CHF', symbol: 'Fr', name: 'Swiss Franc'),
-    Currency(code: 'CNY', symbol: '¥', name: 'Chinese Yuan'),
-    Currency(code: 'SGD', symbol: 'S\$', name: 'Singapore Dollar'),
-  ];
-
   static const String defaultCurrency = 'INR';
 
-  static Currency getCurrency(String code) {
-    return supportedCurrencies.firstWhere(
-      (currency) => currency.code == code,
-      orElse: () => supportedCurrencies.first, // Default to INR
-    );
+  static AppCurrency getCurrency(String code) {
+    return AppCurrency.fromCode(code);
   }
 
   static String getSymbol(String code) {

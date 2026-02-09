@@ -33,15 +33,26 @@ Future<Group?> showChooseGroupDialog({
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: Text(
-                  group.name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
+                child: group.isFriendGroup
+                    ? Icon(
+                        Icons.person,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        size: 20,
+                      )
+                    : Text(
+                        group.name.substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
               ),
-              title: Text(group.name),
-              subtitle: Text('${group.memberIds.length} members'),
+              title: Text(
+                group.isFriendGroup ? 'Individual Expenses' : group.name,
+              ),
+              subtitle: Text(group.isFriendGroup
+                  ? 'Expenses with this friend'
+                  : '${group.memberIds.length} members',),
               onTap: () => Navigator.of(context).pop(group),
             );
           }),

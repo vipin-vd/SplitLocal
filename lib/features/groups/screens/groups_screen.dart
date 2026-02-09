@@ -7,12 +7,14 @@ import '../providers/group_filter_provider.dart';
 import '../../../shared/utils/formatters.dart';
 import '../../../shared/widgets/animated_balance_text.dart';
 import '../../../shared/widgets/app_bar_search.dart';
+import '../../../shared/widgets/currency_selector.dart';
 import '../../expenses/providers/transactions_provider.dart';
 import '../../expenses/widgets/add_expense_target_selector.dart';
 import '../../settings/screens/backup_restore_screen.dart';
 import 'create_group_screen.dart';
 import 'group_detail_screen.dart';
 import '../../../shared/providers/net_totals_provider.dart';
+import '../../../shared/providers/preferred_currency_provider.dart';
 
 class GroupsScreen extends ConsumerWidget {
   const GroupsScreen({super.key});
@@ -63,7 +65,7 @@ class GroupsScreen extends ConsumerWidget {
           ),
         ],
         bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(64),
+          preferredSize: Size.fromHeight(100),
           child: Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: _GroupsTotalsSummary(),
@@ -106,6 +108,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
     final net = ref.watch(netBalanceGlobalProvider);
     final owedToUser = ref.watch(totalOwedToUserGlobalProvider);
     final userOwes = ref.watch(totalUserOwesGlobalProvider);
+    final currency = ref.watch(preferredCurrencyProvider);
 
     Color netColor;
     if (net.abs() < 0.01) {
@@ -115,7 +118,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(12),
@@ -127,33 +130,62 @@ class _GroupsTotalsSummary extends ConsumerWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _TotalItem(
-              label: 'Net',
-              amount: net,
-              color: netColor,
-              semanticsLabel: 'Overall group balance',
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Balance',
+                style: TextStyle(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              CurrencySelector(
+                selectedCurrency: currency,
+                availableCurrencies: ref.watch(usedCurrenciesProvider),
+                onChanged: (val) {
+                  ref.read(preferredCurrencyProvider.notifier).setCurrency(val);
+                },
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _TotalItem(
-              label: "You're owed",
-              amount: owedToUser,
-              color: owedToUser > 0.01 ? Colors.green : scheme.onSurfaceVariant,
-              semanticsLabel: "You're owed across groups",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _TotalItem(
-              label: 'You owe',
-              amount: userOwes,
-              color: userOwes > 0.01 ? Colors.red : scheme.onSurfaceVariant,
-              semanticsLabel: 'You owe across groups',
-            ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _TotalItem(
+                  label: 'Net',
+                  amount: net,
+                  color: netColor,
+                  semanticsLabel: 'Overall group balance',
+                  currency: currency,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TotalItem(
+                  label: "You're owed",
+                  amount: owedToUser,
+                  color: owedToUser > 0.01
+                      ? Colors.green
+                      : scheme.onSurfaceVariant,
+                  semanticsLabel: "You're owed across groups",
+                  currency: currency,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TotalItem(
+                  label: 'You owe',
+                  amount: userOwes,
+                  color: userOwes > 0.01 ? Colors.red : scheme.onSurfaceVariant,
+                  semanticsLabel: 'You owe across groups',
+                  currency: currency,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -167,12 +199,14 @@ class _TotalItem extends StatelessWidget {
     required this.amount,
     required this.color,
     required this.semanticsLabel,
+    required this.currency,
   });
 
   final String label;
   final double amount;
   final Color color;
   final String semanticsLabel;
+  final String currency;
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +226,7 @@ class _TotalItem extends StatelessWidget {
           AnimatedBalanceText(
             amount: amount,
             color: color,
+            currencyCode: currency,
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),

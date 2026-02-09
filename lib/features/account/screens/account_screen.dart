@@ -29,7 +29,6 @@ class AccountScreen extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SwitchListTile(
-            // TODO: Make it look disabled for now
             title: Text('Mobile Notifications'),
             value: false, // This will be managed by a provider later
             onChanged: null,

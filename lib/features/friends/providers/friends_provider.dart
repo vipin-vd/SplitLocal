@@ -7,6 +7,7 @@ import 'package:splitlocal/features/groups/models/user.dart';
 import 'package:splitlocal/features/groups/providers/groups_provider.dart';
 import 'package:splitlocal/features/groups/providers/users_provider.dart';
 import 'package:splitlocal/shared/providers/services_provider.dart';
+import 'package:splitlocal/shared/providers/initialization_provider.dart';
 
 part 'friends_provider.g.dart';
 
@@ -14,6 +15,10 @@ part 'friends_provider.g.dart';
 class Friends extends _$Friends {
   @override
   List<User> build() {
+    // Ensure initialization is complete before trying to access boxes
+    final init = ref.watch(initializationProvider);
+    if (!init.hasValue) return [];
+
     final storage = ref.watch(localStorageServiceProvider);
 
     // Safely get boxes, checking if they're open
@@ -61,8 +66,12 @@ class Friends extends _$Friends {
       allFriendIds.remove(deviceOwner.id);
     }
 
-    // Remove hidden friends
-    allFriendIds.removeAll(hiddenFriendIds);
+    // Remove hidden friends, but only if they were explicitly hidden
+    // We filter out any hidden IDs that are also current group members
+    // This allows a previously hidden friend to "re-appear" if added to a group
+    final explicitlyHiddenFriends =
+        hiddenFriendIds.where((id) => !groupMemberIds.contains(id));
+    allFriendIds.removeAll(explicitlyHiddenFriends);
 
     return allUsers.where((user) => allFriendIds.contains(user.id)).toList();
   }
@@ -77,7 +86,23 @@ class Friends extends _$Friends {
   // A method to remove a friend.
   Future<void> removeFriend(String friendId) async {
     final storage = ref.read(localStorageServiceProvider);
+
+    // Aggressively delete any groups where this friend is a member
+    // and the group only has 2 members (the device owner and the friend).
+    // This handles both "Individual Expenses" groups and any mis-flagged groups.
+    final allGroups = storage.getAllGroups();
+    final groupsToDelete = allGroups
+        .where((g) => g.memberIds.contains(friendId) && g.memberIds.length == 2)
+        .toList();
+
+    for (final group in groupsToDelete) {
+      await storage.deleteGroup(group.id);
+    }
+
     await storage.deleteFriendId(friendId);
-    await storage.addHiddenFriendId(friendId);
+    await storage.removeHiddenFriendId(friendId);
+
+    // Delete the User record itself to fully purge the friend from storage
+    await storage.deleteUser(friendId);
   }
 }

@@ -155,6 +155,157 @@ class _FriendBalanceProviderElement extends AutoDisposeProviderElement<double>
   String get friendId => (origin as FriendBalanceProvider).friendId;
 }
 
+String _$friendBalanceByCurrencyHash() =>
+    r'37c64392818d28cb386e843b99e35a12c36d60d5';
+
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+///
+/// Copied from [friendBalanceByCurrency].
+@ProviderFor(friendBalanceByCurrency)
+const friendBalanceByCurrencyProvider = FriendBalanceByCurrencyFamily();
+
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+///
+/// Copied from [friendBalanceByCurrency].
+class FriendBalanceByCurrencyFamily extends Family<Map<String, double>> {
+  /// Returns friend balance grouped by currency code.
+  /// Positive values mean friend owes you, negative means you owe them.
+  ///
+  /// Copied from [friendBalanceByCurrency].
+  const FriendBalanceByCurrencyFamily();
+
+  /// Returns friend balance grouped by currency code.
+  /// Positive values mean friend owes you, negative means you owe them.
+  ///
+  /// Copied from [friendBalanceByCurrency].
+  FriendBalanceByCurrencyProvider call(
+    String friendId,
+  ) {
+    return FriendBalanceByCurrencyProvider(
+      friendId,
+    );
+  }
+
+  @override
+  FriendBalanceByCurrencyProvider getProviderOverride(
+    covariant FriendBalanceByCurrencyProvider provider,
+  ) {
+    return call(
+      provider.friendId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'friendBalanceByCurrencyProvider';
+}
+
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+///
+/// Copied from [friendBalanceByCurrency].
+class FriendBalanceByCurrencyProvider
+    extends AutoDisposeProvider<Map<String, double>> {
+  /// Returns friend balance grouped by currency code.
+  /// Positive values mean friend owes you, negative means you owe them.
+  ///
+  /// Copied from [friendBalanceByCurrency].
+  FriendBalanceByCurrencyProvider(
+    String friendId,
+  ) : this._internal(
+          (ref) => friendBalanceByCurrency(
+            ref as FriendBalanceByCurrencyRef,
+            friendId,
+          ),
+          from: friendBalanceByCurrencyProvider,
+          name: r'friendBalanceByCurrencyProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$friendBalanceByCurrencyHash,
+          dependencies: FriendBalanceByCurrencyFamily._dependencies,
+          allTransitiveDependencies:
+              FriendBalanceByCurrencyFamily._allTransitiveDependencies,
+          friendId: friendId,
+        );
+
+  FriendBalanceByCurrencyProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.friendId,
+  }) : super.internal();
+
+  final String friendId;
+
+  @override
+  Override overrideWith(
+    Map<String, double> Function(FriendBalanceByCurrencyRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: FriendBalanceByCurrencyProvider._internal(
+        (ref) => create(ref as FriendBalanceByCurrencyRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        friendId: friendId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<Map<String, double>> createElement() {
+    return _FriendBalanceByCurrencyProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FriendBalanceByCurrencyProvider &&
+        other.friendId == friendId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, friendId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin FriendBalanceByCurrencyRef
+    on AutoDisposeProviderRef<Map<String, double>> {
+  /// The parameter `friendId` of this provider.
+  String get friendId;
+}
+
+class _FriendBalanceByCurrencyProviderElement
+    extends AutoDisposeProviderElement<Map<String, double>>
+    with FriendBalanceByCurrencyRef {
+  _FriendBalanceByCurrencyProviderElement(super.provider);
+
+  @override
+  String get friendId => (origin as FriendBalanceByCurrencyProvider).friendId;
+}
+
 String _$allFriendBalancesHash() => r'd99e37b03ec6e0f916c32fe06f22c01d08a66e84';
 
 /// Provides a map of all friend balances to avoid per-item watches during filtering

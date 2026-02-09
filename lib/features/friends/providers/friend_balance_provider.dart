@@ -41,6 +41,64 @@ double friendBalance(FriendBalanceRef ref, String friendId) {
   return balance;
 }
 
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+@riverpod
+Map<String, double> friendBalanceByCurrency(
+  FriendBalanceByCurrencyRef ref,
+  String friendId,
+) {
+  final me = ref.watch(deviceOwnerProvider);
+  if (me == null) return {};
+
+  final allGroups = ref.watch(groupsProvider);
+
+  final sharedGroups = allGroups
+      .where(
+        (g) => g.memberIds.contains(me.id) && g.memberIds.contains(friendId),
+      )
+      .toList();
+
+  if (sharedGroups.isEmpty) return {};
+
+  // Group transactions by currency
+  final transactionsByCurrency = <String, List<dynamic>>{};
+
+  for (final group in sharedGroups) {
+    final transactions = ref.watch(groupTransactionsProvider(group.id));
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      transactionsByCurrency.putIfAbsent(currency, () => []).add(t);
+    }
+  }
+
+  final debtCalculator = DebtCalculatorService();
+  final balanceByCurrency = <String, double>{};
+
+  for (final entry in transactionsByCurrency.entries) {
+    final currency = entry.key;
+    final transactions = entry.value.cast<dynamic>();
+
+    // Calculate simplified debts for this currency's transactions
+    final simplifiedDebts = debtCalculator.simplifyDebts(transactions.cast());
+
+    double balance = 0.0;
+    for (final debt in simplifiedDebts) {
+      if (debt.fromUserId == me.id && debt.toUserId == friendId) {
+        balance -= debt.amount;
+      } else if (debt.fromUserId == friendId && debt.toUserId == me.id) {
+        balance += debt.amount;
+      }
+    }
+
+    if (balance.abs() >= 0.01) {
+      balanceByCurrency[currency] = balance;
+    }
+  }
+
+  return balanceByCurrency;
+}
+
 /// Provides a map of all friend balances to avoid per-item watches during filtering
 @riverpod
 Map<String, double> allFriendBalances(AllFriendBalancesRef ref) {

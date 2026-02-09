@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:splitlocal/features/expenses/providers/group_insights_provider.dart';
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
+import 'package:splitlocal/shared/widgets/currency_selector.dart';
+import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 import '../models/expense_category.dart';
 import '../providers/transactions_provider.dart';
 import '../../groups/providers/groups_provider.dart';
@@ -49,12 +51,57 @@ class _UserStatsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final group = ref.watch(selectedGroupProvider(groupId))!;
-    final userTotalPaid = ref.watch(userTotalPaidProvider(groupId));
-    final userTotalShare = ref.watch(userTotalShareProvider(groupId));
-    final netBalances = ref.watch(groupNetBalancesProvider(groupId));
+    final transactions = ref.watch(groupTransactionsProvider(groupId));
     final deviceOwner = ref.watch(deviceOwnerProvider);
-    final userBalance =
-        deviceOwner != null ? (netBalances[deviceOwner.id] ?? 0.0) : 0.0;
+    final selectedCurrency = ref.watch(preferredCurrencyProvider);
+
+    if (deviceOwner == null) {
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text('No user found'),
+        ),
+      );
+    }
+
+    // Calculate stats grouped by currency
+    final paidByCurrency = <String, double>{};
+    final shareByCurrency = <String, double>{};
+    final balanceByCurrency = <String, double>{};
+
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+
+      // Calculate what user paid
+      final paid = t.payers[deviceOwner.id] ?? 0.0;
+      paidByCurrency[currency] = (paidByCurrency[currency] ?? 0.0) + paid;
+
+      // Calculate user's share
+      final share = t.splits[deviceOwner.id] ?? 0.0;
+      shareByCurrency[currency] = (shareByCurrency[currency] ?? 0.0) + share;
+
+      // Calculate balance (paid - share)
+      balanceByCurrency[currency] =
+          (balanceByCurrency[currency] ?? 0.0) + (paid - share);
+    }
+
+    // Get available currencies in this group
+    final availableCurrencies = paidByCurrency.keys
+        .toSet()
+        .union(shareByCurrency.keys.toSet())
+        .toList()
+      ..sort();
+
+    // Use selected currency if available, otherwise fall back to group currency
+    final currencyToShow = availableCurrencies.contains(selectedCurrency)
+        ? selectedCurrency
+        : (availableCurrencies.isNotEmpty
+            ? availableCurrencies.first
+            : group.currency);
+
+    final userPaid = paidByCurrency[currencyToShow] ?? 0.0;
+    final userShare = shareByCurrency[currencyToShow] ?? 0.0;
+    final userBalance = balanceByCurrency[currencyToShow] ?? 0.0;
 
     return Card(
       child: Padding(
@@ -62,9 +109,24 @@ class _UserStatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Your Stats',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Your Stats',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                if (availableCurrencies.length > 1)
+                  CurrencySelector(
+                    selectedCurrency: selectedCurrency,
+                    availableCurrencies: availableCurrencies,
+                    onChanged: (val) {
+                      ref
+                          .read(preferredCurrencyProvider.notifier)
+                          .setCurrency(val);
+                    },
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
             Row(
@@ -72,21 +134,21 @@ class _UserStatsCard extends ConsumerWidget {
                 Expanded(
                   child: _StatItem(
                     label: 'You Paid',
-                    value: userTotalPaid,
-                    currency: group.currency,
+                    value: userPaid,
+                    currency: currencyToShow,
                   ),
                 ),
                 Expanded(
                   child: _StatItem(
                     label: 'Your Share',
-                    value: userTotalShare,
-                    currency: group.currency,
+                    value: userShare,
+                    currency: currencyToShow,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            _BalanceIndicator(balance: userBalance, currency: group.currency),
+            _BalanceIndicator(balance: userBalance, currency: currencyToShow),
           ],
         ),
       ),
@@ -171,8 +233,19 @@ class _TotalSpendingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final totalSpend = ref.watch(groupTotalSpendProvider(groupId));
     final group = ref.watch(selectedGroupProvider(groupId))!;
+    final transactions = ref.watch(groupTransactionsProvider(groupId));
+
+    // Calculate total spend grouped by currency
+    final totalsByCurrency = <String, double>{};
+    for (final t in transactions) {
+      if (t.type.name == 'expense') {
+        final currency = t.currency ?? group.currency;
+        totalsByCurrency[currency] =
+            (totalsByCurrency[currency] ?? 0.0) + t.totalAmount;
+      }
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -183,11 +256,8 @@ class _TotalSpendingCard extends ConsumerWidget {
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 8),
-            Text(
-              CurrencyFormatter.format(
-                totalSpend,
-                currencyCode: group.currency,
-              ),
+            MultiCurrencyAmountText(
+              amounts: totalsByCurrency,
               style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
           ],
@@ -340,7 +410,7 @@ class _RecurringExpensesCard extends ConsumerWidget {
                       trailing: Text(
                         CurrencyFormatter.format(
                           expense.totalAmount,
-                          currencyCode: group.currency,
+                          currencyCode: expense.currency ?? group.currency,
                         ),
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),

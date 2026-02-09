@@ -17,6 +17,7 @@ import 'package:splitlocal/features/expenses/screens/settle_up_screen.dart';
 import 'package:splitlocal/shared/ui/buttons/settle_up_button.dart';
 import 'package:splitlocal/shared/ui/dialogs/choose_group_dialog.dart';
 import 'package:splitlocal/shared/utils/formatters.dart';
+import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 
 class FriendDetailScreen extends ConsumerWidget {
   final User friend;
@@ -25,7 +26,8 @@ class FriendDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balance = ref.watch(friendBalanceProvider(friend.id));
+    final balanceByCurrency =
+        ref.watch(friendBalanceByCurrencyProvider(friend.id));
     final me = ref.watch(deviceOwnerProvider);
     final allGroups = ref.watch(groupsProvider);
     final sharedGroups = allGroups
@@ -57,7 +59,7 @@ class FriendDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _BalanceSummary(balance: balance),
+          _BalanceSummary(balanceByCurrency: balanceByCurrency),
           const SizedBox(height: 24),
           _SharedGroups(
             friend: friend,
@@ -228,15 +230,20 @@ class _FloatingActionButtons extends ConsumerWidget {
 }
 
 class _BalanceSummary extends StatelessWidget {
-  final double balance;
+  final Map<String, double> balanceByCurrency;
 
-  const _BalanceSummary({required this.balance});
+  const _BalanceSummary({required this.balanceByCurrency});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isPositive = balance > 0;
-    final isZero = balance.abs() < 0.01;
+
+    // Calculate total balance (for determining the overall status)
+    final totalBalance =
+        balanceByCurrency.values.fold(0.0, (sum, v) => sum + v);
+    final isPositive = totalBalance > 0;
+    final isZero = totalBalance.abs() < 0.01;
+
     // Keep a soothing, neutral background and only color the amount text.
     final containerColor = scheme.surfaceContainerHighest;
     final onContainerColor = scheme.onSurfaceVariant;
@@ -278,13 +285,11 @@ class _BalanceSummary extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              CurrencyFormatter.format(balance),
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: isZero
-                        ? onContainerColor
-                        : (isPositive ? Colors.green : Colors.red),
-                  ),
+            MultiCurrencyAmountText(
+              amounts: balanceByCurrency,
+              style: Theme.of(context).textTheme.headlineMedium,
+              positiveColor: Colors.green,
+              negativeColor: Colors.red,
             ),
             // Status wording is already conveyed by the chip; avoid duplication.
           ],
@@ -339,7 +344,10 @@ class _SharedGroups extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      CurrencyFormatter.format(balance),
+                      CurrencyFormatter.format(
+                        balance,
+                        currencyCode: group.currency,
+                      ),
                       style: TextStyle(
                         color: balance > 0 ? Colors.green : Colors.red,
                       ),
@@ -396,12 +404,12 @@ class _IndividualTransactions extends ConsumerWidget {
             (transaction) => TransactionTile(
               transaction: transaction,
               users: users,
-              currency: group.currency,
+              currency: transaction.currency ?? group.currency,
               onTap: () => showExpenseDetailsSheet(
                 context: context,
                 transaction: transaction,
                 users: users,
-                currency: group.currency,
+                currency: transaction.currency ?? group.currency,
               ),
             ),
           ),

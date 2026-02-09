@@ -195,8 +195,10 @@ class ExportImportService {
   }
 
   /// Import data from JSON string
-  Future<void> importFromText(String jsonString,
-      {bool mergeWithExisting = false}) async {
+  Future<void> importFromText(
+    String jsonString, {
+    bool mergeWithExisting = false,
+  }) async {
     try {
       final data = jsonDecode(jsonString) as Map<String, dynamic>;
 

@@ -7,6 +7,9 @@ import 'package:splitlocal/features/expenses/providers/transactions_provider.dar
 import 'package:splitlocal/features/groups/models/user.dart';
 import 'package:splitlocal/features/groups/providers/users_provider.dart';
 import 'package:splitlocal/shared/providers/net_totals_provider.dart';
+import 'package:splitlocal/features/groups/providers/groups_provider.dart';
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
+import 'package:splitlocal/features/groups/models/group.dart';
 
 // Helper classes for provider overrides
 class _FakeTransactions extends Transactions {
@@ -19,6 +22,16 @@ class _FakeTransactions extends Transactions {
 class _EmptyTransactions extends Transactions {
   @override
   List<Transaction> build() => <Transaction>[];
+}
+
+class _FakeGroups extends Groups {
+  @override
+  List<Group> build() => [];
+}
+
+class _FakePreferredCurrency extends PreferredCurrency {
+  @override
+  String build() => 'INR';
 }
 
 void main() {
@@ -45,6 +58,7 @@ void main() {
           splitMode: SplitMode.equal,
           timestamp: DateTime(2024, 01, 02),
           createdBy: aId,
+          currency: 'INR',
         ),
         // B owes Me: 15 (Me paid 30 split equally)
         Transaction(
@@ -58,6 +72,7 @@ void main() {
           splitMode: SplitMode.equal,
           timestamp: DateTime(2024, 01, 03),
           createdBy: meId,
+          currency: 'INR',
         ),
         // Tiny noise below threshold: Me owes A: 0.005 (A paid 0.01 split equally)
         Transaction(
@@ -71,6 +86,7 @@ void main() {
           splitMode: SplitMode.equal,
           timestamp: DateTime(2024, 01, 04),
           createdBy: aId,
+          currency: 'INR',
         ),
       ];
 
@@ -86,6 +102,9 @@ void main() {
             ),
           ),
           transactionsProvider.overrideWith(() => _FakeTransactions(txs)),
+          groupsProvider.overrideWith(() => _FakeGroups()),
+          preferredCurrencyProvider
+              .overrideWith(() => _FakePreferredCurrency()),
         ],
       );
     });
@@ -126,6 +145,9 @@ void main() {
             ),
           ),
           transactionsProvider.overrideWith(() => _EmptyTransactions()),
+          groupsProvider.overrideWith(() => _FakeGroups()),
+          preferredCurrencyProvider
+              .overrideWith(() => _FakePreferredCurrency()),
         ],
       );
 
@@ -142,6 +164,9 @@ void main() {
         overrides: [
           deviceOwnerProvider.overrideWith((ref) => null),
           transactionsProvider.overrideWith(() => _EmptyTransactions()),
+          groupsProvider.overrideWith(() => _FakeGroups()),
+          preferredCurrencyProvider
+              .overrideWith(() => _FakePreferredCurrency()),
         ],
       );
       expect(noOwner.read(totalOwedToUserGlobalProvider), 0);

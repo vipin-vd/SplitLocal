@@ -167,7 +167,9 @@ class _RecordPaymentForm extends ConsumerWidget {
           items: members
               .map(
                 (member) => DropdownMenuItem(
-                    value: member.id, child: Text(member.name)),
+                  value: member.id,
+                  child: Text(member.name),
+                ),
               )
               .toList(),
           onChanged: (value) => notifier.setPayer(value),
@@ -180,7 +182,9 @@ class _RecordPaymentForm extends ConsumerWidget {
           items: members
               .map(
                 (member) => DropdownMenuItem(
-                    value: member.id, child: Text(member.name)),
+                  value: member.id,
+                  child: Text(member.name),
+                ),
               )
               .toList(),
           onChanged: (value) => notifier.setRecipient(value),

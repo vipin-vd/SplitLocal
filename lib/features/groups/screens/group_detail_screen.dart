@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/groups_provider.dart';
 import '../providers/users_provider.dart';
+import '../models/group.dart';
+import '../models/user.dart';
 import '../providers/group_detail_provider.dart';
 import '../../expenses/providers/transactions_provider.dart';
 import '../../expenses/models/expense_category.dart';
@@ -14,6 +16,14 @@ import '../../expenses/screens/group_insights_screen.dart';
 import '../../expenses/screens/admin_debt_view_screen.dart';
 import '../../expenses/widgets/add_expense_entry.dart';
 import 'group_settings_screen.dart';
+import 'package:splitlocal/services/debt_calculator_service.dart';
+import 'package:splitlocal/shared/widgets/currency_selector.dart';
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
+
+final _selectedCurrencyProvider =
+    StateProvider.autoDispose.family<String, String>((ref, defaultCurrency) {
+  return defaultCurrency;
+});
 
 class GroupDetailScreen extends ConsumerWidget {
   final String groupId;
@@ -58,13 +68,15 @@ class _AppBarActions extends ConsumerWidget {
 
   const _AppBarActions({required this.groupId});
 
-  void _shareGroupSummary(BuildContext context, WidgetRef ref) {
+  void _shareGroupSummary(
+    BuildContext context,
+    WidgetRef ref,
+    Group group,
+    List<User> members,
+    Map<String, double> netBalances,
+  ) {
     final logic = ref.read(groupDetailScreenLogicProvider);
     final summaryText = logic.generateGroupSummaryText(groupId);
-    final group = ref.read(selectedGroupProvider(groupId));
-    final users = ref.read(usersProvider);
-    final members =
-        users.where((u) => group!.memberIds.contains(u.id)).toList();
     final membersWithPhone = members
         .where((m) => m.phoneNumber != null && m.phoneNumber!.isNotEmpty)
         .toList();
@@ -86,6 +98,7 @@ class _AppBarActions extends ConsumerWidget {
                     icon: const Icon(Icons.chat),
                     label: Text(member.name),
                     onPressed: () async {
+                      if (member.phoneNumber == null) return;
                       final cleanPhone =
                           member.phoneNumber!.replaceAll(RegExp(r'\D'), '');
                       final encodedMessage = Uri.encodeComponent(summaryText);
@@ -125,12 +138,18 @@ class _AppBarActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final deviceOwner = ref.watch(deviceOwnerProvider);
+    final group = ref.watch(selectedGroupProvider(groupId))!;
+    final users = ref.watch(usersProvider);
+    final members = users.where((u) => group.memberIds.contains(u.id)).toList();
+    final netBalances = ref.watch(groupNetBalancesProvider(groupId));
+
     return Row(
       children: [
         IconButton(
           icon: const Icon(Icons.share),
           tooltip: 'Share',
-          onPressed: () => _shareGroupSummary(context, ref),
+          onPressed: () =>
+              _shareGroupSummary(context, ref, group, members, netBalances),
         ),
         IconButton(
           icon: const Icon(Icons.insights),
@@ -181,11 +200,23 @@ class _GroupStatsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final group = ref.watch(selectedGroupProvider(groupId))!;
-    final totalSpend = ref.watch(groupTotalSpendProvider(groupId));
+    final transactions = ref.watch(groupTransactionsProvider(groupId));
+    final selectedCurrency =
+        ref.watch(_selectedCurrencyProvider(group.currency));
+
+    // Filter transactions by selected currency
+    final filteredTransactions = transactions
+        .where((t) => (t.currency ?? group.currency) == selectedCurrency)
+        .toList();
+
+    final debtCalculator = DebtCalculatorService();
+    final totalSpent =
+        debtCalculator.calculateTotalGroupSpend(filteredTransactions);
+    final netBalances = debtCalculator.computeNetBalances(filteredTransactions);
+
     final members =
         ref.watch(usersProvider).where((u) => group.memberIds.contains(u.id));
     final deviceOwner = ref.watch(deviceOwnerProvider);
-    final netBalances = ref.watch(groupNetBalancesProvider(groupId));
 
     return Card(
       child: Padding(
@@ -193,9 +224,25 @@ class _GroupStatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Group Summary',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Group Summary',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                CurrencySelector(
+                  selectedCurrency: selectedCurrency,
+                  availableCurrencies: ref.watch(usedCurrenciesProvider),
+                  onChanged: (val) {
+                    ref
+                        .read(
+                          _selectedCurrencyProvider(group.currency).notifier,
+                        )
+                        .state = val;
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Row(
@@ -204,8 +251,8 @@ class _GroupStatsCard extends ConsumerWidget {
                 const Text('Total Group Spend:'),
                 Text(
                   CurrencyFormatter.format(
-                    totalSpend,
-                    currencyCode: group.currency,
+                    totalSpent,
+                    currencyCode: selectedCurrency,
                   ),
                   style: const TextStyle(
                     fontSize: 18,
@@ -231,7 +278,7 @@ class _GroupStatsCard extends ConsumerWidget {
                   Text(
                     CurrencyFormatter.format(
                       (netBalances[deviceOwner.id] ?? 0.0).abs(),
-                      currencyCode: group.currency,
+                      currencyCode: selectedCurrency,
                     ),
                     style: TextStyle(
                       fontSize: 18,
@@ -271,7 +318,18 @@ class _BalancesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final group = ref.watch(selectedGroupProvider(groupId))!;
-    final netBalances = ref.watch(groupNetBalancesProvider(groupId));
+    final transactions = ref.watch(groupTransactionsProvider(groupId));
+    final selectedCurrency =
+        ref.watch(_selectedCurrencyProvider(group.currency));
+
+    // Filter transactions by selected currency
+    final filteredTransactions = transactions
+        .where((t) => (t.currency ?? group.currency) == selectedCurrency)
+        .toList();
+
+    final debtCalculator = DebtCalculatorService();
+    final netBalances = debtCalculator.computeNetBalances(filteredTransactions);
+
     final members =
         ref.watch(usersProvider).where((u) => group.memberIds.contains(u.id));
     final showSimplifiedDebts = ref.watch(showSimplifiedDebtsProvider);
@@ -322,11 +380,11 @@ class _BalancesSection extends ConsumerWidget {
                     ),
                     Text(
                       balance > 0
-                          ? '+${CurrencyFormatter.format(balance, currencyCode: group.currency)}'
+                          ? '+${CurrencyFormatter.format(balance, currencyCode: selectedCurrency)}'
                           : balance < 0
                               ? CurrencyFormatter.format(
                                   balance,
-                                  currencyCode: group.currency,
+                                  currencyCode: selectedCurrency,
                                 )
                               : 'Settled',
                       style: TextStyle(
@@ -427,7 +485,7 @@ class _RecentTransactions extends ConsumerWidget {
                   trailing: Text(
                     CurrencyFormatter.format(
                       transaction.totalAmount,
-                      currencyCode: group.currency,
+                      currencyCode: transaction.currency ?? group.currency,
                     ),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),

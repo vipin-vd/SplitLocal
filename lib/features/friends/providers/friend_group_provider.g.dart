@@ -6,7 +6,7 @@ part of 'friend_group_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$friendGroupHash() => r'5b5c221a531f629c1ac9a8a360f6a4c5b278248e';
+String _$friendGroupHash() => r'714ed74da5de7d2fb3c7397d790bf7ef646c43bc';
 
 /// Copied from Dart SDK
 class _SystemHash {

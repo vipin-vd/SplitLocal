@@ -156,7 +156,7 @@ class _FriendBalanceProviderElement extends AutoDisposeProviderElement<double>
 }
 
 String _$friendBalanceByCurrencyHash() =>
-    r'37c64392818d28cb386e843b99e35a12c36d60d5';
+    r'27cd530de675dced4b88370b20365f3baf72f783';
 
 /// Returns friend balance grouped by currency code.
 /// Positive values mean friend owes you, negative means you owe them.
@@ -324,6 +324,27 @@ final allFriendBalancesProvider =
 );
 
 typedef AllFriendBalancesRef = AutoDisposeProviderRef<Map<String, double>>;
+String _$allFriendBalancesByCurrencyHash() =>
+    r'4b8e7bd3f7e5a1a20c45be547e33aed113a2b2c1';
+
+/// Provides a map of all friend balances grouped by currency
+/// Map<FriendId, Map<CurrencyCode, Balance>>
+///
+/// Copied from [allFriendBalancesByCurrency].
+@ProviderFor(allFriendBalancesByCurrency)
+final allFriendBalancesByCurrencyProvider =
+    AutoDisposeProvider<Map<String, Map<String, double>>>.internal(
+  allFriendBalancesByCurrency,
+  name: r'allFriendBalancesByCurrencyProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$allFriendBalancesByCurrencyHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef AllFriendBalancesByCurrencyRef
+    = AutoDisposeProviderRef<Map<String, Map<String, double>>>;
 String _$zeroBalanceFriendIdsHash() =>
     r'0c964f75270de06890889cece27bfe8ea33299d7';
 

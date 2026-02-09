@@ -7,6 +7,8 @@ import 'package:splitlocal/features/groups/providers/groups_provider.dart';
 import 'package:splitlocal/features/groups/providers/users_provider.dart';
 import 'package:splitlocal/shared/providers/services_provider.dart';
 
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
+
 part 'create_group_form_provider.g.dart';
 
 class CreateGroupFormState {
@@ -14,6 +16,7 @@ class CreateGroupFormState {
   final TextEditingController nameController;
   final TextEditingController descriptionController;
   final List<User> selectedMembers;
+  final String selectedCurrency;
   final bool isSaving;
   final String? errorMessage;
 
@@ -22,6 +25,7 @@ class CreateGroupFormState {
     required this.nameController,
     required this.descriptionController,
     this.selectedMembers = const [],
+    this.selectedCurrency = 'INR',
     this.isSaving = false,
     this.errorMessage,
   });
@@ -31,6 +35,7 @@ class CreateGroupFormState {
     TextEditingController? nameController,
     TextEditingController? descriptionController,
     List<User>? selectedMembers,
+    String? selectedCurrency,
     bool? isSaving,
     String? errorMessage,
     bool clearErrorMessage = false,
@@ -41,6 +46,7 @@ class CreateGroupFormState {
       descriptionController:
           descriptionController ?? this.descriptionController,
       selectedMembers: selectedMembers ?? this.selectedMembers,
+      selectedCurrency: selectedCurrency ?? this.selectedCurrency,
       isSaving: isSaving ?? this.isSaving,
       errorMessage:
           clearErrorMessage ? null : errorMessage ?? this.errorMessage,
@@ -64,6 +70,7 @@ class CreateGroupForm extends _$CreateGroupForm {
       formKey: GlobalKey<FormState>(),
       nameController: nameController,
       descriptionController: descriptionController,
+      selectedCurrency: ref.read(preferredCurrencyProvider),
     );
   }
 
@@ -79,6 +86,10 @@ class CreateGroupForm extends _$CreateGroupForm {
       selectedMembers:
           state.selectedMembers.where((m) => m.id != member.id).toList(),
     );
+  }
+
+  void setCurrency(String currencyCode) {
+    state = state.copyWith(selectedCurrency: currencyCode);
   }
 
   Future<void> addMemberFromContacts() async {
@@ -144,6 +155,7 @@ class CreateGroupForm extends _$CreateGroupForm {
       memberIds: memberIds.toSet().toList(), // Ensure unique members
       createdBy: deviceOwner.id,
       createdAt: DateTime.now(),
+      currency: state.selectedCurrency,
     );
 
     try {

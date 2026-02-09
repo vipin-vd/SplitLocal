@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/groups/providers/create_group_form_provider.dart';
 import 'package:splitlocal/features/groups/screens/select_friends_screen.dart';
+import 'package:splitlocal/shared/utils/currency.dart';
 import '../models/user.dart';
 import '../providers/users_provider.dart';
 import '../../../shared/utils/dialogs.dart';
@@ -56,6 +57,7 @@ class _GroupForm extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formState = ref.watch(createGroupFormProvider);
+    final formNotifier = ref.read(createGroupFormProvider.notifier);
     return Column(
       children: [
         TextFormField(
@@ -82,6 +84,27 @@ class _GroupForm extends ConsumerWidget {
             prefixIcon: Icon(Icons.description),
           ),
           maxLines: 2,
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          initialValue: formState.selectedCurrency,
+          decoration: const InputDecoration(
+            labelText: 'Default Currency',
+            prefixIcon: Icon(Icons.attach_money),
+            border: OutlineInputBorder(),
+          ),
+          items: AppCurrency.values.map((currency) {
+            return DropdownMenuItem(
+              value: currency.code,
+              child: Text(
+                  '${currency.symbol} ${currency.code} - ${currency.name}',),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              formNotifier.setCurrency(value);
+            }
+          },
         ),
       ],
     );

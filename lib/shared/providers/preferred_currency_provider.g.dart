@@ -23,7 +23,7 @@ final usedCurrenciesProvider = AutoDisposeProvider<List<String>>.internal(
 );
 
 typedef UsedCurrenciesRef = AutoDisposeProviderRef<List<String>>;
-String _$preferredCurrencyHash() => r'164c8347065115051e714ae7908045e2abe30ef3';
+String _$preferredCurrencyHash() => r'970ac23e9f896e3b7ee01a256cdce85929103ce2';
 
 /// See also [PreferredCurrency].
 @ProviderFor(PreferredCurrency)
@@ -39,5 +39,21 @@ final preferredCurrencyProvider =
 );
 
 typedef _$PreferredCurrency = AutoDisposeNotifier<String>;
+String _$dashboardCurrencyHash() => r'0c757233353895acd730331ec90349b945c1b4ed';
+
+/// See also [DashboardCurrency].
+@ProviderFor(DashboardCurrency)
+final dashboardCurrencyProvider =
+    AutoDisposeNotifierProvider<DashboardCurrency, String>.internal(
+  DashboardCurrency.new,
+  name: r'dashboardCurrencyProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$dashboardCurrencyHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$DashboardCurrency = AutoDisposeNotifier<String>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

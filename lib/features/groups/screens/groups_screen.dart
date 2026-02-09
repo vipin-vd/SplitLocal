@@ -9,12 +9,13 @@ import '../../../shared/widgets/animated_balance_text.dart';
 import '../../../shared/widgets/app_bar_search.dart';
 import '../../../shared/widgets/currency_selector.dart';
 import '../../expenses/providers/transactions_provider.dart';
+import '../../expenses/widgets/add_expense_entry.dart';
 import '../../expenses/widgets/add_expense_target_selector.dart';
-import '../../settings/screens/backup_restore_screen.dart';
 import 'create_group_screen.dart';
 import 'group_detail_screen.dart';
 import '../../../shared/providers/net_totals_provider.dart';
 import '../../../shared/providers/preferred_currency_provider.dart';
+import '../../../shared/widgets/multi_currency_amount_text.dart';
 
 class GroupsScreen extends ConsumerWidget {
   const GroupsScreen({super.key});
@@ -45,22 +46,10 @@ class GroupsScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Add Expense',
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              useRootNavigator: false,
-              builder: (context) => const AddExpenseTargetSelector(
-                defaultTab: ExpenseTargetTab.groups,
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Backup & Restore',
+            tooltip: 'Create Group',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const BackupRestoreScreen()),
+              MaterialPageRoute(builder: (_) => const CreateGroupScreen()),
             ),
           ),
         ],
@@ -88,12 +77,9 @@ class GroupsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CreateGroupScreen()),
-        ),
-        child: const Icon(Icons.add),
+      floatingActionButton: const AddExpenseEntry(
+        heroTag: 'groups_add_expense',
+        defaultTab: ExpenseTargetTab.groups,
       ),
     );
   }
@@ -108,7 +94,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
     final net = ref.watch(netBalanceGlobalProvider);
     final owedToUser = ref.watch(totalOwedToUserGlobalProvider);
     final userOwes = ref.watch(totalUserOwesGlobalProvider);
-    final currency = ref.watch(preferredCurrencyProvider);
+    final currency = ref.watch(dashboardCurrencyProvider);
 
     Color netColor;
     if (net.abs() < 0.01) {
@@ -118,7 +104,7 @@ class _GroupsTotalsSummary extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(12),
@@ -146,21 +132,23 @@ class _GroupsTotalsSummary extends ConsumerWidget {
                 selectedCurrency: currency,
                 availableCurrencies: ref.watch(usedCurrenciesProvider),
                 onChanged: (val) {
-                  ref.read(preferredCurrencyProvider.notifier).setCurrency(val);
+                  ref.read(dashboardCurrencyProvider.notifier).setCurrency(val);
                 },
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: _TotalItem(
-                  label: 'Net',
+                  label: 'Balance',
                   amount: net,
                   color: netColor,
                   semanticsLabel: 'Overall group balance',
                   currency: currency,
+                  showInfoIcon: true,
+                  infoTooltip: 'Balance = You\'re owed − You owe',
                 ),
               ),
               const SizedBox(width: 12),
@@ -200,6 +188,8 @@ class _TotalItem extends StatelessWidget {
     required this.color,
     required this.semanticsLabel,
     required this.currency,
+    this.showInfoIcon = false,
+    this.infoTooltip,
   });
 
   final String label;
@@ -207,6 +197,8 @@ class _TotalItem extends StatelessWidget {
   final Color color;
   final String semanticsLabel;
   final String currency;
+  final bool showInfoIcon;
+  final String? infoTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -217,10 +209,26 @@ class _TotalItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style:
-                textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: textTheme.bodySmall
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              if (showInfoIcon && infoTooltip != null) ...[
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: infoTooltip!,
+                  child: Icon(
+                    Icons.info_outline,
+                    size: 14,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 4),
           AnimatedBalanceText(
@@ -310,11 +318,26 @@ class _GroupListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final totalSpend = ref.watch(groupTotalSpendProvider(group.id));
-    final netBalances = ref.watch(groupNetBalancesProvider(group.id));
+    final totalSpendByCurrency =
+        ref.watch(groupTotalSpendByCurrencyProvider(group.id));
+    final netBalancesByCurrency =
+        ref.watch(groupNetBalancesByCurrencyProvider(group.id));
     final deviceOwner = ref.watch(deviceOwnerProvider);
-    final myBalance =
-        deviceOwner != null ? netBalances[deviceOwner.id] ?? 0.0 : 0.0;
+
+    // Get my balances by currency
+    final Map<String, double> myBalancesByCurrency = deviceOwner != null
+        ? (netBalancesByCurrency[deviceOwner.id] ?? <String, double>{})
+            .cast<String, double>()
+        : <String, double>{};
+
+    // Calculate overall net position across all currencies for status text
+    final totalPositive = myBalancesByCurrency.values
+        .where((v) => v > 0.01)
+        .fold(0.0, (sum, v) => sum + v);
+    final totalNegative = myBalancesByCurrency.values
+        .where((v) => v < -0.01)
+        .fold(0.0, (sum, v) => sum + v);
+    final overallNet = totalPositive + totalNegative;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -334,10 +357,7 @@ class _GroupListItem extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${group.memberIds.length} members'),
-            Text(
-              'Total spend: ${CurrencyFormatter.format(totalSpend, currencyCode: group.currency)}',
-              style: const TextStyle(fontSize: 12),
-            ),
+            _buildTotalSpendText(totalSpendByCurrency),
           ],
         ),
         trailing: Column(
@@ -345,18 +365,22 @@ class _GroupListItem extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              myBalance > 0 ? 'You\'re owed' : 'You owe',
+              overallNet > 0.01
+                  ? 'You\'re owed'
+                  : overallNet < -0.01
+                      ? 'You owe'
+                      : 'Settled',
               style: const TextStyle(fontSize: 11),
             ),
-            Text(
-              CurrencyFormatter.format(
-                myBalance.abs(),
-                currencyCode: group.currency,
-              ),
+            AbbreviatedMultiCurrencyAmountText(
+              amounts: _absoluteBalances(myBalancesByCurrency),
+              primaryCurrency: group.currency,
+              positiveColor: overallNet > 0.01 ? Colors.green : null,
+              negativeColor: overallNet < -0.01 ? Colors.red : null,
               style: TextStyle(
-                color: myBalance > 0
+                color: overallNet > 0.01
                     ? Colors.green
-                    : myBalance < 0
+                    : overallNet < -0.01
                         ? Colors.red
                         : Colors.grey,
                 fontWeight: FontWeight.bold,
@@ -372,5 +396,37 @@ class _GroupListItem extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildTotalSpendText(Map<String, double> spendByCurrency) {
+    if (spendByCurrency.isEmpty) {
+      return Text(
+        'Total spend: ${CurrencyFormatter.format(0, currencyCode: group.currency)}',
+        style: const TextStyle(fontSize: 12),
+      );
+    }
+
+    if (spendByCurrency.length == 1) {
+      final entry = spendByCurrency.entries.first;
+      return Text(
+        'Total spend: ${CurrencyFormatter.format(entry.value, currencyCode: entry.key)}',
+        style: const TextStyle(fontSize: 12),
+      );
+    }
+
+    // Multiple currencies - show abbreviated
+    final sorted = spendByCurrency.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final primary = sorted.first;
+    final remaining = spendByCurrency.length - 1;
+
+    return Text(
+      'Total spend: ${CurrencyFormatter.format(primary.value, currencyCode: primary.key)} +$remaining more',
+      style: const TextStyle(fontSize: 12),
+    );
+  }
+
+  Map<String, double> _absoluteBalances(Map<String, double> balances) {
+    return balances.map((k, v) => MapEntry(k, v.abs()));
   }
 }

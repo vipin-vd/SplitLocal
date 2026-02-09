@@ -321,14 +321,19 @@ class _SharedGroups extends ConsumerWidget {
         else
           ...sharedGroups.map(
             (group) {
-              final balance = ref
-                  .watch(groupBalanceWithFriendProvider(group.id, friend.id));
+              final balanceByCurrency = ref.watch(
+                groupBalanceWithFriendByCurrencyProvider(group.id, friend.id),
+              );
+
+              // Calculate overall balance direction
+              final totalBalance =
+                  balanceByCurrency.values.fold(0.0, (sum, v) => sum + v);
 
               // If balance > 0, friend owes you (you receive payment)
               // If balance < 0, you owe friend (you pay)
               final String? payer;
               final String? recipient;
-              if (balance > 0) {
+              if (totalBalance > 0) {
                 // Friend owes you - friend pays, you receive
                 payer = friend.id;
                 recipient = deviceOwner?.id;
@@ -343,13 +348,17 @@ class _SharedGroups extends ConsumerWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      CurrencyFormatter.format(
-                        balance,
-                        currencyCode: group.currency,
-                      ),
+                    AbbreviatedMultiCurrencyAmountText(
+                      amounts: _absoluteBalances(balanceByCurrency),
+                      primaryCurrency: group.currency,
+                      positiveColor: totalBalance > 0.01 ? Colors.green : null,
+                      negativeColor: totalBalance < -0.01 ? Colors.red : null,
                       style: TextStyle(
-                        color: balance > 0 ? Colors.green : Colors.red,
+                        color: totalBalance > 0.01
+                            ? Colors.green
+                            : totalBalance < -0.01
+                                ? Colors.red
+                                : Colors.grey,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -358,7 +367,7 @@ class _SharedGroups extends ConsumerWidget {
                       iconSize: 20,
                       prePopulatePayer: payer,
                       prePopulateRecipient: recipient,
-                      prePopulateAmount: balance,
+                      prePopulateAmount: totalBalance,
                     ),
                   ],
                 ),
@@ -376,6 +385,10 @@ class _SharedGroups extends ConsumerWidget {
           ),
       ],
     );
+  }
+
+  Map<String, double> _absoluteBalances(Map<String, double> balances) {
+    return balances.map((k, v) => MapEntry(k, v.abs()));
   }
 }
 

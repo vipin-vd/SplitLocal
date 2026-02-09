@@ -15,7 +15,7 @@ Map<String, double> allNetBalances(AllNetBalancesRef ref) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return {};
 
-  final selectedCurrency = ref.watch(preferredCurrencyProvider);
+  final selectedCurrency = ref.watch(dashboardCurrencyProvider);
   final groups = ref.watch(groupsProvider);
 
   final allTransactions = ref.watch(transactionsProvider);

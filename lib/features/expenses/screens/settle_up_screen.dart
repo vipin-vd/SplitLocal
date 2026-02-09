@@ -99,11 +99,31 @@ class _SuggestedSettlements extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final debtCalculator = ref.watch(debtCalculatorServiceProvider);
     final transactions = ref.watch(groupTransactionsProvider(groupId));
-    final simplifiedDebts = debtCalculator.simplifyDebts(transactions);
     final members = ref.watch(usersProvider);
     final group = ref.watch(selectedGroupProvider(groupId))!;
 
-    return simplifiedDebts.isEmpty
+    // Group transactions by currency
+    final transactionsByCurrency = <String, List<dynamic>>{};
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      transactionsByCurrency.putIfAbsent(currency, () => []).add(t);
+    }
+
+    // Calculate simplified debts per currency
+    final debtsByCurrency = <String, List<dynamic>>{};
+    for (final entry in transactionsByCurrency.entries) {
+      final currency = entry.key;
+      final currencyTransactions = entry.value.cast<dynamic>();
+      final simplifiedDebts =
+          debtCalculator.simplifyDebts(currencyTransactions.cast());
+      if (simplifiedDebts.isNotEmpty) {
+        debtsByCurrency[currency] = simplifiedDebts;
+      }
+    }
+
+    final hasDebts = debtsByCurrency.isNotEmpty;
+
+    return !hasDebts
         ? const SizedBox.shrink()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,26 +132,44 @@ class _SuggestedSettlements extends ConsumerWidget {
                 'Suggested Settlements',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
-              ...simplifiedDebts.map((debt) {
-                final payer =
-                    members.firstWhere((u) => u.id == debt.fromUserId);
-                final recipient =
-                    members.firstWhere((u) => u.id == debt.toUserId);
-                return ListTile(
-                  title: Text('${payer.name} → ${recipient.name}'),
-                  trailing: Text(
-                    CurrencyFormatter.format(
-                      debt.amount,
-                      currencyCode: group.currency,
+              ...debtsByCurrency.entries.expand((entry) {
+                final currency = entry.key;
+                final debts = entry.value;
+                return [
+                  if (debtsByCurrency.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 4),
+                      child: Text(
+                        currency,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
                     ),
-                  ),
-                  onTap: () =>
-                      ref.read(settleUpFormProvider.notifier).setFromSuggestion(
+                  ...debts.map((debt) {
+                    final payer =
+                        members.firstWhere((u) => u.id == debt.fromUserId);
+                    final recipient =
+                        members.firstWhere((u) => u.id == debt.toUserId);
+                    return ListTile(
+                      title: Text('${payer.name} → ${recipient.name}'),
+                      trailing: Text(
+                        CurrencyFormatter.format(
+                          debt.amount,
+                          currencyCode: currency,
+                        ),
+                      ),
+                      onTap: () => ref
+                          .read(settleUpFormProvider.notifier)
+                          .setFromSuggestion(
                             debt.fromUserId,
                             debt.toUserId,
                             debt.amount,
                           ),
-                );
+                    );
+                  }),
+                ];
               }),
             ],
           );

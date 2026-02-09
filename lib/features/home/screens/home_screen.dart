@@ -60,7 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               label: 'Groups',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.people),
+              icon: Icon(Icons.person),
               label: 'Friends',
             ),
             BottomNavigationBarItem(

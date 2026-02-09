@@ -10,12 +10,14 @@ class AddExpenseEntry extends ConsumerWidget {
   final String? groupId;
   final String? friendId;
   final String? heroTag;
+  final ExpenseTargetTab? defaultTab;
 
   const AddExpenseEntry({
     super.key,
     this.groupId,
     this.friendId,
     this.heroTag = 'add_expense',
+    this.defaultTab,
   });
 
   @override
@@ -75,7 +77,9 @@ class AddExpenseEntry extends ConsumerWidget {
         context: context,
         isScrollControlled: true,
         useRootNavigator: false,
-        builder: (context) => const AddExpenseTargetSelector(),
+        builder: (context) => AddExpenseTargetSelector(
+          defaultTab: defaultTab,
+        ),
       ),
       child: const Icon(Icons.add),
     );

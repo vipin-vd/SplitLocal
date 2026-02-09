@@ -106,6 +106,107 @@ class MultiCurrencyAmountText extends StatelessWidget {
   }
 }
 
+/// Abbreviated multi-currency display for condensed UI (e.g., group list cards).
+/// Shows primary currency with "+N more" indicator for additional currencies.
+///
+/// Example output: "₹500 +1 more" or "₹716.67" (if single currency)
+class AbbreviatedMultiCurrencyAmountText extends StatelessWidget {
+  const AbbreviatedMultiCurrencyAmountText({
+    super.key,
+    required this.amounts,
+    this.style,
+    this.positiveColor,
+    this.negativeColor,
+    this.primaryCurrency,
+  });
+
+  /// Map of currency code to amount (e.g., {'INR': 500.0, 'USD': 50.0})
+  final Map<String, double> amounts;
+
+  /// Optional text style
+  final TextStyle? style;
+
+  /// Color for positive amounts
+  final Color? positiveColor;
+
+  /// Color for negative amounts
+  final Color? negativeColor;
+
+  /// Primary currency to display first. If null, uses first by alphabetical order.
+  final String? primaryCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    if (amounts.isEmpty) {
+      return Text(
+        CurrencyFormatter.format(0),
+        style: style,
+      );
+    }
+
+    // Filter out zero amounts
+    final nonZeroAmounts = Map.fromEntries(
+      amounts.entries.where((e) => e.value.abs() >= 0.01).toList(),
+    );
+
+    if (nonZeroAmounts.isEmpty) {
+      return Text(
+        CurrencyFormatter.format(0),
+        style: style,
+      );
+    }
+
+    // Determine primary currency (prefer specified, then largest absolute amount)
+    MapEntry<String, double> primaryEntry;
+    if (primaryCurrency != null &&
+        nonZeroAmounts.containsKey(primaryCurrency)) {
+      primaryEntry =
+          MapEntry(primaryCurrency!, nonZeroAmounts[primaryCurrency]!);
+    } else {
+      // Sort by absolute value descending and pick first
+      final sorted = nonZeroAmounts.entries.toList()
+        ..sort((a, b) => b.value.abs().compareTo(a.value.abs()));
+      primaryEntry = sorted.first;
+    }
+
+    final amount = primaryEntry.value;
+    final color = amount > 0 ? positiveColor : negativeColor;
+    final remainingCount = nonZeroAmounts.length - 1;
+
+    if (remainingCount == 0) {
+      // Single currency - just show it
+      return Text(
+        CurrencyFormatter.format(amount, currencyCode: primaryEntry.key),
+        style: (style ?? const TextStyle()).copyWith(
+          color: color ?? style?.color,
+        ),
+      );
+    }
+
+    // Multiple currencies - show primary + "N more"
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: CurrencyFormatter.format(amount,
+                currencyCode: primaryEntry.key),
+            style: (style ?? const TextStyle()).copyWith(
+              color: color ?? style?.color,
+            ),
+          ),
+          TextSpan(
+            text: ' +$remainingCount more',
+            style: (style ?? const TextStyle()).copyWith(
+              color: style?.color?.withValues(alpha: 0.6) ?? Colors.grey,
+              fontSize: (style?.fontSize ?? 14) * 0.85,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Extension to aggregate transaction amounts by currency
 extension TransactionCurrencyAggregation on Iterable<Map<String, dynamic>> {
   /// Groups amounts by currency code

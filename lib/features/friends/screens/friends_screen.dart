@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/expenses/widgets/add_expense_entry.dart';
+import 'package:splitlocal/features/expenses/widgets/add_expense_target_selector.dart';
 import 'package:splitlocal/features/friends/providers/friend_balance_provider.dart';
 import 'package:splitlocal/shared/providers/net_totals_provider.dart';
 import 'package:splitlocal/features/friends/providers/friends_provider.dart';
@@ -15,6 +16,7 @@ import 'package:splitlocal/shared/widgets/app_bar_search.dart';
 import 'package:splitlocal/shared/widgets/currency_selector.dart';
 import 'package:splitlocal/services/contacts_service.dart';
 import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
+import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 import 'package:uuid/uuid.dart';
 
 class FriendsScreen extends ConsumerWidget {
@@ -26,6 +28,7 @@ class FriendsScreen extends ConsumerWidget {
     final showSettledUp = ref.watch(showSettledUpFriendsProvider);
     final filter = ref.watch(friendListFilterProvider);
     final balances = ref.watch(allFriendBalancesProvider);
+    final balancesByCurrency = ref.watch(allFriendBalancesByCurrencyProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -183,7 +186,7 @@ class FriendsScreen extends ConsumerWidget {
             ],
             tooltip: 'Add Friend',
             icon: Icon(
-              Icons.person_add,
+              Icons.person_add_alt_1,
               color: colorScheme.onPrimary,
             ),
           ),
@@ -216,6 +219,8 @@ class FriendsScreen extends ConsumerWidget {
                     return _FriendListTile(
                       friend: searchResults[index],
                       balance: balances[searchResults[index].id] ?? 0.0,
+                      balancesByCurrency:
+                          balancesByCurrency[searchResults[index].id] ?? {},
                     );
                   }
 
@@ -224,6 +229,8 @@ class FriendsScreen extends ConsumerWidget {
                     return _FriendListTile(
                       friend: activeFriends[index],
                       balance: balances[activeFriends[index].id] ?? 0.0,
+                      balancesByCurrency:
+                          balancesByCurrency[activeFriends[index].id] ?? {},
                     );
                   }
 
@@ -291,12 +298,16 @@ class FriendsScreen extends ConsumerWidget {
                   return _FriendListTile(
                     friend: settledFriends[settledIndex],
                     balance: 0.0, // Settled friends have 0 balance
+                    balancesByCurrency: const {},
                     isSettled: true,
                   );
                 },
               ),
             ),
-      floatingActionButton: const AddExpenseEntry(),
+      floatingActionButton: const AddExpenseEntry(
+        heroTag: 'friends_add_expense',
+        defaultTab: ExpenseTargetTab.friends,
+      ),
     );
   }
 }
@@ -304,11 +315,13 @@ class FriendsScreen extends ConsumerWidget {
 class _FriendListTile extends StatelessWidget {
   final User friend;
   final double balance;
+  final Map<String, double> balancesByCurrency;
   final bool isSettled;
 
   const _FriendListTile({
     required this.friend,
     required this.balance,
+    required this.balancesByCurrency,
     this.isSettled = false,
   });
 
@@ -354,10 +367,14 @@ class _FriendListTile extends StatelessWidget {
               size: 16,
               color: scheme.onSurfaceVariant,
             )
-          : AnimatedBalanceText(
-              amount: balance,
-              color: balanceColor,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+          : AbbreviatedMultiCurrencyAmountText(
+              amounts: _absoluteBalances(balancesByCurrency),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: balanceColor,
+              ),
+              positiveColor: isPositive ? Colors.green : null,
+              negativeColor: !isPositive ? Colors.red : null,
             ),
       onTap: () {
         Navigator.push(
@@ -368,6 +385,10 @@ class _FriendListTile extends StatelessWidget {
         );
       },
     );
+  }
+
+  Map<String, double> _absoluteBalances(Map<String, double> balances) {
+    return balances.map((k, v) => MapEntry(k, v.abs()));
   }
 }
 
@@ -380,7 +401,7 @@ class _TotalsSummary extends ConsumerWidget {
     final net = ref.watch(netBalanceGlobalProvider);
     final owedToUser = ref.watch(totalOwedToUserGlobalProvider);
     final userOwes = ref.watch(totalUserOwesGlobalProvider);
-    final currency = ref.watch(preferredCurrencyProvider);
+    final currency = ref.watch(dashboardCurrencyProvider);
 
     Color netColor;
     if (net.abs() < 0.01) {
@@ -418,7 +439,7 @@ class _TotalsSummary extends ConsumerWidget {
                 selectedCurrency: currency,
                 availableCurrencies: ref.watch(usedCurrenciesProvider),
                 onChanged: (val) {
-                  ref.read(preferredCurrencyProvider.notifier).setCurrency(val);
+                  ref.read(dashboardCurrencyProvider.notifier).setCurrency(val);
                 },
               ),
             ],
@@ -428,11 +449,13 @@ class _TotalsSummary extends ConsumerWidget {
             children: [
               Expanded(
                 child: _TotalItem(
-                  label: 'Net',
+                  label: 'Balance',
                   amount: net,
                   color: netColor,
                   semanticsLabel: 'Overall balance',
                   currency: currency,
+                  showInfoIcon: true,
+                  infoTooltip: 'Balance = You\'re owed − You owe',
                 ),
               ),
               const SizedBox(width: 12),
@@ -472,6 +495,8 @@ class _TotalItem extends StatelessWidget {
     required this.color,
     required this.semanticsLabel,
     required this.currency,
+    this.showInfoIcon = false,
+    this.infoTooltip,
   });
 
   final String label;
@@ -479,6 +504,8 @@ class _TotalItem extends StatelessWidget {
   final Color color;
   final String semanticsLabel;
   final String currency;
+  final bool showInfoIcon;
+  final String? infoTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -489,10 +516,26 @@ class _TotalItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style:
-                textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: textTheme.bodySmall
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              if (showInfoIcon && infoTooltip != null) ...[
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: infoTooltip!,
+                  child: Icon(
+                    Icons.info_outline,
+                    size: 14,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 4),
           AnimatedBalanceText(

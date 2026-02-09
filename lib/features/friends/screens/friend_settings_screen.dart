@@ -208,9 +208,11 @@ class _DangerZoneSection extends ConsumerWidget {
       // Determine if the block is due to balances or just membership
       // (If ANY blocking group has a balance, we say "outstanding balances")
       // Check again strictly for balances to set the message
-      bool hasOutstanding = memberGroupIds.any((gid) =>
-          ref.read(groupBalanceWithFriendProvider(gid, friend.id)).abs() >
-          0.01,);
+      bool hasOutstanding = memberGroupIds.any(
+        (gid) =>
+            ref.read(groupBalanceWithFriendProvider(gid, friend.id)).abs() >
+            0.01,
+      );
 
       await showCannotRemoveFriendDialog(
         context,

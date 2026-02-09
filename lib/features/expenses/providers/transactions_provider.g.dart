@@ -414,6 +414,275 @@ class _GroupTotalSpendProviderElement extends AutoDisposeProviderElement<double>
   String get groupId => (origin as GroupTotalSpendProvider).groupId;
 }
 
+String _$groupTotalSpendByCurrencyHash() =>
+    r'a69be2b4026f2a5dbc38aa8ce9966fc74baa7fa7';
+
+/// See also [groupTotalSpendByCurrency].
+@ProviderFor(groupTotalSpendByCurrency)
+const groupTotalSpendByCurrencyProvider = GroupTotalSpendByCurrencyFamily();
+
+/// See also [groupTotalSpendByCurrency].
+class GroupTotalSpendByCurrencyFamily extends Family<Map<String, double>> {
+  /// See also [groupTotalSpendByCurrency].
+  const GroupTotalSpendByCurrencyFamily();
+
+  /// See also [groupTotalSpendByCurrency].
+  GroupTotalSpendByCurrencyProvider call(
+    String groupId,
+  ) {
+    return GroupTotalSpendByCurrencyProvider(
+      groupId,
+    );
+  }
+
+  @override
+  GroupTotalSpendByCurrencyProvider getProviderOverride(
+    covariant GroupTotalSpendByCurrencyProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupTotalSpendByCurrencyProvider';
+}
+
+/// See also [groupTotalSpendByCurrency].
+class GroupTotalSpendByCurrencyProvider
+    extends AutoDisposeProvider<Map<String, double>> {
+  /// See also [groupTotalSpendByCurrency].
+  GroupTotalSpendByCurrencyProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => groupTotalSpendByCurrency(
+            ref as GroupTotalSpendByCurrencyRef,
+            groupId,
+          ),
+          from: groupTotalSpendByCurrencyProvider,
+          name: r'groupTotalSpendByCurrencyProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupTotalSpendByCurrencyHash,
+          dependencies: GroupTotalSpendByCurrencyFamily._dependencies,
+          allTransitiveDependencies:
+              GroupTotalSpendByCurrencyFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  GroupTotalSpendByCurrencyProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    Map<String, double> Function(GroupTotalSpendByCurrencyRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupTotalSpendByCurrencyProvider._internal(
+        (ref) => create(ref as GroupTotalSpendByCurrencyRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<Map<String, double>> createElement() {
+    return _GroupTotalSpendByCurrencyProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupTotalSpendByCurrencyProvider &&
+        other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GroupTotalSpendByCurrencyRef
+    on AutoDisposeProviderRef<Map<String, double>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _GroupTotalSpendByCurrencyProviderElement
+    extends AutoDisposeProviderElement<Map<String, double>>
+    with GroupTotalSpendByCurrencyRef {
+  _GroupTotalSpendByCurrencyProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as GroupTotalSpendByCurrencyProvider).groupId;
+}
+
+String _$groupNetBalancesByCurrencyHash() =>
+    r'cca08093ecb0972c4625493ecadf66f06ea12f73';
+
+/// See also [groupNetBalancesByCurrency].
+@ProviderFor(groupNetBalancesByCurrency)
+const groupNetBalancesByCurrencyProvider = GroupNetBalancesByCurrencyFamily();
+
+/// See also [groupNetBalancesByCurrency].
+class GroupNetBalancesByCurrencyFamily
+    extends Family<Map<String, Map<String, double>>> {
+  /// See also [groupNetBalancesByCurrency].
+  const GroupNetBalancesByCurrencyFamily();
+
+  /// See also [groupNetBalancesByCurrency].
+  GroupNetBalancesByCurrencyProvider call(
+    String groupId,
+  ) {
+    return GroupNetBalancesByCurrencyProvider(
+      groupId,
+    );
+  }
+
+  @override
+  GroupNetBalancesByCurrencyProvider getProviderOverride(
+    covariant GroupNetBalancesByCurrencyProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupNetBalancesByCurrencyProvider';
+}
+
+/// See also [groupNetBalancesByCurrency].
+class GroupNetBalancesByCurrencyProvider
+    extends AutoDisposeProvider<Map<String, Map<String, double>>> {
+  /// See also [groupNetBalancesByCurrency].
+  GroupNetBalancesByCurrencyProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => groupNetBalancesByCurrency(
+            ref as GroupNetBalancesByCurrencyRef,
+            groupId,
+          ),
+          from: groupNetBalancesByCurrencyProvider,
+          name: r'groupNetBalancesByCurrencyProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupNetBalancesByCurrencyHash,
+          dependencies: GroupNetBalancesByCurrencyFamily._dependencies,
+          allTransitiveDependencies:
+              GroupNetBalancesByCurrencyFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  GroupNetBalancesByCurrencyProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    Map<String, Map<String, double>> Function(
+            GroupNetBalancesByCurrencyRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupNetBalancesByCurrencyProvider._internal(
+        (ref) => create(ref as GroupNetBalancesByCurrencyRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<Map<String, Map<String, double>>> createElement() {
+    return _GroupNetBalancesByCurrencyProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupNetBalancesByCurrencyProvider &&
+        other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GroupNetBalancesByCurrencyRef
+    on AutoDisposeProviderRef<Map<String, Map<String, double>>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _GroupNetBalancesByCurrencyProviderElement
+    extends AutoDisposeProviderElement<Map<String, Map<String, double>>>
+    with GroupNetBalancesByCurrencyRef {
+  _GroupNetBalancesByCurrencyProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as GroupNetBalancesByCurrencyProvider).groupId;
+}
+
 String _$groupCategorySpendingHash() =>
     r'804abb3b7e37fb491181f6d35e16e4f5264344fb';
 

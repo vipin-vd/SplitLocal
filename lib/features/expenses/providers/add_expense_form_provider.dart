@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:splitlocal/features/groups/providers/groups_provider.dart';
 import 'package:splitlocal/features/groups/providers/users_provider.dart';
 import 'package:splitlocal/shared/utils/formatters.dart';
+import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
 import 'package:uuid/uuid.dart';
 import '../models/transaction.dart';
 import '../models/split_mode.dart';
@@ -94,7 +95,13 @@ class AddExpenseForm extends _$AddExpenseForm {
   @override
   AddExpenseFormState build(String groupId, Transaction? transaction) {
     final group = ref.watch(selectedGroupProvider(groupId));
-    final currency = group?.currency ?? 'USD';
+    final defaultCurrency = ref.read(preferredCurrencyProvider);
+    // For friend groups (Individual Expenses), always use Account Default
+    // because friend groups may have stale currency from creation time.
+    // For regular groups, use the group's currency.
+    final currency = (group?.isFriendGroup ?? false)
+        ? defaultCurrency
+        : (group?.currency ?? defaultCurrency);
 
     final amountText =
         transaction != null ? transaction.totalAmount.toStringAsFixed(2) : '';

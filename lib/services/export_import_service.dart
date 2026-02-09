@@ -39,11 +39,13 @@ class ExportImportService {
       await file.writeAsString(jsonString);
 
       // Share the file
-      final result = await Share.shareXFiles(
-        [XFile(filePath)],
-        subject:
-            groupId != null ? 'SplitLocal Group Data' : 'SplitLocal Backup',
-        text: 'Import this file in SplitLocal app to view the expense data.',
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          subject:
+              groupId != null ? 'SplitLocal Group Data' : 'SplitLocal Backup',
+          text: 'Import this file in SplitLocal app to view the expense data.',
+          files: [XFile(filePath)],
+        ),
       );
 
       return result.status == ShareResultStatus.success;

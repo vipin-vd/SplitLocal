@@ -11,7 +11,7 @@ class PreferredCurrency extends _$PreferredCurrency {
   @override
   String build() {
     // Default to most frequent currency in groups, or INR
-    final groups = ref.watch(groupsProvider);
+    final groups = ref.read(groupsProvider);
     if (groups.isEmpty) return AppCurrency.INR.code;
 
     final currencies = groups.map((g) => g.currency).toList();
@@ -34,6 +34,18 @@ class PreferredCurrency extends _$PreferredCurrency {
     });
 
     return mostFrequent;
+  }
+
+  void setCurrency(String code) {
+    state = code;
+  }
+}
+
+@riverpod
+class DashboardCurrency extends _$DashboardCurrency {
+  @override
+  String build() {
+    return ref.watch(preferredCurrencyProvider);
   }
 
   void setCurrency(String code) {

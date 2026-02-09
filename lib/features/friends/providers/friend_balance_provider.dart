@@ -145,6 +145,76 @@ Map<String, double> allFriendBalances(AllFriendBalancesRef ref) {
   return balances;
 }
 
+/// Provides a map of all friend balances grouped by currency
+/// Map<FriendId, Map<CurrencyCode, Balance>>
+@riverpod
+Map<String, Map<String, double>> allFriendBalancesByCurrency(
+  AllFriendBalancesByCurrencyRef ref,
+) {
+  final me = ref.watch(deviceOwnerProvider);
+  if (me == null) return {};
+
+  final allGroups = ref.watch(groupsProvider);
+  final friends = ref.watch(friendsProvider);
+
+  final balances = <String, Map<String, double>>{};
+
+  for (final friend in friends) {
+    final sharedGroups = allGroups
+        .where(
+          (g) => g.memberIds.contains(me.id) && g.memberIds.contains(friend.id),
+        )
+        .toList();
+
+    if (sharedGroups.isEmpty) {
+      balances[friend.id] = {};
+      continue;
+    }
+
+    final friendBalances = <String, double>{};
+
+    // Calculate balance per currency across all shared groups
+    for (final group in sharedGroups) {
+      final transactions = ref.watch(groupTransactionsProvider(group.id));
+
+      // Group transactions by currency
+      final transactionsByCurrency = <String, List<dynamic>>{};
+      for (final t in transactions) {
+        final currency = t.currency ?? group.currency ?? 'INR';
+        transactionsByCurrency.putIfAbsent(currency, () => []).add(t);
+      }
+
+      final debtCalculator = DebtCalculatorService();
+
+      for (final entry in transactionsByCurrency.entries) {
+        final currency = entry.key;
+        final currencyTransactions = entry.value.cast<dynamic>();
+
+        final simplifiedDebts =
+            debtCalculator.simplifyDebts(currencyTransactions.cast());
+
+        double balance = 0.0;
+        for (final debt in simplifiedDebts) {
+          if (debt.fromUserId == me.id && debt.toUserId == friend.id) {
+            balance -= debt.amount;
+          } else if (debt.fromUserId == friend.id && debt.toUserId == me.id) {
+            balance += debt.amount;
+          }
+        }
+
+        if (balance.abs() >= 0.01) {
+          friendBalances[currency] =
+              (friendBalances[currency] ?? 0.0) + balance;
+        }
+      }
+    }
+
+    balances[friend.id] = friendBalances;
+  }
+
+  return balances;
+}
+
 /// Provides list of friend IDs with zero balances (settled up or new friends)
 @riverpod
 List<String> zeroBalanceFriendIds(ZeroBalanceFriendIdsRef ref) {

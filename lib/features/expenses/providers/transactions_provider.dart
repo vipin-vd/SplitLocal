@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/transaction.dart';
 import '../models/expense_category.dart';
 import '../../../../shared/providers/services_provider.dart';
+import 'package:splitlocal/features/groups/providers/groups_provider.dart';
 
 part 'transactions_provider.g.dart';
 
@@ -56,6 +57,34 @@ double groupTotalSpend(GroupTotalSpendRef ref, String groupId) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);
   return debtCalculator.calculateTotalGroupSpend(transactions);
+}
+
+@riverpod
+Map<String, double> groupTotalSpendByCurrency(
+  GroupTotalSpendByCurrencyRef ref,
+  String groupId,
+) {
+  final transactions = ref.watch(groupTransactionsProvider(groupId));
+  final debtCalculator = ref.watch(debtCalculatorServiceProvider);
+  final group = ref.watch(selectedGroupProvider(groupId));
+  return debtCalculator.calculateTotalGroupSpendByCurrency(
+    transactions,
+    defaultCurrency: group?.currency,
+  );
+}
+
+@riverpod
+Map<String, Map<String, double>> groupNetBalancesByCurrency(
+  GroupNetBalancesByCurrencyRef ref,
+  String groupId,
+) {
+  final transactions = ref.watch(groupTransactionsProvider(groupId));
+  final debtCalculator = ref.watch(debtCalculatorServiceProvider);
+  final group = ref.watch(selectedGroupProvider(groupId));
+  return debtCalculator.computeNetBalancesByCurrency(
+    transactions,
+    defaultCurrency: group?.currency,
+  );
 }
 
 @riverpod

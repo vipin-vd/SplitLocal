@@ -200,6 +200,66 @@ class DebtCalculatorService {
         .fold(0.0, (sum, t) => sum + t.totalAmount);
   }
 
+  /// Calculate total group spending grouped by currency
+  /// Returns Map<currencyCode, totalSpend>
+  Map<String, double> calculateTotalGroupSpendByCurrency(
+    List<Transaction> transactions, {
+    String? defaultCurrency,
+  }) {
+    final result = <String, double>{};
+    for (final t in transactions) {
+      if (t.type == TransactionType.expense) {
+        final currency = t.currency ?? defaultCurrency ?? 'INR';
+        result[currency] = (result[currency] ?? 0.0) + t.totalAmount;
+      }
+    }
+    return result;
+  }
+
+  /// Calculate net balances for all members grouped by currency
+  /// Returns Map<userId, Map<currencyCode, balance>>
+  Map<String, Map<String, double>> computeNetBalancesByCurrency(
+    List<Transaction> transactions, {
+    String? defaultCurrency,
+  }) {
+    final result = <String, Map<String, double>>{};
+
+    for (final transaction in transactions) {
+      final currency = transaction.currency ?? defaultCurrency ?? 'INR';
+
+      if (transaction.type == TransactionType.expense) {
+        // Add what each person paid
+        transaction.payers.forEach((userId, amountPaid) {
+          result.putIfAbsent(userId, () => {});
+          result[userId]![currency] =
+              (result[userId]![currency] ?? 0.0) + amountPaid;
+        });
+
+        // Subtract what each person owes
+        transaction.splits.forEach((userId, amountOwed) {
+          result.putIfAbsent(userId, () => {});
+          result[userId]![currency] =
+              (result[userId]![currency] ?? 0.0) - amountOwed;
+        });
+      } else if (transaction.type == TransactionType.payment) {
+        // Process payment
+        transaction.payers.forEach((payerId, amount) {
+          result.putIfAbsent(payerId, () => {});
+          result[payerId]![currency] =
+              (result[payerId]![currency] ?? 0.0) + amount;
+        });
+
+        transaction.splits.forEach((recipientId, amount) {
+          result.putIfAbsent(recipientId, () => {});
+          result[recipientId]![currency] =
+              (result[recipientId]![currency] ?? 0.0) - amount;
+        });
+      }
+    }
+
+    return result;
+  }
+
   /// Get individual's total contribution (what they paid)
   double getUserTotalPaid(String userId, List<Transaction> transactions) {
     return transactions.fold(0.0, (sum, t) {

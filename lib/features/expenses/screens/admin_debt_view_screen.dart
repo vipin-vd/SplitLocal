@@ -331,7 +331,28 @@ class _SettleUpCard extends ConsumerWidget {
         ref.watch(usersProvider).where((u) => group.memberIds.contains(u.id));
     final debtCalculator = ref.watch(debtCalculatorServiceProvider);
     final transactions = ref.watch(groupTransactionsProvider(groupId));
-    final simplifiedDebts = debtCalculator.simplifyDebts(transactions);
+
+    // Group transactions by currency
+    final transactionsByCurrency = <String, List<dynamic>>{};
+    for (final t in transactions) {
+      final currency = t.currency ?? group.currency;
+      transactionsByCurrency.putIfAbsent(currency, () => []).add(t);
+    }
+
+    // Calculate simplified debts per currency
+    final debtsByCurrency = <String, List<dynamic>>{};
+    for (final entry in transactionsByCurrency.entries) {
+      final currency = entry.key;
+      final currencyTransactions = entry.value.cast<dynamic>();
+      final simplifiedDebts =
+          debtCalculator.simplifyDebts(currencyTransactions.cast());
+      if (simplifiedDebts.isNotEmpty) {
+        debtsByCurrency[currency] = simplifiedDebts;
+      }
+    }
+
+    final allSettled = debtsByCurrency.isEmpty ||
+        debtsByCurrency.values.every((debts) => debts.isEmpty);
 
     return Card(
       child: Padding(
@@ -343,34 +364,47 @@ class _SettleUpCard extends ConsumerWidget {
               'How to Settle Up',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            if (simplifiedDebts.isEmpty)
+            if (allSettled)
               const Text('All Settled Up!')
             else
-              ...simplifiedDebts
-                  // Filter out any debts that reference users no longer in the group
-                  .where(
-                (debt) =>
-                    members.any((u) => u.id == debt.fromUserId) &&
-                    members.any((u) => u.id == debt.toUserId),
-              )
-                  .map((debt) {
-                // Safe resolution of users; avoids StateError: No element
-                final fromUser = members.firstWhere(
-                  (u) => u.id == debt.fromUserId,
-                  orElse: () =>
-                      // Fallback should never hit due to the where() above
-                      members.first,
-                );
-                final toUser = members.firstWhere(
-                  (u) => u.id == debt.toUserId,
-                  orElse: () => members.first,
-                );
-                return _DebtRow(
-                  from: fromUser,
-                  to: toUser,
-                  amount: debt.amount,
-                  currency: group.currency,
-                );
+              ...debtsByCurrency.entries.expand((entry) {
+                final currency = entry.key;
+                final debts = entry.value;
+                return [
+                  if (debtsByCurrency.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 4),
+                      child: Text(
+                        currency,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                  ...debts
+                      .where(
+                    (debt) =>
+                        members.any((u) => u.id == debt.fromUserId) &&
+                        members.any((u) => u.id == debt.toUserId),
+                  )
+                      .map((debt) {
+                    final fromUser = members.firstWhere(
+                      (u) => u.id == debt.fromUserId,
+                      orElse: () => members.first,
+                    );
+                    final toUser = members.firstWhere(
+                      (u) => u.id == debt.toUserId,
+                      orElse: () => members.first,
+                    );
+                    return _DebtRow(
+                      from: fromUser,
+                      to: toUser,
+                      amount: debt.amount,
+                      currency: currency,
+                    );
+                  }),
+                ];
               }),
           ],
         ),

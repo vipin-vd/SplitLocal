@@ -50,9 +50,11 @@ Future<Group?> showChooseGroupDialog({
               title: Text(
                 group.isFriendGroup ? 'Individual Expenses' : group.name,
               ),
-              subtitle: Text(group.isFriendGroup
-                  ? 'Expenses with this friend'
-                  : '${group.memberIds.length} members',),
+              subtitle: Text(
+                group.isFriendGroup
+                    ? 'Expenses with this friend'
+                    : '${group.memberIds.length} members',
+              ),
               onTap: () => Navigator.of(context).pop(group),
             );
           }),

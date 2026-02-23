@@ -192,14 +192,20 @@ class _BalanceIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: balance > 0
-            ? Colors.green.shade50
+            ? (isDark
+                ? Colors.green.shade900.withValues(alpha: 0.3)
+                : Colors.green.shade50)
             : balance < 0
-                ? Colors.red.shade50
-                : Colors.grey.shade100,
+                ? (isDark
+                    ? Colors.red.shade900.withValues(alpha: 0.3)
+                    : Colors.red.shade50)
+                : (isDark ? Colors.grey.shade900 : Colors.grey.shade100),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

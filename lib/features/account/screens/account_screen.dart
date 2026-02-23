@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:splitlocal/features/groups/providers/users_provider.dart';
 import 'package:splitlocal/features/settings/screens/backup_restore_screen.dart';
+import 'package:splitlocal/features/settings/providers/theme_provider.dart';
 import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
 import 'package:splitlocal/shared/utils/currency.dart';
 
@@ -63,7 +64,8 @@ class AccountScreen extends ConsumerWidget {
                       return DropdownMenuItem(
                         value: currency.code,
                         child: Text(
-                            '${currency.symbol} ${currency.code} - ${currency.name}',),
+                          '${currency.symbol} ${currency.code} - ${currency.name}',
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -72,6 +74,60 @@ class AccountScreen extends ConsumerWidget {
                             .read(preferredCurrencyProvider.notifier)
                             .setCurrency(value);
                       }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Appearance Settings
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Appearance',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final themeMode = ref.watch(themeModeNotifierProvider);
+                      return DropdownButtonFormField<ThemeMode>(
+                        initialValue: themeMode,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: ThemeMode.system,
+                            child: Text('System Default'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.light,
+                            child: Text('Light'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.dark,
+                            child: Text('Dark'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            ref
+                                .read(themeModeNotifierProvider.notifier)
+                                .setThemeMode(value);
+                          }
+                        },
+                      );
                     },
                   ),
                 ],

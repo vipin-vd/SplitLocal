@@ -1,7 +1,7 @@
 name: splitlocal
 description: A local-only, offline-first expense tracking app for managing group expenses
 publish_to: "none"
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

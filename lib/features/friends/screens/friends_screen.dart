@@ -185,9 +185,8 @@ class FriendsScreen extends ConsumerWidget {
               ),
             ],
             tooltip: 'Add Friend',
-            icon: Icon(
+            icon: const Icon(
               Icons.person_add_alt_1,
-              color: colorScheme.onPrimary,
             ),
           ),
         ],
@@ -413,15 +412,22 @@ class _TotalsSummary extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? scheme.surfaceContainerHigh
+            : scheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.06 * 255).round()),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: scheme.outlineVariant)
+            : null,
+        boxShadow: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withAlpha((0.06 * 255).round()),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [

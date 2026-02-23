@@ -16,7 +16,6 @@ import 'package:splitlocal/features/groups/screens/group_detail_screen.dart';
 import 'package:splitlocal/features/expenses/screens/settle_up_screen.dart';
 import 'package:splitlocal/shared/ui/buttons/settle_up_button.dart';
 import 'package:splitlocal/shared/ui/dialogs/choose_group_dialog.dart';
-import 'package:splitlocal/shared/utils/formatters.dart';
 import 'package:splitlocal/shared/widgets/multi_currency_amount_text.dart';
 
 class FriendDetailScreen extends ConsumerWidget {

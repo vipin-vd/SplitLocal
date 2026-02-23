@@ -56,7 +56,7 @@ class CurrencySelector extends StatelessWidget {
         decoration: BoxDecoration(
           color: isWhite
               ? Colors.white.withValues(alpha: 0.2)
-              : Colors.black.withValues(alpha: 0.05),
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -65,7 +65,9 @@ class CurrencySelector extends StatelessWidget {
             Text(
               CurrencyHelper.getSymbol(selectedCurrency),
               style: TextStyle(
-                color: isWhite ? Colors.white : Colors.black87,
+                color: isWhite
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -74,7 +76,9 @@ class CurrencySelector extends StatelessWidget {
             Text(
               selectedCurrency,
               style: TextStyle(
-                color: isWhite ? Colors.white : Colors.black87,
+                color: isWhite
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
               ),
@@ -83,7 +87,9 @@ class CurrencySelector extends StatelessWidget {
             Icon(
               Icons.keyboard_arrow_down,
               size: 16,
-              color: isWhite ? Colors.white70 : Colors.black54,
+              color: isWhite
+                  ? Colors.white70
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ],
         ),

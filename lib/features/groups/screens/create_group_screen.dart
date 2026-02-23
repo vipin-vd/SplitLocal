@@ -97,7 +97,8 @@ class _GroupForm extends ConsumerWidget {
             return DropdownMenuItem(
               value: currency.code,
               child: Text(
-                  '${currency.symbol} ${currency.code} - ${currency.name}',),
+                '${currency.symbol} ${currency.code} - ${currency.name}',
+              ),
             );
           }).toList(),
           onChanged: (value) {

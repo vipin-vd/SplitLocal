@@ -71,21 +71,27 @@ class _RemovalBlockedBanner extends ConsumerWidget {
         deviceOwner == null ? 0.0 : (netBalances[deviceOwner.id] ?? 0.0);
     final canLeave = myBalance.abs() < 0.01;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
-      color: Colors.red.shade50,
+      color: isDark
+          ? Colors.red.shade900.withValues(alpha: 0.3)
+          : Colors.red.shade50,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.info, color: Colors.red),
-                SizedBox(width: 12),
+                Icon(Icons.info,
+                    color: isDark ? Colors.red.shade200 : Colors.red,),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Removal blocked: Outstanding debts exist. Please settle up before removing or leaving.',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                        color: isDark ? Colors.red.shade200 : Colors.red,),
                   ),
                 ),
               ],
@@ -144,16 +150,28 @@ class _AdminNoticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
-      color: Colors.orange.shade50,
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      color: isDark
+          ? Colors.orange.shade900.withValues(alpha: 0.3)
+          : Colors.orange.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.admin_panel_settings),
-            SizedBox(width: 12),
+            Icon(
+              Icons.admin_panel_settings,
+              color: isDark ? Colors.orange.shade200 : Colors.orange.shade900,
+            ),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text('Admin View: Only you can see this information'),
+              child: Text(
+                'Admin View: Only you can see this information',
+                style: TextStyle(
+                  color:
+                      isDark ? Colors.orange.shade200 : Colors.orange.shade900,
+                ),
+              ),
             ),
           ],
         ),

@@ -424,13 +424,19 @@ class _DangerZoneSection extends ConsumerWidget {
       return const SizedBox.shrink(); // Only show for group creator
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      color: Colors.red.shade50,
+      color: isDark
+          ? Colors.red.shade900.withValues(alpha: 0.3)
+          : Colors.red.shade50,
       child: ListTile(
-        leading: Icon(Icons.delete_forever, color: Colors.red.shade700),
-        title:
-            Text('Delete Group', style: TextStyle(color: Colors.red.shade900)),
+        leading: Icon(Icons.delete_forever,
+            color: isDark ? Colors.red.shade200 : Colors.red.shade700,),
+        title: Text('Delete Group',
+            style: TextStyle(
+                color: isDark ? Colors.red.shade200 : Colors.red.shade900,),),
         onTap: () => _deleteGroup(context, ref),
       ),
     );
@@ -449,23 +455,31 @@ class _LeaveGroupSection extends ConsumerWidget {
         deviceOwner == null ? 0.0 : (netBalances[deviceOwner.id] ?? 0.0);
     final canLeave = myBalance.abs() < 0.01;
     final isCreator = deviceOwner != null && group.createdBy == deviceOwner.id;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      color: (canLeave && !isCreator) ? null : Colors.grey.shade200,
+      color: (canLeave && !isCreator)
+          ? null
+          : (isDark ? Colors.grey.shade900 : Colors.grey.shade200),
       child: ListTile(
         leading: const Icon(Icons.exit_to_app),
         title: const Text('Leave Group'),
         subtitle: canLeave
             ? isCreator
-                ? const Text(
+                ? Text(
                     'Group admin cannot leave the group. You must delete the group or transfer ownership first.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.grey.shade400 : Colors.grey,),
                   )
                 : null
             : Text(
                 'You have outstanding debts (${CurrencyHelper.getCurrency(group.currency).symbol}${myBalance.abs().toStringAsFixed(2)}) that must be settled before leaving',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                style: TextStyle(
+                    fontSize: 12,
+                    color:
+                        isDark ? Colors.grey.shade400 : Colors.grey.shade700,),
               ),
         enabled: canLeave && !isCreator && deviceOwner != null,
         onTap: (canLeave && !isCreator && deviceOwner != null)

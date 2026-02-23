@@ -124,21 +124,32 @@ void main() {
       // Simulate that this friend was previously hidden (or soft deleted behavior)
       await mockStorage.addHiddenFriendId(friendId);
 
-      expect(mockStorage.containsFriend(friendId), isTrue,
-          reason: 'Friend should be in valid list',);
-      expect(mockStorage.containsHiddenFriend(friendId), isTrue,
-          reason:
-              'Friend should be in hidden list (simulating previous state)',);
+      expect(
+        mockStorage.containsFriend(friendId),
+        isTrue,
+        reason: 'Friend should be in valid list',
+      );
+      expect(
+        mockStorage.containsHiddenFriend(friendId),
+        isTrue,
+        reason: 'Friend should be in hidden list (simulating previous state)',
+      );
 
       // 2. Action: Remove Friend
       final notifier = container.read(friendsProvider.notifier);
       await notifier.removeFriend(friendId);
 
       // 3. Verify
-      expect(mockStorage.containsFriend(friendId), isFalse,
-          reason: 'Friend should be removed from valid list',);
-      expect(mockStorage.containsHiddenFriend(friendId), isFalse,
-          reason: 'Friend should be removed from hidden list',);
+      expect(
+        mockStorage.containsFriend(friendId),
+        isFalse,
+        reason: 'Friend should be removed from valid list',
+      );
+      expect(
+        mockStorage.containsHiddenFriend(friendId),
+        isFalse,
+        reason: 'Friend should be removed from hidden list',
+      );
     });
 
     test('removeFriend should NOT add to hidden list if not present', () async {
@@ -154,8 +165,11 @@ void main() {
 
       // 3. Verify
       expect(mockStorage.containsFriend(friendId), isFalse);
-      expect(mockStorage.containsHiddenFriend(friendId), isFalse,
-          reason: 'Should not have added friend to hidden list',);
+      expect(
+        mockStorage.containsHiddenFriend(friendId),
+        isFalse,
+        reason: 'Should not have added friend to hidden list',
+      );
     });
 
     test(
@@ -179,18 +193,27 @@ void main() {
       await mockStorage.saveGroup(friendGroup);
       await mockStorage.addFriendId(friendId);
 
-      expect(mockStorage.containsGroup(groupId), isTrue,
-          reason: 'Friend group should exist initially',);
+      expect(
+        mockStorage.containsGroup(groupId),
+        isTrue,
+        reason: 'Friend group should exist initially',
+      );
 
       // 2. Action: Remove Friend
       final notifier = container.read(friendsProvider.notifier);
       await notifier.removeFriend(friendId);
 
       // 3. Verify
-      expect(mockStorage.containsGroup(groupId), isFalse,
-          reason: 'Friend group should be auto-deleted',);
-      expect(mockStorage.containsFriend(friendId), isFalse,
-          reason: 'Friend should be removed',);
+      expect(
+        mockStorage.containsGroup(groupId),
+        isFalse,
+        reason: 'Friend group should be auto-deleted',
+      );
+      expect(
+        mockStorage.containsFriend(friendId),
+        isFalse,
+        reason: 'Friend should be removed',
+      );
     });
 
     test(
@@ -214,18 +237,27 @@ void main() {
       await mockStorage.saveGroup(regularGroup);
       await mockStorage.addFriendId(friendId);
 
-      expect(mockStorage.containsGroup(groupId), isTrue,
-          reason: 'Regular 2-member group should exist initially',);
+      expect(
+        mockStorage.containsGroup(groupId),
+        isTrue,
+        reason: 'Regular 2-member group should exist initially',
+      );
 
       // 2. Action: Remove Friend
       final notifier = container.read(friendsProvider.notifier);
       await notifier.removeFriend(friendId);
 
       // 3. Verify
-      expect(mockStorage.containsGroup(groupId), isFalse,
-          reason: 'Regular 2-member group should ALSO be auto-deleted',);
-      expect(mockStorage.containsFriend(friendId), isFalse,
-          reason: 'Friend should be removed',);
+      expect(
+        mockStorage.containsGroup(groupId),
+        isFalse,
+        reason: 'Regular 2-member group should ALSO be auto-deleted',
+      );
+      expect(
+        mockStorage.containsFriend(friendId),
+        isFalse,
+        reason: 'Friend should be removed',
+      );
     });
 
     test('removeFriend should also delete the User record', () async {
@@ -237,16 +269,22 @@ void main() {
       await mockStorage.saveUser(friendUser);
       await mockStorage.addFriendId(friendId);
 
-      expect(mockStorage.containsUser(friendId), isTrue,
-          reason: 'User record should exist initially',);
+      expect(
+        mockStorage.containsUser(friendId),
+        isTrue,
+        reason: 'User record should exist initially',
+      );
 
       // 2. Action: Remove Friend
       final notifier = container.read(friendsProvider.notifier);
       await notifier.removeFriend(friendId);
 
       // 3. Verify
-      expect(mockStorage.containsUser(friendId), isFalse,
-          reason: 'User record should be deleted',);
+      expect(
+        mockStorage.containsUser(friendId),
+        isFalse,
+        reason: 'User record should be deleted',
+      );
     });
   });
 }

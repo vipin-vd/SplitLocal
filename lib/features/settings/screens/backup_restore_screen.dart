@@ -178,12 +178,18 @@ class _WarningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
-      color: Colors.orange[50],
-      child: const Padding(
-        padding: EdgeInsets.all(12),
+      color: isDark
+          ? Colors.orange.shade900.withValues(alpha: 0.3)
+          : Colors.orange.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
         child: Text(
           'Important: Importing will overwrite existing data unless merged. Keep your backups safe.',
+          style: TextStyle(
+            color: isDark ? Colors.orange.shade200 : Colors.orange.shade900,
+          ),
         ),
       ),
     );

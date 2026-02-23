@@ -1,3 +1,7 @@
+---
+trigger: model_decision
+---
+
 # SplitLocal Application Domain Rules
 
 > **IMPORTANT**: Keep updating this rule file as you gain more understanding of the project!

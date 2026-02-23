@@ -188,8 +188,10 @@ class AbbreviatedMultiCurrencyAmountText extends StatelessWidget {
       TextSpan(
         children: [
           TextSpan(
-            text: CurrencyFormatter.format(amount,
-                currencyCode: primaryEntry.key,),
+            text: CurrencyFormatter.format(
+              amount,
+              currencyCode: primaryEntry.key,
+            ),
             style: (style ?? const TextStyle()).copyWith(
               color: color ?? style?.color,
             ),

@@ -432,11 +432,16 @@ class _DangerZoneSection extends ConsumerWidget {
           ? Colors.red.shade900.withValues(alpha: 0.3)
           : Colors.red.shade50,
       child: ListTile(
-        leading: Icon(Icons.delete_forever,
-            color: isDark ? Colors.red.shade200 : Colors.red.shade700,),
-        title: Text('Delete Group',
-            style: TextStyle(
-                color: isDark ? Colors.red.shade200 : Colors.red.shade900,),),
+        leading: Icon(
+          Icons.delete_forever,
+          color: isDark ? Colors.red.shade200 : Colors.red.shade700,
+        ),
+        title: Text(
+          'Delete Group',
+          style: TextStyle(
+            color: isDark ? Colors.red.shade200 : Colors.red.shade900,
+          ),
+        ),
         onTap: () => _deleteGroup(context, ref),
       ),
     );
@@ -470,16 +475,17 @@ class _LeaveGroupSection extends ConsumerWidget {
                 ? Text(
                     'Group admin cannot leave the group. You must delete the group or transfer ownership first.',
                     style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey,),
+                      fontSize: 12,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey,
+                    ),
                   )
                 : null
             : Text(
                 'You have outstanding debts (${CurrencyHelper.getCurrency(group.currency).symbol}${myBalance.abs().toStringAsFixed(2)}) that must be settled before leaving',
                 style: TextStyle(
-                    fontSize: 12,
-                    color:
-                        isDark ? Colors.grey.shade400 : Colors.grey.shade700,),
+                  fontSize: 12,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                ),
               ),
         enabled: canLeave && !isCreator && deviceOwner != null,
         onTap: (canLeave && !isCreator && deviceOwner != null)

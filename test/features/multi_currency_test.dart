@@ -88,8 +88,10 @@ void main() {
       // Current behavior (incorrect): sums all amounts regardless of currency
       final incorrectTotalSpend =
           debtCalculator.calculateTotalGroupSpend(transactions);
-      expect(incorrectTotalSpend,
-          equals(8100.0),); // 100 + 8000 = incorrectly mixed
+      expect(
+        incorrectTotalSpend,
+        equals(8100.0),
+      ); // 100 + 8000 = incorrectly mixed
 
       // After fix: should return {'USD': 100.0, 'INR': 8000.0}
       // We'll add a new method: calculateTotalGroupSpendByCurrency

@@ -84,14 +84,17 @@ class _RemovalBlockedBanner extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.info,
-                    color: isDark ? Colors.red.shade200 : Colors.red,),
+                Icon(
+                  Icons.info,
+                  color: isDark ? Colors.red.shade200 : Colors.red,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Removal blocked: Outstanding debts exist. Please settle up before removing or leaving.',
                     style: TextStyle(
-                        color: isDark ? Colors.red.shade200 : Colors.red,),
+                      color: isDark ? Colors.red.shade200 : Colors.red,
+                    ),
                   ),
                 ),
               ],

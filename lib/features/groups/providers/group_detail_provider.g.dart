@@ -6,40 +6,96 @@ part of 'group_detail_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupDetailScreenLogicHash() =>
-    r'cae91cb3224e49fda784fdd21cfcbe8e4edecb0a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [groupDetailScreenLogic].
-@ProviderFor(groupDetailScreenLogic)
-final groupDetailScreenLogicProvider =
-    AutoDisposeProvider<GroupDetailScreenLogic>.internal(
-  groupDetailScreenLogic,
-  name: r'groupDetailScreenLogicProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$groupDetailScreenLogicHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(ShowSimplifiedDebts)
+final showSimplifiedDebtsProvider = ShowSimplifiedDebtsProvider._();
 
-typedef GroupDetailScreenLogicRef
-    = AutoDisposeProviderRef<GroupDetailScreenLogic>;
+final class ShowSimplifiedDebtsProvider
+    extends $NotifierProvider<ShowSimplifiedDebts, bool> {
+  ShowSimplifiedDebtsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'showSimplifiedDebtsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$showSimplifiedDebtsHash();
+
+  @$internal
+  @override
+  ShowSimplifiedDebts create() => ShowSimplifiedDebts();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
 String _$showSimplifiedDebtsHash() =>
     r'b43121e5f4a1a3664f27ed3cc38ae2fae5d5c4a3';
 
-/// See also [ShowSimplifiedDebts].
-@ProviderFor(ShowSimplifiedDebts)
-final showSimplifiedDebtsProvider =
-    AutoDisposeNotifierProvider<ShowSimplifiedDebts, bool>.internal(
-  ShowSimplifiedDebts.new,
-  name: r'showSimplifiedDebtsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$showSimplifiedDebtsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$ShowSimplifiedDebts extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ShowSimplifiedDebts = AutoDisposeNotifier<bool>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+@ProviderFor(groupDetailScreenLogic)
+final groupDetailScreenLogicProvider = GroupDetailScreenLogicProvider._();
+
+final class GroupDetailScreenLogicProvider extends $FunctionalProvider<
+    GroupDetailScreenLogic,
+    GroupDetailScreenLogic,
+    GroupDetailScreenLogic> with $Provider<GroupDetailScreenLogic> {
+  GroupDetailScreenLogicProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'groupDetailScreenLogicProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$groupDetailScreenLogicHash();
+
+  @$internal
+  @override
+  $ProviderElement<GroupDetailScreenLogic> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GroupDetailScreenLogic create(Ref ref) {
+    return groupDetailScreenLogic(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GroupDetailScreenLogic value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GroupDetailScreenLogic>(value),
+    );
+  }
+}
+
+String _$groupDetailScreenLogicHash() =>
+    r'cae91cb3224e49fda784fdd21cfcbe8e4edecb0a';

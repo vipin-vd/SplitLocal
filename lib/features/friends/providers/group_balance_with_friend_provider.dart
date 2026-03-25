@@ -8,7 +8,7 @@ part 'group_balance_with_friend_provider.g.dart';
 
 @riverpod
 double groupBalanceWithFriend(
-  GroupBalanceWithFriendRef ref,
+  Ref ref,
   String groupId,
   String friendId,
 ) {
@@ -36,7 +36,7 @@ double groupBalanceWithFriend(
 /// Positive values mean friend owes you, negative means you owe them.
 @riverpod
 Map<String, double> groupBalanceWithFriendByCurrency(
-  GroupBalanceWithFriendByCurrencyRef ref,
+  Ref ref,
   String groupId,
   String friendId,
 ) {

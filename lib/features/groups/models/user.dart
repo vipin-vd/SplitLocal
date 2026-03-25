@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';

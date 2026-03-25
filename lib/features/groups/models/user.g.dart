@@ -8,7 +8,7 @@ part of 'user.dart';
 
 class UserAdapter extends TypeAdapter<User> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   User read(BinaryReader reader) {
@@ -20,7 +20,7 @@ class UserAdapter extends TypeAdapter<User> {
       id: fields[0] as String,
       name: fields[1] as String,
       phoneNumber: fields[2] as String?,
-      isDeviceOwner: fields[3] as bool,
+      isDeviceOwner: fields[3] == null ? false : fields[3] as bool,
       createdAt: fields[4] as DateTime,
     );
   }

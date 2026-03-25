@@ -17,7 +17,7 @@ class AppBarSearch<T extends SearchFilterNotifier>
   final String hintText;
   final String? semanticsLabel;
   final int debounceMs;
-  final ProviderListenable<String> queryProvider;
+  final dynamic queryProvider;
 
   const AppBarSearch({
     required this.getNotifier,

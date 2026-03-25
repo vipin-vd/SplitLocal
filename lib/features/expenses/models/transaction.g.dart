@@ -8,7 +8,7 @@ part of 'transaction.dart';
 
 class TransactionAdapter extends TypeAdapter<Transaction> {
   @override
-  final int typeId = 4;
+  final typeId = 4;
 
   @override
   Transaction read(BinaryReader reader) {
@@ -21,16 +21,18 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       groupId: fields[1] as String,
       type: fields[2] as TransactionType,
       description: fields[3] as String,
-      totalAmount: fields[4] as double,
+      totalAmount: (fields[4] as num).toDouble(),
       payers: (fields[5] as Map).cast<String, double>(),
       splits: (fields[6] as Map).cast<String, double>(),
       splitMode: fields[7] as SplitMode,
       timestamp: fields[8] as DateTime,
       notes: fields[9] as String?,
       createdBy: fields[10] as String,
-      category: fields[11] as ExpenseCategory,
+      category: fields[11] == null
+          ? ExpenseCategory.general
+          : fields[11] as ExpenseCategory,
       receiptPath: fields[12] as String?,
-      isRecurring: fields[13] as bool,
+      isRecurring: fields[13] == null ? false : fields[13] as bool,
       recurringFrequency: fields[14] as String?,
       currency: fields[15] as String?,
     );

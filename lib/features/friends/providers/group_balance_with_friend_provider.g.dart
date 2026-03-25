@@ -6,171 +6,187 @@ part of 'group_balance_with_friend_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupBalanceWithFriendHash() =>
-    r'2128b26abf1422290009fd2149e40da46636d931';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [groupBalanceWithFriend].
 @ProviderFor(groupBalanceWithFriend)
-const groupBalanceWithFriendProvider = GroupBalanceWithFriendFamily();
+final groupBalanceWithFriendProvider = GroupBalanceWithFriendFamily._();
 
-/// See also [groupBalanceWithFriend].
-class GroupBalanceWithFriendFamily extends Family<double> {
-  /// See also [groupBalanceWithFriend].
-  const GroupBalanceWithFriendFamily();
-
-  /// See also [groupBalanceWithFriend].
-  GroupBalanceWithFriendProvider call(
-    String groupId,
-    String friendId,
-  ) {
-    return GroupBalanceWithFriendProvider(
-      groupId,
-      friendId,
-    );
-  }
-
-  @override
-  GroupBalanceWithFriendProvider getProviderOverride(
-    covariant GroupBalanceWithFriendProvider provider,
-  ) {
-    return call(
-      provider.groupId,
-      provider.friendId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupBalanceWithFriendProvider';
-}
-
-/// See also [groupBalanceWithFriend].
-class GroupBalanceWithFriendProvider extends AutoDisposeProvider<double> {
-  /// See also [groupBalanceWithFriend].
-  GroupBalanceWithFriendProvider(
-    String groupId,
-    String friendId,
-  ) : this._internal(
-          (ref) => groupBalanceWithFriend(
-            ref as GroupBalanceWithFriendRef,
-            groupId,
-            friendId,
-          ),
-          from: groupBalanceWithFriendProvider,
+final class GroupBalanceWithFriendProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  GroupBalanceWithFriendProvider._(
+      {required GroupBalanceWithFriendFamily super.from,
+      required (
+        String,
+        String,
+      )
+          super.argument})
+      : super(
+          retry: null,
           name: r'groupBalanceWithFriendProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$groupBalanceWithFriendHash,
-          dependencies: GroupBalanceWithFriendFamily._dependencies,
-          allTransitiveDependencies:
-              GroupBalanceWithFriendFamily._allTransitiveDependencies,
-          groupId: groupId,
-          friendId: friendId,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  GroupBalanceWithFriendProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.groupId,
-    required this.friendId,
-  }) : super.internal();
-
-  final String groupId;
-  final String friendId;
+  @override
+  String debugGetCreateSourceHash() => _$groupBalanceWithFriendHash();
 
   @override
-  Override overrideWith(
-    double Function(GroupBalanceWithFriendRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: GroupBalanceWithFriendProvider._internal(
-        (ref) => create(ref as GroupBalanceWithFriendRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        groupId: groupId,
-        friendId: friendId,
-      ),
+  String toString() {
+    return r'groupBalanceWithFriendProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    final argument = this.argument as (
+      String,
+      String,
+    );
+    return groupBalanceWithFriend(
+      ref,
+      argument.$1,
+      argument.$2,
     );
   }
 
-  @override
-  AutoDisposeProviderElement<double> createElement() {
-    return _GroupBalanceWithFriendProviderElement(this);
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return other is GroupBalanceWithFriendProvider &&
-        other.groupId == groupId &&
-        other.friendId == friendId;
+        other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, groupId.hashCode);
-    hash = _SystemHash.combine(hash, friendId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-mixin GroupBalanceWithFriendRef on AutoDisposeProviderRef<double> {
-  /// The parameter `groupId` of this provider.
-  String get groupId;
+String _$groupBalanceWithFriendHash() =>
+    r'2128b26abf1422290009fd2149e40da46636d931';
 
-  /// The parameter `friendId` of this provider.
-  String get friendId;
+final class GroupBalanceWithFriendFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            double,
+            (
+              String,
+              String,
+            )> {
+  GroupBalanceWithFriendFamily._()
+      : super(
+          retry: null,
+          name: r'groupBalanceWithFriendProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  GroupBalanceWithFriendProvider call(
+    String groupId,
+    String friendId,
+  ) =>
+      GroupBalanceWithFriendProvider._(argument: (
+        groupId,
+        friendId,
+      ), from: this);
+
+  @override
+  String toString() => r'groupBalanceWithFriendProvider';
 }
 
-class _GroupBalanceWithFriendProviderElement
-    extends AutoDisposeProviderElement<double> with GroupBalanceWithFriendRef {
-  _GroupBalanceWithFriendProviderElement(super.provider);
+/// Returns friend balance within a specific group, grouped by currency.
+/// Positive values mean friend owes you, negative means you owe them.
+
+@ProviderFor(groupBalanceWithFriendByCurrency)
+final groupBalanceWithFriendByCurrencyProvider =
+    GroupBalanceWithFriendByCurrencyFamily._();
+
+/// Returns friend balance within a specific group, grouped by currency.
+/// Positive values mean friend owes you, negative means you owe them.
+
+final class GroupBalanceWithFriendByCurrencyProvider
+    extends $FunctionalProvider<Map<String, double>, Map<String, double>,
+        Map<String, double>> with $Provider<Map<String, double>> {
+  /// Returns friend balance within a specific group, grouped by currency.
+  /// Positive values mean friend owes you, negative means you owe them.
+  GroupBalanceWithFriendByCurrencyProvider._(
+      {required GroupBalanceWithFriendByCurrencyFamily super.from,
+      required (
+        String,
+        String,
+      )
+          super.argument})
+      : super(
+          retry: null,
+          name: r'groupBalanceWithFriendByCurrencyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
   @override
-  String get groupId => (origin as GroupBalanceWithFriendProvider).groupId;
+  String debugGetCreateSourceHash() => _$groupBalanceWithFriendByCurrencyHash();
+
   @override
-  String get friendId => (origin as GroupBalanceWithFriendProvider).friendId;
+  String toString() {
+    return r'groupBalanceWithFriendByCurrencyProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, double>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, double> create(Ref ref) {
+    final argument = this.argument as (
+      String,
+      String,
+    );
+    return groupBalanceWithFriendByCurrency(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, double> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, double>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupBalanceWithFriendByCurrencyProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$groupBalanceWithFriendByCurrencyHash() =>
@@ -178,171 +194,36 @@ String _$groupBalanceWithFriendByCurrencyHash() =>
 
 /// Returns friend balance within a specific group, grouped by currency.
 /// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [groupBalanceWithFriendByCurrency].
-@ProviderFor(groupBalanceWithFriendByCurrency)
-const groupBalanceWithFriendByCurrencyProvider =
-    GroupBalanceWithFriendByCurrencyFamily();
 
-/// Returns friend balance within a specific group, grouped by currency.
-/// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [groupBalanceWithFriendByCurrency].
-class GroupBalanceWithFriendByCurrencyFamily
-    extends Family<Map<String, double>> {
+final class GroupBalanceWithFriendByCurrencyFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            Map<String, double>,
+            (
+              String,
+              String,
+            )> {
+  GroupBalanceWithFriendByCurrencyFamily._()
+      : super(
+          retry: null,
+          name: r'groupBalanceWithFriendByCurrencyProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
   /// Returns friend balance within a specific group, grouped by currency.
   /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [groupBalanceWithFriendByCurrency].
-  const GroupBalanceWithFriendByCurrencyFamily();
 
-  /// Returns friend balance within a specific group, grouped by currency.
-  /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [groupBalanceWithFriendByCurrency].
   GroupBalanceWithFriendByCurrencyProvider call(
     String groupId,
     String friendId,
-  ) {
-    return GroupBalanceWithFriendByCurrencyProvider(
-      groupId,
-      friendId,
-    );
-  }
+  ) =>
+      GroupBalanceWithFriendByCurrencyProvider._(argument: (
+        groupId,
+        friendId,
+      ), from: this);
 
   @override
-  GroupBalanceWithFriendByCurrencyProvider getProviderOverride(
-    covariant GroupBalanceWithFriendByCurrencyProvider provider,
-  ) {
-    return call(
-      provider.groupId,
-      provider.friendId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'groupBalanceWithFriendByCurrencyProvider';
+  String toString() => r'groupBalanceWithFriendByCurrencyProvider';
 }
-
-/// Returns friend balance within a specific group, grouped by currency.
-/// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [groupBalanceWithFriendByCurrency].
-class GroupBalanceWithFriendByCurrencyProvider
-    extends AutoDisposeProvider<Map<String, double>> {
-  /// Returns friend balance within a specific group, grouped by currency.
-  /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [groupBalanceWithFriendByCurrency].
-  GroupBalanceWithFriendByCurrencyProvider(
-    String groupId,
-    String friendId,
-  ) : this._internal(
-          (ref) => groupBalanceWithFriendByCurrency(
-            ref as GroupBalanceWithFriendByCurrencyRef,
-            groupId,
-            friendId,
-          ),
-          from: groupBalanceWithFriendByCurrencyProvider,
-          name: r'groupBalanceWithFriendByCurrencyProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$groupBalanceWithFriendByCurrencyHash,
-          dependencies: GroupBalanceWithFriendByCurrencyFamily._dependencies,
-          allTransitiveDependencies:
-              GroupBalanceWithFriendByCurrencyFamily._allTransitiveDependencies,
-          groupId: groupId,
-          friendId: friendId,
-        );
-
-  GroupBalanceWithFriendByCurrencyProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.groupId,
-    required this.friendId,
-  }) : super.internal();
-
-  final String groupId;
-  final String friendId;
-
-  @override
-  Override overrideWith(
-    Map<String, double> Function(GroupBalanceWithFriendByCurrencyRef provider)
-        create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: GroupBalanceWithFriendByCurrencyProvider._internal(
-        (ref) => create(ref as GroupBalanceWithFriendByCurrencyRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        groupId: groupId,
-        friendId: friendId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeProviderElement<Map<String, double>> createElement() {
-    return _GroupBalanceWithFriendByCurrencyProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is GroupBalanceWithFriendByCurrencyProvider &&
-        other.groupId == groupId &&
-        other.friendId == friendId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, groupId.hashCode);
-    hash = _SystemHash.combine(hash, friendId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin GroupBalanceWithFriendByCurrencyRef
-    on AutoDisposeProviderRef<Map<String, double>> {
-  /// The parameter `groupId` of this provider.
-  String get groupId;
-
-  /// The parameter `friendId` of this provider.
-  String get friendId;
-}
-
-class _GroupBalanceWithFriendByCurrencyProviderElement
-    extends AutoDisposeProviderElement<Map<String, double>>
-    with GroupBalanceWithFriendByCurrencyRef {
-  _GroupBalanceWithFriendByCurrencyProviderElement(super.provider);
-
-  @override
-  String get groupId =>
-      (origin as GroupBalanceWithFriendByCurrencyProvider).groupId;
-  @override
-  String get friendId =>
-      (origin as GroupBalanceWithFriendByCurrencyProvider).friendId;
-}
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

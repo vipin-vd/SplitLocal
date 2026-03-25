@@ -35,7 +35,7 @@ class Transactions extends _$Transactions {
 
 @riverpod
 List<Transaction> groupTransactions(
-  GroupTransactionsRef ref,
+  Ref ref,
   String groupId,
 ) {
   final allTransactions = ref.watch(transactionsProvider);
@@ -44,7 +44,7 @@ List<Transaction> groupTransactions(
 
 @riverpod
 Map<String, double> groupNetBalances(
-  GroupNetBalancesRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
@@ -53,7 +53,7 @@ Map<String, double> groupNetBalances(
 }
 
 @riverpod
-double groupTotalSpend(GroupTotalSpendRef ref, String groupId) {
+double groupTotalSpend(Ref ref, String groupId) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);
   return debtCalculator.calculateTotalGroupSpend(transactions);
@@ -61,7 +61,7 @@ double groupTotalSpend(GroupTotalSpendRef ref, String groupId) {
 
 @riverpod
 Map<String, double> groupTotalSpendByCurrency(
-  GroupTotalSpendByCurrencyRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
@@ -75,7 +75,7 @@ Map<String, double> groupTotalSpendByCurrency(
 
 @riverpod
 Map<String, Map<String, double>> groupNetBalancesByCurrency(
-  GroupNetBalancesByCurrencyRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
@@ -89,7 +89,7 @@ Map<String, Map<String, double>> groupNetBalancesByCurrency(
 
 @riverpod
 Map<ExpenseCategory, double> groupCategorySpending(
-  GroupCategorySpendingRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
@@ -108,7 +108,7 @@ Map<ExpenseCategory, double> groupCategorySpending(
 
 @riverpod
 List<Transaction> recurringExpenses(
-  RecurringExpensesRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));

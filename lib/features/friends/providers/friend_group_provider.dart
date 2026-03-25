@@ -8,7 +8,7 @@ import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
 part 'friend_group_provider.g.dart';
 
 @riverpod
-Future<Group> friendGroup(FriendGroupRef ref, String friendId) async {
+Future<Group> friendGroup(Ref ref, String friendId) async {
   final groups = ref.watch(groupsProvider);
   final me = ref.watch(deviceOwnerProvider);
   final users = ref.watch(usersProvider);

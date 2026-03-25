@@ -8,7 +8,7 @@ import 'package:splitlocal/services/debt_calculator_service.dart';
 part 'friend_balance_provider.g.dart';
 
 @riverpod
-double friendBalance(FriendBalanceRef ref, String friendId) {
+double friendBalance(Ref ref, String friendId) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return 0.0;
 
@@ -45,7 +45,7 @@ double friendBalance(FriendBalanceRef ref, String friendId) {
 /// Positive values mean friend owes you, negative means you owe them.
 @riverpod
 Map<String, double> friendBalanceByCurrency(
-  FriendBalanceByCurrencyRef ref,
+  Ref ref,
   String friendId,
 ) {
   final me = ref.watch(deviceOwnerProvider);
@@ -101,7 +101,7 @@ Map<String, double> friendBalanceByCurrency(
 
 /// Provides a map of all friend balances to avoid per-item watches during filtering
 @riverpod
-Map<String, double> allFriendBalances(AllFriendBalancesRef ref) {
+Map<String, double> allFriendBalances(Ref ref) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return {};
 
@@ -149,7 +149,7 @@ Map<String, double> allFriendBalances(AllFriendBalancesRef ref) {
 /// Map<FriendId, Map<CurrencyCode, Balance>>
 @riverpod
 Map<String, Map<String, double>> allFriendBalancesByCurrency(
-  AllFriendBalancesByCurrencyRef ref,
+  Ref ref,
 ) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return {};
@@ -217,7 +217,7 @@ Map<String, Map<String, double>> allFriendBalancesByCurrency(
 
 /// Provides list of friend IDs with zero balances (settled up or new friends)
 @riverpod
-List<String> zeroBalanceFriendIds(ZeroBalanceFriendIdsRef ref) {
+List<String> zeroBalanceFriendIds(Ref ref) {
   final balances = ref.watch(allFriendBalancesProvider);
   return balances.entries
       .where((entry) => entry.value.abs() < 0.01)
@@ -227,7 +227,7 @@ List<String> zeroBalanceFriendIds(ZeroBalanceFriendIdsRef ref) {
 
 /// Total amount the user is owed by all friends (sum of positive balances)
 @riverpod
-double totalOwedToUser(TotalOwedToUserRef ref) {
+double totalOwedToUser(Ref ref) {
   final balances = ref.watch(allFriendBalancesProvider);
   double total = 0.0;
   for (final amount in balances.values) {
@@ -238,7 +238,7 @@ double totalOwedToUser(TotalOwedToUserRef ref) {
 
 /// Total amount the user owes to all friends (sum of negative balances, returned positive)
 @riverpod
-double totalUserOwes(TotalUserOwesRef ref) {
+double totalUserOwes(Ref ref) {
   final balances = ref.watch(allFriendBalancesProvider);
   double total = 0.0;
   for (final amount in balances.values) {
@@ -249,7 +249,7 @@ double totalUserOwes(TotalUserOwesRef ref) {
 
 /// Net balance across all friends (positive => friends owe user, negative => user owes)
 @riverpod
-double netFriendBalance(NetFriendBalanceRef ref) {
+double netFriendBalance(Ref ref) {
   final owedToUser = ref.watch(totalOwedToUserProvider);
   final userOwes = ref.watch(totalUserOwesProvider);
   final net = owedToUser - userOwes;

@@ -6,169 +6,130 @@ part of 'groups_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$selectedGroupHash() => r'6bb80a5317b8580332501a3b4172da733386012d';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+@ProviderFor(Groups)
+final groupsProvider = GroupsProvider._();
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [selectedGroup].
-@ProviderFor(selectedGroup)
-const selectedGroupProvider = SelectedGroupFamily();
-
-/// See also [selectedGroup].
-class SelectedGroupFamily extends Family<Group?> {
-  /// See also [selectedGroup].
-  const SelectedGroupFamily();
-
-  /// See also [selectedGroup].
-  SelectedGroupProvider call(
-    String groupId,
-  ) {
-    return SelectedGroupProvider(
-      groupId,
-    );
-  }
-
-  @override
-  SelectedGroupProvider getProviderOverride(
-    covariant SelectedGroupProvider provider,
-  ) {
-    return call(
-      provider.groupId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'selectedGroupProvider';
-}
-
-/// See also [selectedGroup].
-class SelectedGroupProvider extends AutoDisposeProvider<Group?> {
-  /// See also [selectedGroup].
-  SelectedGroupProvider(
-    String groupId,
-  ) : this._internal(
-          (ref) => selectedGroup(
-            ref as SelectedGroupRef,
-            groupId,
-          ),
-          from: selectedGroupProvider,
-          name: r'selectedGroupProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$selectedGroupHash,
-          dependencies: SelectedGroupFamily._dependencies,
-          allTransitiveDependencies:
-              SelectedGroupFamily._allTransitiveDependencies,
-          groupId: groupId,
+final class GroupsProvider extends $NotifierProvider<Groups, List<Group>> {
+  GroupsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'groupsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  SelectedGroupProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.groupId,
-  }) : super.internal();
-
-  final String groupId;
-
   @override
-  Override overrideWith(
-    Group? Function(SelectedGroupRef provider) create,
-  ) {
-    return ProviderOverride(
+  String debugGetCreateSourceHash() => _$groupsHash();
+
+  @$internal
+  @override
+  Groups create() => Groups();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<Group> value) {
+    return $ProviderOverride(
       origin: this,
-      override: SelectedGroupProvider._internal(
-        (ref) => create(ref as SelectedGroupRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        groupId: groupId,
-      ),
+      providerOverride: $SyncValueProvider<List<Group>>(value),
     );
   }
-
-  @override
-  AutoDisposeProviderElement<Group?> createElement() {
-    return _SelectedGroupProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is SelectedGroupProvider && other.groupId == groupId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, groupId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin SelectedGroupRef on AutoDisposeProviderRef<Group?> {
-  /// The parameter `groupId` of this provider.
-  String get groupId;
-}
-
-class _SelectedGroupProviderElement extends AutoDisposeProviderElement<Group?>
-    with SelectedGroupRef {
-  _SelectedGroupProviderElement(super.provider);
-
-  @override
-  String get groupId => (origin as SelectedGroupProvider).groupId;
 }
 
 String _$groupsHash() => r'27458968e620a6802a915fbe048fc33f5ee8fd3f';
 
-/// See also [Groups].
-@ProviderFor(Groups)
-final groupsProvider =
-    AutoDisposeNotifierProvider<Groups, List<Group>>.internal(
-  Groups.new,
-  name: r'groupsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$groupsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$Groups extends $Notifier<List<Group>> {
+  List<Group> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<List<Group>, List<Group>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<List<Group>, List<Group>>, List<Group>, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$Groups = AutoDisposeNotifier<List<Group>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+@ProviderFor(selectedGroup)
+final selectedGroupProvider = SelectedGroupFamily._();
+
+final class SelectedGroupProvider
+    extends $FunctionalProvider<Group?, Group?, Group?> with $Provider<Group?> {
+  SelectedGroupProvider._(
+      {required SelectedGroupFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'selectedGroupProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$selectedGroupHash();
+
+  @override
+  String toString() {
+    return r'selectedGroupProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<Group?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Group? create(Ref ref) {
+    final argument = this.argument as String;
+    return selectedGroup(
+      ref,
+      argument,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Group? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Group?>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SelectedGroupProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$selectedGroupHash() => r'6bb80a5317b8580332501a3b4172da733386012d';
+
+final class SelectedGroupFamily extends $Family
+    with $FunctionalFamilyOverride<Group?, String> {
+  SelectedGroupFamily._()
+      : super(
+          retry: null,
+          name: r'selectedGroupProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  SelectedGroupProvider call(
+    String groupId,
+  ) =>
+      SelectedGroupProvider._(argument: groupId, from: this);
+
+  @override
+  String toString() => r'selectedGroupProvider';
+}

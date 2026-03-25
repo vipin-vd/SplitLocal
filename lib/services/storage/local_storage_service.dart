@@ -1,4 +1,4 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import '../../features/groups/models/user.dart';
 import '../../features/groups/models/group.dart';
 import '../../features/expenses/models/transaction.dart';

@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:splitlocal/services/storage/local_storage_service.dart';
 import 'package:uuid/uuid.dart';
@@ -92,7 +92,7 @@ class Users extends _$Users {
 }
 
 @riverpod
-User? deviceOwner(DeviceOwnerRef ref) {
+User? deviceOwner(Ref ref) {
   final users = ref.watch(usersProvider);
   try {
     return users.firstWhere((user) => user.isDeviceOwner);

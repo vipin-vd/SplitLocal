@@ -8,28 +8,28 @@ import '../../services/export_import_service.dart';
 part 'services_provider.g.dart';
 
 @riverpod
-LocalStorageService localStorageService(LocalStorageServiceRef ref) {
+LocalStorageService localStorageService(Ref ref) {
   return LocalStorageService();
 }
 
 @riverpod
-DebtCalculatorService debtCalculatorService(DebtCalculatorServiceRef ref) {
+DebtCalculatorService debtCalculatorService(Ref ref) {
   return DebtCalculatorService();
 }
 
 @riverpod
-ContactsService contactsService(ContactsServiceRef ref) {
+ContactsService contactsService(Ref ref) {
   return ContactsService();
 }
 
 @riverpod
-WhatsAppService whatsAppService(WhatsAppServiceRef ref) {
+WhatsAppService whatsAppService(Ref ref) {
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);
   return WhatsAppService(debtCalculator);
 }
 
 @riverpod
-ExportImportService exportImportService(ExportImportServiceRef ref) {
+ExportImportService exportImportService(Ref ref) {
   final storage = ref.watch(localStorageServiceProvider);
   return ExportImportService(storage);
 }

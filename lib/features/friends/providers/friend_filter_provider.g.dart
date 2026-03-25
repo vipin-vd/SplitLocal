@@ -6,21 +6,54 @@ part of 'friend_filter_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(FriendListFilter)
+final friendListFilterProvider = FriendListFilterProvider._();
+
+final class FriendListFilterProvider
+    extends $NotifierProvider<FriendListFilter, FriendFilter> {
+  FriendListFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'friendListFilterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$friendListFilterHash();
+
+  @$internal
+  @override
+  FriendListFilter create() => FriendListFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FriendFilter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FriendFilter>(value),
+    );
+  }
+}
+
 String _$friendListFilterHash() => r'd574a63a693470203a86b0f22ff8564e330d03bb';
 
-/// See also [FriendListFilter].
-@ProviderFor(FriendListFilter)
-final friendListFilterProvider =
-    AutoDisposeNotifierProvider<FriendListFilter, FriendFilter>.internal(
-  FriendListFilter.new,
-  name: r'friendListFilterProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$friendListFilterHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$FriendListFilter = AutoDisposeNotifier<FriendFilter>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+abstract class _$FriendListFilter extends $Notifier<FriendFilter> {
+  FriendFilter build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<FriendFilter, FriendFilter>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<FriendFilter, FriendFilter>,
+        FriendFilter,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

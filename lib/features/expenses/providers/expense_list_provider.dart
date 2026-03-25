@@ -61,7 +61,7 @@ class ExpenseListFilter extends _$ExpenseListFilter {
 }
 
 @riverpod
-List<Transaction> filteredExpenses(FilteredExpensesRef ref, String groupId) {
+List<Transaction> filteredExpenses(Ref ref, String groupId) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final filter = ref.watch(expenseListFilterProvider);
 
@@ -94,7 +94,7 @@ List<Transaction> filteredExpenses(FilteredExpensesRef ref, String groupId) {
 
 @riverpod
 Map<ExpenseCategory, double> categoryTotals(
-  CategoryTotalsRef ref,
+  Ref ref,
   String groupId,
 ) {
   final transactions = ref.watch(groupTransactionsProvider(groupId));

@@ -40,7 +40,7 @@ class Groups extends _$Groups {
 }
 
 @riverpod
-Group? selectedGroup(SelectedGroupRef ref, String groupId) {
+Group? selectedGroup(Ref ref, String groupId) {
   final groups = ref.watch(groupsProvider);
   try {
     return groups.firstWhere((group) => group.id == groupId);

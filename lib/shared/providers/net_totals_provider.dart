@@ -11,7 +11,7 @@ part 'net_totals_provider.g.dart';
 /// from all transactions across the app (friend groups + regular groups).
 @riverpod
 @riverpod
-Map<String, double> allNetBalances(AllNetBalancesRef ref) {
+Map<String, double> allNetBalances(Ref ref) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return {};
 
@@ -52,7 +52,7 @@ Map<String, double> allNetBalances(AllNetBalancesRef ref) {
 
 /// Total amount the user is owed globally (sum of positive balances)
 @riverpod
-double totalOwedToUserGlobal(TotalOwedToUserGlobalRef ref) {
+double totalOwedToUserGlobal(Ref ref) {
   final net = ref.watch(allNetBalancesProvider);
   double total = 0.0;
   for (final amount in net.values) {
@@ -63,7 +63,7 @@ double totalOwedToUserGlobal(TotalOwedToUserGlobalRef ref) {
 
 /// Total amount the user owes globally (sum of negative balances, returned positive)
 @riverpod
-double totalUserOwesGlobal(TotalUserOwesGlobalRef ref) {
+double totalUserOwesGlobal(Ref ref) {
   final net = ref.watch(allNetBalancesProvider);
   double total = 0.0;
   for (final amount in net.values) {
@@ -74,7 +74,7 @@ double totalUserOwesGlobal(TotalUserOwesGlobalRef ref) {
 
 /// Net global balance (positive => others owe user, negative => user owes)
 @riverpod
-double netBalanceGlobal(NetBalanceGlobalRef ref) {
+double netBalanceGlobal(Ref ref) {
   final owed = ref.watch(totalOwedToUserGlobalProvider);
   final owes = ref.watch(totalUserOwesGlobalProvider);
   final net = owed - owes;

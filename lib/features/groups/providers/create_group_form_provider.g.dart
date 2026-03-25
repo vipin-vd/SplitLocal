@@ -6,21 +6,54 @@ part of 'create_group_form_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(CreateGroupForm)
+final createGroupFormProvider = CreateGroupFormProvider._();
+
+final class CreateGroupFormProvider
+    extends $NotifierProvider<CreateGroupForm, CreateGroupFormState> {
+  CreateGroupFormProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'createGroupFormProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$createGroupFormHash();
+
+  @$internal
+  @override
+  CreateGroupForm create() => CreateGroupForm();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CreateGroupFormState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CreateGroupFormState>(value),
+    );
+  }
+}
+
 String _$createGroupFormHash() => r'ef49a35d8ee4801009533f1df2396851bc517efe';
 
-/// See also [CreateGroupForm].
-@ProviderFor(CreateGroupForm)
-final createGroupFormProvider =
-    AutoDisposeNotifierProvider<CreateGroupForm, CreateGroupFormState>.internal(
-  CreateGroupForm.new,
-  name: r'createGroupFormProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$createGroupFormHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$CreateGroupForm = AutoDisposeNotifier<CreateGroupFormState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+abstract class _$CreateGroupForm extends $Notifier<CreateGroupFormState> {
+  CreateGroupFormState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<CreateGroupFormState, CreateGroupFormState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<CreateGroupFormState, CreateGroupFormState>,
+        CreateGroupFormState,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

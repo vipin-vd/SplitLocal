@@ -8,7 +8,7 @@ part of 'expense_category.dart';
 
 class ExpenseCategoryAdapter extends TypeAdapter<ExpenseCategory> {
   @override
-  final int typeId = 5;
+  final typeId = 5;
 
   @override
   ExpenseCategory read(BinaryReader reader) {
@@ -45,37 +45,26 @@ class ExpenseCategoryAdapter extends TypeAdapter<ExpenseCategory> {
     switch (obj) {
       case ExpenseCategory.general:
         writer.writeByte(0);
-        break;
       case ExpenseCategory.food:
         writer.writeByte(1);
-        break;
       case ExpenseCategory.entertainment:
         writer.writeByte(2);
-        break;
       case ExpenseCategory.transport:
         writer.writeByte(3);
-        break;
       case ExpenseCategory.utilities:
         writer.writeByte(4);
-        break;
       case ExpenseCategory.shopping:
         writer.writeByte(5);
-        break;
       case ExpenseCategory.groceries:
         writer.writeByte(6);
-        break;
       case ExpenseCategory.rent:
         writer.writeByte(7);
-        break;
       case ExpenseCategory.healthcare:
         writer.writeByte(8);
-        break;
       case ExpenseCategory.travel:
         writer.writeByte(9);
-        break;
       case ExpenseCategory.other:
         writer.writeByte(10);
-        break;
     }
   }
 

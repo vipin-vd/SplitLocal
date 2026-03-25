@@ -6,281 +6,166 @@ part of 'group_insights_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userTotalPaidHash() => r'eda998898daf4f70c67f453448609c36919ab1e7';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [userTotalPaid].
 @ProviderFor(userTotalPaid)
-const userTotalPaidProvider = UserTotalPaidFamily();
+final userTotalPaidProvider = UserTotalPaidFamily._();
 
-/// See also [userTotalPaid].
-class UserTotalPaidFamily extends Family<double> {
-  /// See also [userTotalPaid].
-  const UserTotalPaidFamily();
-
-  /// See also [userTotalPaid].
-  UserTotalPaidProvider call(
-    String groupId,
-  ) {
-    return UserTotalPaidProvider(
-      groupId,
-    );
-  }
-
-  @override
-  UserTotalPaidProvider getProviderOverride(
-    covariant UserTotalPaidProvider provider,
-  ) {
-    return call(
-      provider.groupId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userTotalPaidProvider';
-}
-
-/// See also [userTotalPaid].
-class UserTotalPaidProvider extends AutoDisposeProvider<double> {
-  /// See also [userTotalPaid].
-  UserTotalPaidProvider(
-    String groupId,
-  ) : this._internal(
-          (ref) => userTotalPaid(
-            ref as UserTotalPaidRef,
-            groupId,
-          ),
-          from: userTotalPaidProvider,
+final class UserTotalPaidProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  UserTotalPaidProvider._(
+      {required UserTotalPaidFamily super.from, required String super.argument})
+      : super(
+          retry: null,
           name: r'userTotalPaidProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$userTotalPaidHash,
-          dependencies: UserTotalPaidFamily._dependencies,
-          allTransitiveDependencies:
-              UserTotalPaidFamily._allTransitiveDependencies,
-          groupId: groupId,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  UserTotalPaidProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.groupId,
-  }) : super.internal();
-
-  final String groupId;
+  @override
+  String debugGetCreateSourceHash() => _$userTotalPaidHash();
 
   @override
-  Override overrideWith(
-    double Function(UserTotalPaidRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: UserTotalPaidProvider._internal(
-        (ref) => create(ref as UserTotalPaidRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        groupId: groupId,
-      ),
+  String toString() {
+    return r'userTotalPaidProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    final argument = this.argument as String;
+    return userTotalPaid(
+      ref,
+      argument,
     );
   }
 
-  @override
-  AutoDisposeProviderElement<double> createElement() {
-    return _UserTotalPaidProviderElement(this);
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is UserTotalPaidProvider && other.groupId == groupId;
+    return other is UserTotalPaidProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, groupId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-mixin UserTotalPaidRef on AutoDisposeProviderRef<double> {
-  /// The parameter `groupId` of this provider.
-  String get groupId;
-}
+String _$userTotalPaidHash() => r'eda998898daf4f70c67f453448609c36919ab1e7';
 
-class _UserTotalPaidProviderElement extends AutoDisposeProviderElement<double>
-    with UserTotalPaidRef {
-  _UserTotalPaidProviderElement(super.provider);
+final class UserTotalPaidFamily extends $Family
+    with $FunctionalFamilyOverride<double, String> {
+  UserTotalPaidFamily._()
+      : super(
+          retry: null,
+          name: r'userTotalPaidProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  UserTotalPaidProvider call(
+    String groupId,
+  ) =>
+      UserTotalPaidProvider._(argument: groupId, from: this);
 
   @override
-  String get groupId => (origin as UserTotalPaidProvider).groupId;
+  String toString() => r'userTotalPaidProvider';
+}
+
+@ProviderFor(userTotalShare)
+final userTotalShareProvider = UserTotalShareFamily._();
+
+final class UserTotalShareProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  UserTotalShareProvider._(
+      {required UserTotalShareFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'userTotalShareProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$userTotalShareHash();
+
+  @override
+  String toString() {
+    return r'userTotalShareProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    final argument = this.argument as String;
+    return userTotalShare(
+      ref,
+      argument,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserTotalShareProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$userTotalShareHash() => r'09e89f2630544a8817b7c2c92926aa1c440f9a0e';
 
-/// See also [userTotalShare].
-@ProviderFor(userTotalShare)
-const userTotalShareProvider = UserTotalShareFamily();
-
-/// See also [userTotalShare].
-class UserTotalShareFamily extends Family<double> {
-  /// See also [userTotalShare].
-  const UserTotalShareFamily();
-
-  /// See also [userTotalShare].
-  UserTotalShareProvider call(
-    String groupId,
-  ) {
-    return UserTotalShareProvider(
-      groupId,
-    );
-  }
-
-  @override
-  UserTotalShareProvider getProviderOverride(
-    covariant UserTotalShareProvider provider,
-  ) {
-    return call(
-      provider.groupId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userTotalShareProvider';
-}
-
-/// See also [userTotalShare].
-class UserTotalShareProvider extends AutoDisposeProvider<double> {
-  /// See also [userTotalShare].
-  UserTotalShareProvider(
-    String groupId,
-  ) : this._internal(
-          (ref) => userTotalShare(
-            ref as UserTotalShareRef,
-            groupId,
-          ),
-          from: userTotalShareProvider,
+final class UserTotalShareFamily extends $Family
+    with $FunctionalFamilyOverride<double, String> {
+  UserTotalShareFamily._()
+      : super(
+          retry: null,
           name: r'userTotalShareProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$userTotalShareHash,
-          dependencies: UserTotalShareFamily._dependencies,
-          allTransitiveDependencies:
-              UserTotalShareFamily._allTransitiveDependencies,
-          groupId: groupId,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  UserTotalShareProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.groupId,
-  }) : super.internal();
-
-  final String groupId;
+  UserTotalShareProvider call(
+    String groupId,
+  ) =>
+      UserTotalShareProvider._(argument: groupId, from: this);
 
   @override
-  Override overrideWith(
-    double Function(UserTotalShareRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: UserTotalShareProvider._internal(
-        (ref) => create(ref as UserTotalShareRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        groupId: groupId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeProviderElement<double> createElement() {
-    return _UserTotalShareProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is UserTotalShareProvider && other.groupId == groupId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, groupId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
+  String toString() => r'userTotalShareProvider';
 }
-
-mixin UserTotalShareRef on AutoDisposeProviderRef<double> {
-  /// The parameter `groupId` of this provider.
-  String get groupId;
-}
-
-class _UserTotalShareProviderElement extends AutoDisposeProviderElement<double>
-    with UserTotalShareRef {
-  _UserTotalShareProviderElement(super.provider);
-
-  @override
-  String get groupId => (origin as UserTotalShareProvider).groupId;
-}
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

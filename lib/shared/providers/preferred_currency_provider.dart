@@ -55,7 +55,7 @@ class DashboardCurrency extends _$DashboardCurrency {
 
 /// Returns a list of currency codes that are actually used in groups or transactions.
 @riverpod
-List<String> usedCurrencies(UsedCurrenciesRef ref) {
+List<String> usedCurrencies(Ref ref) {
   final groups = ref.watch(groupsProvider);
   final transactions = ref.watch(transactionsProvider);
 

@@ -16,7 +16,7 @@ class ShowSimplifiedDebts extends _$ShowSimplifiedDebts {
 
 class GroupDetailScreenLogic {
   GroupDetailScreenLogic(this.ref);
-  final GroupDetailScreenLogicRef ref;
+  final Ref ref;
 
   String generateGroupSummaryText(String groupId) {
     final group = ref.read(selectedGroupProvider(groupId));
@@ -174,6 +174,6 @@ class GroupDetailScreenLogic {
 }
 
 @riverpod
-GroupDetailScreenLogic groupDetailScreenLogic(GroupDetailScreenLogicRef ref) {
+GroupDetailScreenLogic groupDetailScreenLogic(Ref ref) {
   return GroupDetailScreenLogic(ref);
 }

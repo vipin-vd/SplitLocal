@@ -8,7 +8,7 @@ part of 'transaction_type.dart';
 
 class TransactionTypeAdapter extends TypeAdapter<TransactionType> {
   @override
-  final int typeId = 2;
+  final typeId = 2;
 
   @override
   TransactionType read(BinaryReader reader) {
@@ -27,10 +27,8 @@ class TransactionTypeAdapter extends TypeAdapter<TransactionType> {
     switch (obj) {
       case TransactionType.expense:
         writer.writeByte(0);
-        break;
       case TransactionType.payment:
         writer.writeByte(1);
-        break;
     }
   }
 

@@ -3,25 +3,29 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 class ContactsService {
   /// Request permission to access contacts
   Future<bool> requestPermission() async {
-    return await FlutterContacts.requestPermission(readonly: true);
+    final status =
+        await FlutterContacts.permissions.request(PermissionType.read);
+    return status == PermissionStatus.granted;
   }
 
   /// Pick a contact from device contacts
   /// Returns a map with 'name' and 'phoneNumber' keys
   Future<Map<String, dynamic>?> pickContact() async {
     // Request permission if not granted
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
+    final status =
+        await FlutterContacts.permissions.request(PermissionType.read);
+    if (status != PermissionStatus.granted) {
       return null;
     }
 
     // Pick a contact
-    final contact = await FlutterContacts.openExternalPick();
-    if (contact == null) {
+    final contactId = await FlutterContacts.native.showPicker();
+    if (contactId == null) {
       return null;
     }
 
     // Get full contact details
-    final fullContact = await FlutterContacts.getContact(contact.id);
+    final fullContact = await FlutterContacts.get(contactId);
     if (fullContact == null) {
       return null;
     }
@@ -48,17 +52,16 @@ class ContactsService {
       return [];
     }
 
-    final contacts = await FlutterContacts.getContacts(
-      withProperties: true,
-      withPhoto: false,
-    );
+    final contacts = await FlutterContacts.getAll();
 
     if (query.isEmpty) {
       return contacts;
     }
 
     return contacts.where((contact) {
-      return contact.displayName.toLowerCase().contains(query.toLowerCase());
+      return (contact.displayName ?? '')
+          .toLowerCase()
+          .contains(query.toLowerCase());
     }).toList();
   }
 
@@ -69,9 +72,6 @@ class ContactsService {
       return [];
     }
 
-    return await FlutterContacts.getContacts(
-      withProperties: true,
-      withPhoto: false,
-    );
+    return await FlutterContacts.getAll();
   }
 }

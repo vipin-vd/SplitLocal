@@ -6,7 +6,7 @@ import 'transactions_provider.dart';
 part 'group_insights_provider.g.dart';
 
 @riverpod
-double userTotalPaid(UserTotalPaidRef ref, String groupId) {
+double userTotalPaid(Ref ref, String groupId) {
   final deviceOwner = ref.watch(deviceOwnerProvider);
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);
@@ -15,7 +15,7 @@ double userTotalPaid(UserTotalPaidRef ref, String groupId) {
 }
 
 @riverpod
-double userTotalShare(UserTotalShareRef ref, String groupId) {
+double userTotalShare(Ref ref, String groupId) {
   final deviceOwner = ref.watch(deviceOwnerProvider);
   final transactions = ref.watch(groupTransactionsProvider(groupId));
   final debtCalculator = ref.watch(debtCalculatorServiceProvider);

@@ -6,77 +6,192 @@ part of 'net_totals_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allNetBalancesHash() => r'ef2d332bb2ef223b355c501fd1615ce2f0fe305b';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Computes the device owner's net balances against all other users
+/// from all transactions across the app (friend groups + regular groups).
+
+@ProviderFor(allNetBalances)
+final allNetBalancesProvider = AllNetBalancesProvider._();
 
 /// Computes the device owner's net balances against all other users
 /// from all transactions across the app (friend groups + regular groups).
-///
-/// Copied from [allNetBalances].
-@ProviderFor(allNetBalances)
-final allNetBalancesProvider =
-    AutoDisposeProvider<Map<String, double>>.internal(
-  allNetBalances,
-  name: r'allNetBalancesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$allNetBalancesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef AllNetBalancesRef = AutoDisposeProviderRef<Map<String, double>>;
+final class AllNetBalancesProvider extends $FunctionalProvider<
+    Map<String, double>,
+    Map<String, double>,
+    Map<String, double>> with $Provider<Map<String, double>> {
+  /// Computes the device owner's net balances against all other users
+  /// from all transactions across the app (friend groups + regular groups).
+  AllNetBalancesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allNetBalancesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$allNetBalancesHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, double>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, double> create(Ref ref) {
+    return allNetBalances(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, double> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, double>>(value),
+    );
+  }
+}
+
+String _$allNetBalancesHash() => r'ef2d332bb2ef223b355c501fd1615ce2f0fe305b';
+
+/// Total amount the user is owed globally (sum of positive balances)
+
+@ProviderFor(totalOwedToUserGlobal)
+final totalOwedToUserGlobalProvider = TotalOwedToUserGlobalProvider._();
+
+/// Total amount the user is owed globally (sum of positive balances)
+
+final class TotalOwedToUserGlobalProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Total amount the user is owed globally (sum of positive balances)
+  TotalOwedToUserGlobalProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'totalOwedToUserGlobalProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$totalOwedToUserGlobalHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return totalOwedToUserGlobal(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
 String _$totalOwedToUserGlobalHash() =>
     r'b5ba6964124c2e42ba12ca1c90dbe802e0b7f410';
 
-/// Total amount the user is owed globally (sum of positive balances)
-///
-/// Copied from [totalOwedToUserGlobal].
-@ProviderFor(totalOwedToUserGlobal)
-final totalOwedToUserGlobalProvider = AutoDisposeProvider<double>.internal(
-  totalOwedToUserGlobal,
-  name: r'totalOwedToUserGlobalProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalOwedToUserGlobalHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Total amount the user owes globally (sum of negative balances, returned positive)
 
-typedef TotalOwedToUserGlobalRef = AutoDisposeProviderRef<double>;
+@ProviderFor(totalUserOwesGlobal)
+final totalUserOwesGlobalProvider = TotalUserOwesGlobalProvider._();
+
+/// Total amount the user owes globally (sum of negative balances, returned positive)
+
+final class TotalUserOwesGlobalProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Total amount the user owes globally (sum of negative balances, returned positive)
+  TotalUserOwesGlobalProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'totalUserOwesGlobalProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$totalUserOwesGlobalHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return totalUserOwesGlobal(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
 String _$totalUserOwesGlobalHash() =>
     r'5712febd82c097f7608969e4039b0717cb71b7ce';
 
-/// Total amount the user owes globally (sum of negative balances, returned positive)
-///
-/// Copied from [totalUserOwesGlobal].
-@ProviderFor(totalUserOwesGlobal)
-final totalUserOwesGlobalProvider = AutoDisposeProvider<double>.internal(
-  totalUserOwesGlobal,
-  name: r'totalUserOwesGlobalProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalUserOwesGlobalHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Net global balance (positive => others owe user, negative => user owes)
 
-typedef TotalUserOwesGlobalRef = AutoDisposeProviderRef<double>;
-String _$netBalanceGlobalHash() => r'71a3ac16c8ea50eb28f8524b024560da71244712';
+@ProviderFor(netBalanceGlobal)
+final netBalanceGlobalProvider = NetBalanceGlobalProvider._();
 
 /// Net global balance (positive => others owe user, negative => user owes)
-///
-/// Copied from [netBalanceGlobal].
-@ProviderFor(netBalanceGlobal)
-final netBalanceGlobalProvider = AutoDisposeProvider<double>.internal(
-  netBalanceGlobal,
-  name: r'netBalanceGlobalProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$netBalanceGlobalHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef NetBalanceGlobalRef = AutoDisposeProviderRef<double>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+final class NetBalanceGlobalProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Net global balance (positive => others owe user, negative => user owes)
+  NetBalanceGlobalProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'netBalanceGlobalProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$netBalanceGlobalHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return netBalanceGlobal(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$netBalanceGlobalHash() => r'71a3ac16c8ea50eb28f8524b024560da71244712';

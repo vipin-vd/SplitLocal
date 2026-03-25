@@ -8,7 +8,7 @@ part of 'group.dart';
 
 class GroupAdapter extends TypeAdapter<Group> {
   @override
-  final int typeId = 1;
+  final typeId = 1;
 
   @override
   Group read(BinaryReader reader) {
@@ -24,7 +24,7 @@ class GroupAdapter extends TypeAdapter<Group> {
       createdBy: fields[4] as String,
       createdAt: fields[5] as DateTime,
       updatedAt: fields[6] as DateTime?,
-      currency: fields[7] as String,
+      currency: fields[7] == null ? 'INR' : fields[7] as String,
       isFriendGroup: fields[8] == null ? false : fields[8] as bool,
     );
   }

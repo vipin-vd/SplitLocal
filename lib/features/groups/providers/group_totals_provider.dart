@@ -7,7 +7,7 @@ part 'group_totals_provider.g.dart';
 
 /// Total amount the user is owed across all non-friend groups
 @riverpod
-double totalOwedToUserAcrossGroups(TotalOwedToUserAcrossGroupsRef ref) {
+double totalOwedToUserAcrossGroups(Ref ref) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return 0.0;
 
@@ -25,7 +25,7 @@ double totalOwedToUserAcrossGroups(TotalOwedToUserAcrossGroupsRef ref) {
 
 /// Total amount the user owes across all non-friend groups (returned positive)
 @riverpod
-double totalUserOwesAcrossGroups(TotalUserOwesAcrossGroupsRef ref) {
+double totalUserOwesAcrossGroups(Ref ref) {
   final me = ref.watch(deviceOwnerProvider);
   if (me == null) return 0.0;
 
@@ -43,7 +43,7 @@ double totalUserOwesAcrossGroups(TotalUserOwesAcrossGroupsRef ref) {
 
 /// Net balance across all non-friend groups
 @riverpod
-double netBalanceAcrossGroups(NetBalanceAcrossGroupsRef ref) {
+double netBalanceAcrossGroups(Ref ref) {
   final owed = ref.watch(totalOwedToUserAcrossGroupsProvider);
   final owes = ref.watch(totalUserOwesAcrossGroupsProvider);
   final net = owed - owes;

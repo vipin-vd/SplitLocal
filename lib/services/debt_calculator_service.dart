@@ -201,7 +201,7 @@ class DebtCalculatorService {
   }
 
   /// Calculate total group spending grouped by currency
-  /// Returns Map<currencyCode, totalSpend>
+  /// Returns `Map<currencyCode, totalSpend>`
   Map<String, double> calculateTotalGroupSpendByCurrency(
     List<Transaction> transactions, {
     String? defaultCurrency,
@@ -217,7 +217,7 @@ class DebtCalculatorService {
   }
 
   /// Calculate net balances for all members grouped by currency
-  /// Returns Map<userId, Map<currencyCode, balance>>
+  /// Returns `Map<userId, Map<currencyCode, balance>>`
   Map<String, Map<String, double>> computeNetBalancesByCurrency(
     List<Transaction> transactions, {
     String? defaultCurrency,

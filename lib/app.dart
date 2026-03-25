@@ -12,7 +12,7 @@ class SplitLocalApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initialization = ref.watch(initializationProvider);
-    final themeMode = ref.watch(themeModeNotifierProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'SplitLocal',

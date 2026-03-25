@@ -6,54 +6,143 @@ part of 'preferred_currency_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$usedCurrenciesHash() => r'71572fbe3b7915d83a65f93adff611d7b1175b88';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Returns a list of currency codes that are actually used in groups or transactions.
-///
-/// Copied from [usedCurrencies].
-@ProviderFor(usedCurrencies)
-final usedCurrenciesProvider = AutoDisposeProvider<List<String>>.internal(
-  usedCurrencies,
-  name: r'usedCurrenciesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$usedCurrenciesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(PreferredCurrency)
+final preferredCurrencyProvider = PreferredCurrencyProvider._();
 
-typedef UsedCurrenciesRef = AutoDisposeProviderRef<List<String>>;
+final class PreferredCurrencyProvider
+    extends $NotifierProvider<PreferredCurrency, String> {
+  PreferredCurrencyProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'preferredCurrencyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$preferredCurrencyHash();
+
+  @$internal
+  @override
+  PreferredCurrency create() => PreferredCurrency();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$preferredCurrencyHash() => r'970ac23e9f896e3b7ee01a256cdce85929103ce2';
 
-/// See also [PreferredCurrency].
-@ProviderFor(PreferredCurrency)
-final preferredCurrencyProvider =
-    AutoDisposeNotifierProvider<PreferredCurrency, String>.internal(
-  PreferredCurrency.new,
-  name: r'preferredCurrencyProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$preferredCurrencyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$PreferredCurrency extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$PreferredCurrency = AutoDisposeNotifier<String>;
+@ProviderFor(DashboardCurrency)
+final dashboardCurrencyProvider = DashboardCurrencyProvider._();
+
+final class DashboardCurrencyProvider
+    extends $NotifierProvider<DashboardCurrency, String> {
+  DashboardCurrencyProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dashboardCurrencyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dashboardCurrencyHash();
+
+  @$internal
+  @override
+  DashboardCurrency create() => DashboardCurrency();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$dashboardCurrencyHash() => r'0c757233353895acd730331ec90349b945c1b4ed';
 
-/// See also [DashboardCurrency].
-@ProviderFor(DashboardCurrency)
-final dashboardCurrencyProvider =
-    AutoDisposeNotifierProvider<DashboardCurrency, String>.internal(
-  DashboardCurrency.new,
-  name: r'dashboardCurrencyProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$dashboardCurrencyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$DashboardCurrency extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$DashboardCurrency = AutoDisposeNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+/// Returns a list of currency codes that are actually used in groups or transactions.
+
+@ProviderFor(usedCurrencies)
+final usedCurrenciesProvider = UsedCurrenciesProvider._();
+
+/// Returns a list of currency codes that are actually used in groups or transactions.
+
+final class UsedCurrenciesProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// Returns a list of currency codes that are actually used in groups or transactions.
+  UsedCurrenciesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'usedCurrenciesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$usedCurrenciesHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return usedCurrencies(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$usedCurrenciesHash() => r'71572fbe3b7915d83a65f93adff611d7b1175b88';

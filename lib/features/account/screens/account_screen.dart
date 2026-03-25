@@ -98,7 +98,7 @@ class AccountScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Consumer(
                     builder: (context, ref, child) {
-                      final themeMode = ref.watch(themeModeNotifierProvider);
+                      final themeMode = ref.watch(themeModeProvider);
                       return DropdownButtonFormField<ThemeMode>(
                         initialValue: themeMode,
                         decoration: const InputDecoration(
@@ -123,7 +123,7 @@ class AccountScreen extends ConsumerWidget {
                         onChanged: (value) {
                           if (value != null) {
                             ref
-                                .read(themeModeNotifierProvider.notifier)
+                                .read(themeModeProvider.notifier)
                                 .setThemeMode(value);
                           }
                         },

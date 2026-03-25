@@ -20,10 +20,19 @@ import 'package:splitlocal/services/debt_calculator_service.dart';
 import 'package:splitlocal/shared/widgets/currency_selector.dart';
 import 'package:splitlocal/shared/providers/preferred_currency_provider.dart';
 
+class SelectedCurrencyNotifier extends Notifier<Map<String, String>> {
+  @override
+  Map<String, String> build() => {};
+
+  void updateCurrency(String groupId, String value) {
+    state = {...state, groupId: value};
+  }
+}
+
 final _selectedCurrencyProvider =
-    StateProvider.autoDispose.family<String, String>((ref, defaultCurrency) {
-  return defaultCurrency;
-});
+    NotifierProvider<SelectedCurrencyNotifier, Map<String, String>>(
+  SelectedCurrencyNotifier.new,
+);
 
 class GroupDetailScreen extends ConsumerWidget {
   final String groupId;
@@ -201,8 +210,8 @@ class _GroupStatsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final group = ref.watch(selectedGroupProvider(groupId))!;
     final transactions = ref.watch(groupTransactionsProvider(groupId));
-    final selectedCurrency =
-        ref.watch(_selectedCurrencyProvider(group.currency));
+    final currencyMap = ref.watch(_selectedCurrencyProvider);
+    final selectedCurrency = currencyMap[group.id] ?? group.currency;
 
     // Filter transactions by selected currency
     final filteredTransactions = transactions
@@ -236,10 +245,8 @@ class _GroupStatsCard extends ConsumerWidget {
                   availableCurrencies: ref.watch(usedCurrenciesProvider),
                   onChanged: (val) {
                     ref
-                        .read(
-                          _selectedCurrencyProvider(group.currency).notifier,
-                        )
-                        .state = val;
+                        .read(_selectedCurrencyProvider.notifier)
+                        .updateCurrency(group.id, val);
                   },
                 ),
               ],
@@ -319,8 +326,8 @@ class _BalancesSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final group = ref.watch(selectedGroupProvider(groupId))!;
     final transactions = ref.watch(groupTransactionsProvider(groupId));
-    final selectedCurrency =
-        ref.watch(_selectedCurrencyProvider(group.currency));
+    final currencyMap = ref.watch(_selectedCurrencyProvider);
+    final selectedCurrency = currencyMap[group.id] ?? group.currency;
 
     // Filter transactions by selected currency
     final filteredTransactions = transactions

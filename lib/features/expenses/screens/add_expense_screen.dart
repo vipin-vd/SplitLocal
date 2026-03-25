@@ -9,10 +9,11 @@ import '../../../../shared/utils/dialogs.dart';
 import '../../../../shared/utils/formatters.dart';
 import '../widgets/category_selector_dialog.dart';
 import '../widgets/currency_selector_dialog.dart';
+import '../widgets/calculator_amount_field.dart';
 import 'paid_by_screen.dart';
 import 'split_method_screen.dart';
 
-class AddExpenseScreen extends ConsumerWidget {
+class AddExpenseScreen extends ConsumerStatefulWidget {
   final String groupId;
   final Transaction? transaction; // Optional - for edit mode
 
@@ -23,8 +24,21 @@ class AddExpenseScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final provider = addExpenseFormProvider(groupId, transaction);
+  ConsumerState<AddExpenseScreen> createState() => _AddExpenseScreenState();
+}
+
+class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
+  final ValueNotifier<bool> _isKeyboardVisible = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _isKeyboardVisible.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = addExpenseFormProvider(widget.groupId, widget.transaction);
     final formState = ref.watch(provider);
     final formNotifier = ref.read(provider.notifier);
 
@@ -35,7 +49,7 @@ class AddExpenseScreen extends ConsumerWidget {
       }
     });
 
-    final group = ref.watch(selectedGroupProvider(groupId));
+    final group = ref.watch(selectedGroupProvider(widget.groupId));
 
     if (group == null) {
       return Scaffold(
@@ -46,36 +60,74 @@ class AddExpenseScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(transaction != null ? 'Edit Expense' : 'Add Expense'),
+        title:
+            Text(widget.transaction != null ? 'Edit Expense' : 'Add Expense'),
       ),
-      body: Form(
-        key: formState.formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _DescriptionAndAmountSection(
-              formState: formState,
-              formNotifier: formNotifier,
+      body: Column(
+        children: [
+          Expanded(
+            child: Form(
+              key: formState.formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _DescriptionAndAmountSection(
+                    formState: formState,
+                    formNotifier: formNotifier,
+                    onKeyboardToggle: (isVisible) =>
+                        _isKeyboardVisible.value = isVisible,
+                    bottomSheetAccessory: _SaveButton(
+                      formState: formState,
+                      formNotifier: formNotifier,
+                      isKeyboardVisible: true,
+                      onSaved: () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          final message = formState.initialTransaction != null
+                              ? 'Expense updated successfully'
+                              : 'Expense added successfully';
+                          showSnackBar(context, message);
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _PaidByAndSplitSection(
+                    groupId: widget.groupId,
+                    formState: formState,
+                    formNotifier: formNotifier,
+                  ),
+                  const SizedBox(height: 16),
+                  _NotesSection(formState: formState),
+                  const SizedBox(height: 16),
+                  _RecurringExpenseSection(
+                    formState: formState,
+                    formNotifier: formNotifier,
+                  ),
+                  // Add padding so the list can scroll past the button
+                  const SizedBox(height: 80),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-            _PaidByAndSplitSection(
-              groupId: groupId,
-              formState: formState,
-              formNotifier: formNotifier,
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: _isKeyboardVisible,
+            builder: (context, isVisible, child) {
+              if (isVisible)
+                return const SizedBox
+                    .shrink(); // Hide the native button when custom keyboard is up
+              return child!;
+            },
+            child: Container(
+              width: double.infinity,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: _SaveButton(
+                formState: formState,
+                formNotifier: formNotifier,
+              ),
             ),
-            const SizedBox(height: 16),
-            _NotesSection(formState: formState),
-            const SizedBox(height: 16),
-            _RecurringExpenseSection(
-              formState: formState,
-              formNotifier: formNotifier,
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _SaveButton(
-        formState: formState,
-        formNotifier: formNotifier,
+          ),
+        ],
       ),
     );
   }
@@ -84,10 +136,14 @@ class AddExpenseScreen extends ConsumerWidget {
 class _DescriptionAndAmountSection extends ConsumerWidget {
   final AddExpenseFormState formState;
   final AddExpenseForm formNotifier;
+  final ValueChanged<bool>? onKeyboardToggle;
+  final Widget? bottomSheetAccessory;
 
   const _DescriptionAndAmountSection({
     required this.formState,
     required this.formNotifier,
+    this.onKeyboardToggle,
+    this.bottomSheetAccessory,
   });
 
   Future<void> _openCategorySelector(BuildContext context) async {
@@ -141,24 +197,12 @@ class _DescriptionAndAmountSection extends ConsumerWidget {
           },
         ),
         const SizedBox(height: 16),
-        TextFormField(
+        CalculatorAmountField(
           controller: formState.amountController,
-          decoration: InputDecoration(
-            labelText: 'Total Amount',
-            hintText: '0.00',
-            prefixIcon: IconButton(
-              icon: Text(
-                CurrencySelectorDialog.getCurrencySymbol(
-                  formState.selectedCurrency,
-                ),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              onPressed: () => _openCurrencySelector(context),
-              tooltip: 'Change Currency',
-            ),
+          currencySymbol: CurrencySelectorDialog.getCurrencySymbol(
+            formState.selectedCurrency,
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          onCurrencySelect: () => _openCurrencySelector(context),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Please enter an amount';
@@ -169,6 +213,8 @@ class _DescriptionAndAmountSection extends ConsumerWidget {
             }
             return null;
           },
+          onKeyboardToggle: onKeyboardToggle,
+          bottomSheetAccessory: bottomSheetAccessory,
         ),
       ],
     );
@@ -428,28 +474,38 @@ class _RecurringExpenseSection extends StatelessWidget {
 class _SaveButton extends StatelessWidget {
   final AddExpenseFormState formState;
   final AddExpenseForm formNotifier;
+  final bool isKeyboardVisible;
+  final VoidCallback? onSaved;
 
   const _SaveButton({
     required this.formState,
     required this.formNotifier,
+    this.isKeyboardVisible = false,
+    this.onSaved,
   });
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      bottom: !isKeyboardVisible,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.only(
+            left: 16, right: 16, bottom: isKeyboardVisible ? 8 : 16, top: 8),
         child: ElevatedButton(
           onPressed: formState.isSaving
               ? null
               : () async {
                   final success = await formNotifier.saveExpense();
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
-                    final message = formState.initialTransaction != null
-                        ? 'Expense updated successfully'
-                        : 'Expense added successfully';
-                    showSnackBar(context, message);
+                  if (success) {
+                    if (onSaved != null) {
+                      onSaved!();
+                    } else if (context.mounted) {
+                      Navigator.pop(context);
+                      final message = formState.initialTransaction != null
+                          ? 'Expense updated successfully'
+                          : 'Expense added successfully';
+                      showSnackBar(context, message);
+                    }
                   }
                 },
           style: ElevatedButton.styleFrom(

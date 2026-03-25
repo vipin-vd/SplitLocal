@@ -6,153 +6,158 @@ part of 'friend_balance_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$friendBalanceHash() => r'4e206764c560ab7483e753e96ceff9c665ccf5ce';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [friendBalance].
 @ProviderFor(friendBalance)
-const friendBalanceProvider = FriendBalanceFamily();
+final friendBalanceProvider = FriendBalanceFamily._();
 
-/// See also [friendBalance].
-class FriendBalanceFamily extends Family<double> {
-  /// See also [friendBalance].
-  const FriendBalanceFamily();
-
-  /// See also [friendBalance].
-  FriendBalanceProvider call(
-    String friendId,
-  ) {
-    return FriendBalanceProvider(
-      friendId,
-    );
-  }
-
-  @override
-  FriendBalanceProvider getProviderOverride(
-    covariant FriendBalanceProvider provider,
-  ) {
-    return call(
-      provider.friendId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'friendBalanceProvider';
-}
-
-/// See also [friendBalance].
-class FriendBalanceProvider extends AutoDisposeProvider<double> {
-  /// See also [friendBalance].
-  FriendBalanceProvider(
-    String friendId,
-  ) : this._internal(
-          (ref) => friendBalance(
-            ref as FriendBalanceRef,
-            friendId,
-          ),
-          from: friendBalanceProvider,
+final class FriendBalanceProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  FriendBalanceProvider._(
+      {required FriendBalanceFamily super.from, required String super.argument})
+      : super(
+          retry: null,
           name: r'friendBalanceProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$friendBalanceHash,
-          dependencies: FriendBalanceFamily._dependencies,
-          allTransitiveDependencies:
-              FriendBalanceFamily._allTransitiveDependencies,
-          friendId: friendId,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  FriendBalanceProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.friendId,
-  }) : super.internal();
-
-  final String friendId;
+  @override
+  String debugGetCreateSourceHash() => _$friendBalanceHash();
 
   @override
-  Override overrideWith(
-    double Function(FriendBalanceRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: FriendBalanceProvider._internal(
-        (ref) => create(ref as FriendBalanceRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        friendId: friendId,
-      ),
+  String toString() {
+    return r'friendBalanceProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    final argument = this.argument as String;
+    return friendBalance(
+      ref,
+      argument,
     );
   }
 
-  @override
-  AutoDisposeProviderElement<double> createElement() {
-    return _FriendBalanceProviderElement(this);
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is FriendBalanceProvider && other.friendId == friendId;
+    return other is FriendBalanceProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, friendId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-mixin FriendBalanceRef on AutoDisposeProviderRef<double> {
-  /// The parameter `friendId` of this provider.
-  String get friendId;
-}
+String _$friendBalanceHash() => r'4e206764c560ab7483e753e96ceff9c665ccf5ce';
 
-class _FriendBalanceProviderElement extends AutoDisposeProviderElement<double>
-    with FriendBalanceRef {
-  _FriendBalanceProviderElement(super.provider);
+final class FriendBalanceFamily extends $Family
+    with $FunctionalFamilyOverride<double, String> {
+  FriendBalanceFamily._()
+      : super(
+          retry: null,
+          name: r'friendBalanceProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  FriendBalanceProvider call(
+    String friendId,
+  ) =>
+      FriendBalanceProvider._(argument: friendId, from: this);
 
   @override
-  String get friendId => (origin as FriendBalanceProvider).friendId;
+  String toString() => r'friendBalanceProvider';
+}
+
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+
+@ProviderFor(friendBalanceByCurrency)
+final friendBalanceByCurrencyProvider = FriendBalanceByCurrencyFamily._();
+
+/// Returns friend balance grouped by currency code.
+/// Positive values mean friend owes you, negative means you owe them.
+
+final class FriendBalanceByCurrencyProvider extends $FunctionalProvider<
+    Map<String, double>,
+    Map<String, double>,
+    Map<String, double>> with $Provider<Map<String, double>> {
+  /// Returns friend balance grouped by currency code.
+  /// Positive values mean friend owes you, negative means you owe them.
+  FriendBalanceByCurrencyProvider._(
+      {required FriendBalanceByCurrencyFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'friendBalanceByCurrencyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$friendBalanceByCurrencyHash();
+
+  @override
+  String toString() {
+    return r'friendBalanceByCurrencyProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, double>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, double> create(Ref ref) {
+    final argument = this.argument as String;
+    return friendBalanceByCurrency(
+      ref,
+      argument,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, double> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, double>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FriendBalanceByCurrencyProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$friendBalanceByCurrencyHash() =>
@@ -160,259 +165,311 @@ String _$friendBalanceByCurrencyHash() =>
 
 /// Returns friend balance grouped by currency code.
 /// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [friendBalanceByCurrency].
-@ProviderFor(friendBalanceByCurrency)
-const friendBalanceByCurrencyProvider = FriendBalanceByCurrencyFamily();
 
-/// Returns friend balance grouped by currency code.
-/// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [friendBalanceByCurrency].
-class FriendBalanceByCurrencyFamily extends Family<Map<String, double>> {
-  /// Returns friend balance grouped by currency code.
-  /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [friendBalanceByCurrency].
-  const FriendBalanceByCurrencyFamily();
-
-  /// Returns friend balance grouped by currency code.
-  /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [friendBalanceByCurrency].
-  FriendBalanceByCurrencyProvider call(
-    String friendId,
-  ) {
-    return FriendBalanceByCurrencyProvider(
-      friendId,
-    );
-  }
-
-  @override
-  FriendBalanceByCurrencyProvider getProviderOverride(
-    covariant FriendBalanceByCurrencyProvider provider,
-  ) {
-    return call(
-      provider.friendId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'friendBalanceByCurrencyProvider';
-}
-
-/// Returns friend balance grouped by currency code.
-/// Positive values mean friend owes you, negative means you owe them.
-///
-/// Copied from [friendBalanceByCurrency].
-class FriendBalanceByCurrencyProvider
-    extends AutoDisposeProvider<Map<String, double>> {
-  /// Returns friend balance grouped by currency code.
-  /// Positive values mean friend owes you, negative means you owe them.
-  ///
-  /// Copied from [friendBalanceByCurrency].
-  FriendBalanceByCurrencyProvider(
-    String friendId,
-  ) : this._internal(
-          (ref) => friendBalanceByCurrency(
-            ref as FriendBalanceByCurrencyRef,
-            friendId,
-          ),
-          from: friendBalanceByCurrencyProvider,
+final class FriendBalanceByCurrencyFamily extends $Family
+    with $FunctionalFamilyOverride<Map<String, double>, String> {
+  FriendBalanceByCurrencyFamily._()
+      : super(
+          retry: null,
           name: r'friendBalanceByCurrencyProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$friendBalanceByCurrencyHash,
-          dependencies: FriendBalanceByCurrencyFamily._dependencies,
-          allTransitiveDependencies:
-              FriendBalanceByCurrencyFamily._allTransitiveDependencies,
-          friendId: friendId,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  FriendBalanceByCurrencyProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.friendId,
-  }) : super.internal();
+  /// Returns friend balance grouped by currency code.
+  /// Positive values mean friend owes you, negative means you owe them.
 
-  final String friendId;
+  FriendBalanceByCurrencyProvider call(
+    String friendId,
+  ) =>
+      FriendBalanceByCurrencyProvider._(argument: friendId, from: this);
 
   @override
-  Override overrideWith(
-    Map<String, double> Function(FriendBalanceByCurrencyRef provider) create,
-  ) {
-    return ProviderOverride(
+  String toString() => r'friendBalanceByCurrencyProvider';
+}
+
+/// Provides a map of all friend balances to avoid per-item watches during filtering
+
+@ProviderFor(allFriendBalances)
+final allFriendBalancesProvider = AllFriendBalancesProvider._();
+
+/// Provides a map of all friend balances to avoid per-item watches during filtering
+
+final class AllFriendBalancesProvider extends $FunctionalProvider<
+    Map<String, double>,
+    Map<String, double>,
+    Map<String, double>> with $Provider<Map<String, double>> {
+  /// Provides a map of all friend balances to avoid per-item watches during filtering
+  AllFriendBalancesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allFriendBalancesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$allFriendBalancesHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, double>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, double> create(Ref ref) {
+    return allFriendBalances(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, double> value) {
+    return $ProviderOverride(
       origin: this,
-      override: FriendBalanceByCurrencyProvider._internal(
-        (ref) => create(ref as FriendBalanceByCurrencyRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        friendId: friendId,
-      ),
+      providerOverride: $SyncValueProvider<Map<String, double>>(value),
     );
   }
-
-  @override
-  AutoDisposeProviderElement<Map<String, double>> createElement() {
-    return _FriendBalanceByCurrencyProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is FriendBalanceByCurrencyProvider &&
-        other.friendId == friendId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, friendId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin FriendBalanceByCurrencyRef
-    on AutoDisposeProviderRef<Map<String, double>> {
-  /// The parameter `friendId` of this provider.
-  String get friendId;
-}
-
-class _FriendBalanceByCurrencyProviderElement
-    extends AutoDisposeProviderElement<Map<String, double>>
-    with FriendBalanceByCurrencyRef {
-  _FriendBalanceByCurrencyProviderElement(super.provider);
-
-  @override
-  String get friendId => (origin as FriendBalanceByCurrencyProvider).friendId;
 }
 
 String _$allFriendBalancesHash() => r'd99e37b03ec6e0f916c32fe06f22c01d08a66e84';
 
-/// Provides a map of all friend balances to avoid per-item watches during filtering
-///
-/// Copied from [allFriendBalances].
-@ProviderFor(allFriendBalances)
-final allFriendBalancesProvider =
-    AutoDisposeProvider<Map<String, double>>.internal(
-  allFriendBalances,
-  name: r'allFriendBalancesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$allFriendBalancesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Provides a map of all friend balances grouped by currency
+/// Map<FriendId, Map<CurrencyCode, Balance>>
 
-typedef AllFriendBalancesRef = AutoDisposeProviderRef<Map<String, double>>;
-String _$allFriendBalancesByCurrencyHash() =>
-    r'4b8e7bd3f7e5a1a20c45be547e33aed113a2b2c1';
+@ProviderFor(allFriendBalancesByCurrency)
+final allFriendBalancesByCurrencyProvider =
+    AllFriendBalancesByCurrencyProvider._();
 
 /// Provides a map of all friend balances grouped by currency
 /// Map<FriendId, Map<CurrencyCode, Balance>>
-///
-/// Copied from [allFriendBalancesByCurrency].
-@ProviderFor(allFriendBalancesByCurrency)
-final allFriendBalancesByCurrencyProvider =
-    AutoDisposeProvider<Map<String, Map<String, double>>>.internal(
-  allFriendBalancesByCurrency,
-  name: r'allFriendBalancesByCurrencyProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$allFriendBalancesByCurrencyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef AllFriendBalancesByCurrencyRef
-    = AutoDisposeProviderRef<Map<String, Map<String, double>>>;
+final class AllFriendBalancesByCurrencyProvider extends $FunctionalProvider<
+        Map<String, Map<String, double>>,
+        Map<String, Map<String, double>>,
+        Map<String, Map<String, double>>>
+    with $Provider<Map<String, Map<String, double>>> {
+  /// Provides a map of all friend balances grouped by currency
+  /// Map<FriendId, Map<CurrencyCode, Balance>>
+  AllFriendBalancesByCurrencyProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allFriendBalancesByCurrencyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$allFriendBalancesByCurrencyHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, Map<String, double>>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, Map<String, double>> create(Ref ref) {
+    return allFriendBalancesByCurrency(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, Map<String, double>> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<Map<String, Map<String, double>>>(value),
+    );
+  }
+}
+
+String _$allFriendBalancesByCurrencyHash() =>
+    r'4b8e7bd3f7e5a1a20c45be547e33aed113a2b2c1';
+
+/// Provides list of friend IDs with zero balances (settled up or new friends)
+
+@ProviderFor(zeroBalanceFriendIds)
+final zeroBalanceFriendIdsProvider = ZeroBalanceFriendIdsProvider._();
+
+/// Provides list of friend IDs with zero balances (settled up or new friends)
+
+final class ZeroBalanceFriendIdsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// Provides list of friend IDs with zero balances (settled up or new friends)
+  ZeroBalanceFriendIdsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'zeroBalanceFriendIdsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$zeroBalanceFriendIdsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return zeroBalanceFriendIds(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
 String _$zeroBalanceFriendIdsHash() =>
     r'0c964f75270de06890889cece27bfe8ea33299d7';
 
-/// Provides list of friend IDs with zero balances (settled up or new friends)
-///
-/// Copied from [zeroBalanceFriendIds].
-@ProviderFor(zeroBalanceFriendIds)
-final zeroBalanceFriendIdsProvider = AutoDisposeProvider<List<String>>.internal(
-  zeroBalanceFriendIds,
-  name: r'zeroBalanceFriendIdsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$zeroBalanceFriendIdsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Total amount the user is owed by all friends (sum of positive balances)
 
-typedef ZeroBalanceFriendIdsRef = AutoDisposeProviderRef<List<String>>;
-String _$totalOwedToUserHash() => r'8591f5a69d1c6797d151797230721f76ccae4ec0';
+@ProviderFor(totalOwedToUser)
+final totalOwedToUserProvider = TotalOwedToUserProvider._();
 
 /// Total amount the user is owed by all friends (sum of positive balances)
-///
-/// Copied from [totalOwedToUser].
-@ProviderFor(totalOwedToUser)
-final totalOwedToUserProvider = AutoDisposeProvider<double>.internal(
-  totalOwedToUser,
-  name: r'totalOwedToUserProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalOwedToUserHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef TotalOwedToUserRef = AutoDisposeProviderRef<double>;
-String _$totalUserOwesHash() => r'f8a651526bba514e48811445a69a861e317fc974';
+final class TotalOwedToUserProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Total amount the user is owed by all friends (sum of positive balances)
+  TotalOwedToUserProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'totalOwedToUserProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$totalOwedToUserHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return totalOwedToUser(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$totalOwedToUserHash() => r'8591f5a69d1c6797d151797230721f76ccae4ec0';
 
 /// Total amount the user owes to all friends (sum of negative balances, returned positive)
-///
-/// Copied from [totalUserOwes].
-@ProviderFor(totalUserOwes)
-final totalUserOwesProvider = AutoDisposeProvider<double>.internal(
-  totalUserOwes,
-  name: r'totalUserOwesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalUserOwesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef TotalUserOwesRef = AutoDisposeProviderRef<double>;
-String _$netFriendBalanceHash() => r'73570694a92e829959cdb9d67dd02e1404b16e5f';
+@ProviderFor(totalUserOwes)
+final totalUserOwesProvider = TotalUserOwesProvider._();
+
+/// Total amount the user owes to all friends (sum of negative balances, returned positive)
+
+final class TotalUserOwesProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Total amount the user owes to all friends (sum of negative balances, returned positive)
+  TotalUserOwesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'totalUserOwesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$totalUserOwesHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return totalUserOwes(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$totalUserOwesHash() => r'f8a651526bba514e48811445a69a861e317fc974';
 
 /// Net balance across all friends (positive => friends owe user, negative => user owes)
-///
-/// Copied from [netFriendBalance].
-@ProviderFor(netFriendBalance)
-final netFriendBalanceProvider = AutoDisposeProvider<double>.internal(
-  netFriendBalance,
-  name: r'netFriendBalanceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$netFriendBalanceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef NetFriendBalanceRef = AutoDisposeProviderRef<double>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+@ProviderFor(netFriendBalance)
+final netFriendBalanceProvider = NetFriendBalanceProvider._();
+
+/// Net balance across all friends (positive => friends owe user, negative => user owes)
+
+final class NetFriendBalanceProvider
+    extends $FunctionalProvider<double, double, double> with $Provider<double> {
+  /// Net balance across all friends (positive => friends owe user, negative => user owes)
+  NetFriendBalanceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'netFriendBalanceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$netFriendBalanceHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return netFriendBalance(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$netFriendBalanceHash() => r'73570694a92e829959cdb9d67dd02e1404b16e5f';

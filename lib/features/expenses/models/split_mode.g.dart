@@ -8,7 +8,7 @@ part of 'split_mode.dart';
 
 class SplitModeAdapter extends TypeAdapter<SplitMode> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   SplitMode read(BinaryReader reader) {
@@ -31,16 +31,12 @@ class SplitModeAdapter extends TypeAdapter<SplitMode> {
     switch (obj) {
       case SplitMode.equal:
         writer.writeByte(0);
-        break;
       case SplitMode.unequal:
         writer.writeByte(1);
-        break;
       case SplitMode.percent:
         writer.writeByte(2);
-        break;
       case SplitMode.shares:
         writer.writeByte(3);
-        break;
     }
   }
 
